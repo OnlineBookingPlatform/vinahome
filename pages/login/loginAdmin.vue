@@ -130,7 +130,6 @@ const submitForm = () => {
     text-decoration: none;
     font-size: 14px;
     text-align: right;
-    flex-grow: 1;
 }
 
 .forgot-password:hover {
