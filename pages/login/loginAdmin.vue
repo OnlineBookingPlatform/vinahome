@@ -84,7 +84,7 @@ const submitForm = () => {
 
 .submit-btn {
     width: 100%;
-    padding: 10px 0;
+    padding: 23px 0;
 }
 
 .username-input {
