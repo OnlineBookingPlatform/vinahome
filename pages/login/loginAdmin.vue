@@ -74,7 +74,7 @@ const submitForm = () => {
 
 .content-section {
     padding: 30px;
-    width: 1000%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -84,7 +84,7 @@ const submitForm = () => {
 
 .submit-btn {
     width: 100%;
-    height: 25%;
+    padding: 10px 0;
 }
 
 .username-input {
@@ -137,16 +137,17 @@ const submitForm = () => {
     text-decoration: underline;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 400px) { 
     .extra-options {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .forgot-password {
+    .forgot-password {    
         text-align: left;
         width: 100%;
         margin-top: 5px;
     }
 }
+
 </style>
