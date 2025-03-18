@@ -111,20 +111,42 @@ const submitForm = () => {
     margin-top: 20px;
     align-items: center;
 }
+
 .extra-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.extra-options .el-checkbox {
+    flex-shrink: 0;
 }
 
 .forgot-password {
     color: #409eff;
     text-decoration: none;
     font-size: 14px;
+    text-align: right;
+    flex-grow: 1;
 }
 
 .forgot-password:hover {
     text-decoration: underline;
+}
+
+@media (max-width: 400px) {
+    .extra-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .forgot-password {
+        text-align: left;
+        width: 100%;
+        margin-top: 5px;
+    }
 }
 </style>
