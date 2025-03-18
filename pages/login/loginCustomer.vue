@@ -15,12 +15,12 @@
                         </el-form-item>
 
                         <el-form-item prop="password">
-                            <el-input v-model="form.password" type="password" class="password-input "  prop="password" placeholder="Enter your password" show-password size="large" />
+                            <el-input v-model="form.password" type="password" class="password-input "  prop="password" placeholder="Nhập mật khẩu" show-password size="large" />
                         </el-form-item>
                     </div>
 
-                    <el-button type="primary" class="submit-btn" @click="submitForm">Log In</el-button>
-                    <p class="login-link">Don't have an account? <a href="/register" class="link">Sign up</a></p>
+                    <el-button type="primary" class="submit-btn" @click="submitForm">Đăng nhập</el-button>
+                    <p class="login-link">Bạn chưa có tài khoản? <a href="/register" class="link">Đăng ký</a></p>
 
                     <div class="divider">Đăng nhập bằng cách khác</div>
                     <div class="social-login">
@@ -132,7 +132,7 @@ const submitForm = () => {
     text-decoration: underline;
 }
 
-.email-input {
+.username-input {
     font-size: 1rem;
 }
 

@@ -7,13 +7,13 @@
                 <el-form :model="form" class="login-form" :rules="rules">
                     <div class="login-input">
                         <el-form-item prop="username">
-                            <el-input v-model="form.username" placeholder="Nhập tên đăng nhập..." class="username-input"
+                            <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input"
                                 size="large" />
                         </el-form-item>
 
                         <el-form-item prop="password">
                             <el-input v-model="form.password" type="password" class="password-input"
-                                placeholder="Nhập mật khẩu..." show-password size="large" />
+                                placeholder="Nhập mật khẩu" show-password size="large" />
                         </el-form-item>
                     </div>
 
@@ -22,7 +22,7 @@
                         <a href="/forgot-password" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
-                    <el-button type="primary" class="submit-btn" @click="submitForm">Log In</el-button>
+                    <el-button type="primary" class="submit-btn" @click="submitForm">Đăng nhập</el-button>
                 </el-form>
             </div>
         </div>
