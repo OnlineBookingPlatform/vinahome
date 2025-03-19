@@ -3,8 +3,7 @@
         <div class="form">
             <div class="content-section">
                 <img src="/static/logo-4.png" alt="Logo" class="app-logo" />
-
-                <el-form :model="form" class="login-form" :rules="rules">
+                <el-form ref="loginForm" :model="form" class="login-form" :rules="rules">
                     <div class="login-input">
                         <el-form-item prop="username">
                             <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input"
@@ -30,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 const form = reactive({
     username: '',
@@ -39,12 +38,29 @@ const form = reactive({
 });
 
 const rules = {
-    username: [{ required: true, message: 'Vui lòng nhập tên đăng nhập', trigger: 'blur' }],
-    password: [{ required: true, message: 'Vui lòng nhập mật khẩu', trigger: 'blur' }, { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự', trigger: 'blur' }],
+    username: [
+        { required: true, message: 'Vui lòng nhập tên đăng nhập', trigger: 'blur' }
+    ],
+    password: [
+        { required: true, message: 'Vui lòng nhập mật khẩu', trigger: 'blur' },
+        { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự', trigger: 'blur' }
+    ],
 };
 
+const loginForm = ref();
 const submitForm = () => {
-    console.log('Đăng nhập với:', form);
+    loginForm.value.validate((valid: boolean) => {
+        if (valid) {
+            const loginData = {
+                username: form.username,
+                password: form.password,
+                rememberMe: false,
+            };
+            console.log(JSON.stringify(loginData, null, 2)); 
+        } else {
+            console.log("Form không hợp lệ, vui lòng kiểm tra lại!");
+        }
+    });
 };
 </script>
 
@@ -136,17 +152,16 @@ const submitForm = () => {
     text-decoration: underline;
 }
 
-@media (max-width: 400px) { 
+@media (max-width: 400px) {
     .extra-options {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .forgot-password {    
+    .forgot-password {
         text-align: left;
         width: 100%;
         margin-top: 5px;
     }
 }
-
 </style>

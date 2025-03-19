@@ -8,7 +8,7 @@
             <div class="content-section">
                 <img src="/static/logo-4.png" alt="Logo" class="app-logo" />
                 <p class="tagline">Đặt vé dễ dàng - Hành trình thuận tiện!</p>
-                <el-form :model="form"  class="login-form" :rules="rules">
+                <el-form ref="loginForm" :model="form"  class="login-form" :rules="rules">
                     <div class="login-input">
                         <el-form-item prop="username">
                             <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input" size="large" />
@@ -52,13 +52,17 @@ const rules = {
 };
 
 const loginForm = ref();
-
 const submitForm = () => {
     loginForm.value.validate((valid: boolean) => {
         if (valid) {
-            console.log('Login info:', form);
+            const loginData = {
+                username: form.username,
+                password: form.password,
+            };
+
+            console.log(JSON.stringify(loginData, null, 2)); 
         } else {
-            console.log('Validation failed');
+            console.log("Form không hợp lệ, vui lòng kiểm tra lại!");
         }
     });
 };
