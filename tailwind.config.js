@@ -7,18 +7,29 @@ export default {
     extend: {
       container: {
         center: true,
-        padding: "50px",
+        padding: {
+          DEFAULT: "16px",
+          md: "50px",
+          "2xl": "150px",
+        },
       },
       screens: {
         "2xl": "1440px",
       },
       colors: {
         foreground: {
-          DEFAULT: "hsl(180,4%,5%)",
+          DEFAULT: "hsla(239, 100%, 10%, 1)",
         },
         primary: {
-          DEFAULT: "hsl(204,82%,55%)",
-          600: "hsl(204,82%,40%)",
+          DEFAULT: "hsla(200, 100%, 51%, 1)",
+          200: "hsla(199, 100%, 94%, 1)",
+          600: "hsl(204, 82%, 40%)",
+        },
+        stroke: {
+          DEFAULT: "hsl(213, 29%, 92%)",
+        },
+        muted: {
+          DEFAULT: "hsla(213, 2%, 57%, 1)",
         },
       },
     },
@@ -54,6 +65,13 @@ export default {
           fontSize: theme("fontSize.sm"),
           fontWeight: theme("fontWeight.semibold"),
           display: "block",
+        },
+      });
+
+      addComponents({
+        ".span-gradient": {
+          background:
+            "linear-gradient(90deg,  #01B0FF -20%, #147BFF 90%, #02AFFF 105.17%)",
         },
       });
     }),
