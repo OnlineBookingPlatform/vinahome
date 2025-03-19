@@ -2,24 +2,23 @@
     <div class="login-container">
         <div class="form">
             <div class="image-section">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfSVkN04PJBh_ud6G2Oeg4oZaVXHdrLXDrFA&s"
-                    alt="Bus Ticket Booking" />
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfSVkN04PJBh_ud6G2Oeg4oZaVXHdrLXDrFA&s" alt="Bus Ticket Booking" />
             </div>
             <div class="content-section">
                 <img src="/static/logo-4.png" alt="Logo" class="app-logo" />
                 <p class="tagline">Đặt vé dễ dàng - Hành trình thuận tiện!</p>
-                <el-form ref="loginForm" :model="form"  class="login-form" :rules="rules">
+                <el-form ref="loginForm" :model="form" class="login-form" :rules="rules" @submit.prevent>
                     <div class="login-input">
                         <el-form-item prop="username">
                             <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input" size="large" />
                         </el-form-item>
 
                         <el-form-item prop="password">
-                            <el-input v-model="form.password" type="password" class="password-input "  prop="password" placeholder="Nhập mật khẩu" show-password size="large" />
+                            <el-input v-model="form.password" type="password" class="password-input" placeholder="Nhập mật khẩu" show-password size="large" />
                         </el-form-item>
                     </div>
 
-                    <el-button type="primary" class="submit-btn" @click="submitForm">Đăng nhập</el-button>
+                    <el-button type="primary" class="submit-btn" @click.prevent="submitForm">Đăng nhập</el-button>
                     <p class="login-link">Bạn chưa có tài khoản? <a href="/register" class="link">Đăng ký</a></p>
 
                     <div class="divider">Đăng nhập bằng cách khác</div>
@@ -59,8 +58,7 @@ const submitForm = () => {
                 username: form.username,
                 password: form.password,
             };
-
-            console.log(JSON.stringify(loginData, null, 2)); 
+            console.log(JSON.stringify(loginData, null, 2));
         } else {
             console.log("Form không hợp lệ, vui lòng kiểm tra lại!");
         }
@@ -146,7 +144,7 @@ const submitForm = () => {
 
 .login-input {
     width: 100%;
-   
+
     align-items: flex-start;
 }
 
@@ -190,10 +188,9 @@ const submitForm = () => {
 }
 
 .tagline {
-    font-size: 1.1rem; 
-    font-weight: bold; 
-    text-align: center; 
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
     margin-top: 10px;
 }
-
 </style>

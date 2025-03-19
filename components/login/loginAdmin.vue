@@ -3,16 +3,14 @@
         <div class="form">
             <div class="content-section">
                 <img src="/static/logo-4.png" alt="Logo" class="app-logo" />
-                <el-form ref="loginForm" :model="form" class="login-form" :rules="rules">
+                <el-form ref="loginForm" :model="form" class="login-form" :rules="rules" @submit.prevent>
                     <div class="login-input">
                         <el-form-item prop="username">
-                            <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input"
-                                size="large" />
+                            <el-input v-model="form.username" placeholder="Nhập tên đăng nhập" class="username-input" size="large" />
                         </el-form-item>
 
                         <el-form-item prop="password">
-                            <el-input v-model="form.password" type="password" class="password-input"
-                                placeholder="Nhập mật khẩu" show-password size="large" />
+                            <el-input v-model="form.password" type="password" class="password-input" placeholder="Nhập mật khẩu" show-password size="large" />
                         </el-form-item>
                     </div>
 
@@ -21,7 +19,7 @@
                         <a href="/forgot-password" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
-                    <el-button type="primary" class="submit-btn" @click="submitForm">Đăng nhập</el-button>
+                    <el-button type="primary" class="submit-btn" @click.prevent="submitForm">Đăng nhập</el-button>
                 </el-form>
             </div>
         </div>
