@@ -22,6 +22,7 @@ const handleOnSuccess = async (response: AuthCodeFlowSuccessResponse) => {
   try {
     const responseData = await loginWithGoogle(response.access_token);
     console.log("Full Response from Server: ", responseData?.result);
+    console.log("Full Response: ", responseData);
 
     if (responseData?.result) {
       const userStore = useUserStore();

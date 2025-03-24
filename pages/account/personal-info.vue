@@ -22,11 +22,14 @@ const fetchUserInfo = async () => {
     console.log("response", response);
     if (response) {
       userInfo.value = response.result;
+      // ElMessage.success("Tải thông tin người dùng thành công!");
     } else {
       console.error("Failed to fetch user data:", response);
+      ElMessage.error("Lỗi khi tải thông tin người dùng");
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
+    ElMessage.error("Có lỗi xảy ra, vui lòng thử lại");
   } finally {
     loading.value = false;
   }
@@ -49,6 +52,10 @@ const beforeAvatarUpload = async (file: File) => {
       await updateAvatarOnServer(userId.value, imageUrl);
     }
     userInfo.value.url_avatar = imageUrl; 
+    userStore.setUserData({
+        ...userStore.userData,
+        url_avatar: imageUrl,
+      });
     ElMessage.success("Cập nhật ảnh đại diện thành công!");
   } else {
     ElMessage.error("Tải ảnh thất bại!");
@@ -83,13 +90,13 @@ const saveChanges = async () => {
 
 watchEffect(async () => {
   if (userStore.userData?.id) {
-    userId.value = Number(userStore.userData.id);
+    userId.value = userStore.userData.id;
     await fetchUserInfo();
   }
 });
 onMounted(() => {
   if (userStore.userData?.id) {
-    userId.value = Number(userStore.userData.id);
+    userId.value = userStore.userData.id;
     fetchUserInfo();
   }
 });

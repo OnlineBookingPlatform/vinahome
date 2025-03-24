@@ -1,5 +1,5 @@
 export interface UserType {
-    id: number;
+    id: string;
     name: string;
     email: string;
     url_avatar: string;
@@ -11,7 +11,7 @@ export interface UserType {
 }
 
 export interface AccountByCompanyBusType {
-    id: number;
+    id: string;
     name: string;
     username: string;
     phone: string;
