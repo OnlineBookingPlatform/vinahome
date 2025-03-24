@@ -1,117 +1,75 @@
 <script setup lang="ts">
 import type { UserType } from "~/types/UserType";
+import { ElMessage } from 'element-plus'
+import { getAccountInfo, updateAccountInfo, updateAvatarOnServer, uploadAvatarToCloudinary } from "~/api/accountAPI";
+import { useUserStore } from "~/stores/userStore";
+import { z } from "zod";
 
 definePageMeta({
   layout: 'default'
 });
-import ContentAccountCustomer from "~/components/customer/ContentAccountCustomer.vue"
-import { ElMessage, ElMessageBox, type UploadProps, type UploadUserFile } from 'element-plus'
-import { getAccountInfo, updateAccountInfo, updateAvatarOnServer, uploadAvatarToCloudinary } from "~/api/accountAPI";
-import { useUserStore } from "~/stores/userStore";
 
-const userStore = useUserStore();
-const userId = ref<number | null>(null);
-const userInfo = ref<UserType>({} as UserType);
-const loading = ref(false)
+const formSchema = z.object({
+  name: z.string(),
+  date_birth: z.string().date(),
+  gender: z.enum(["male", "female"]),
+  phone: z.string(),
+  avatar: z.string().url(),
+})
 
-const fetchUserInfo = async () => {
-  if (!userId.value) return;
-  loading.value = true;
-  try {
-    const response = await getAccountInfo(userId.value);
-    console.log("response", response);
-    if (response) {
-      userInfo.value = response.result;
-    } else {
-      console.error("Failed to fetch user data:", response);
-    }
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-  } finally {
-    loading.value = false;
-  }
-};
+const userForm = ref<Partial<UserType>>({});
+const isValid = ref(true);
 
-const fileList = ref([]);
+const { userData } = useUserStore();
+const { data: userInfo, status, error, refresh } = await useAsyncData('userInfo', () => getAccountInfo(userData?.id));
 
-const handleAvatarUpload: UploadProps[ "onSuccess" ] = (response, file) => {
-  if (userInfo.value) {
-    userInfo.value.url_avatar = URL.createObjectURL(file.raw as Blob);
-  }
-};
-const beforeAvatarUpload = async (file: File) => {
-  loading.value = true;
+watch(() => userData, () => refresh());
+watch(userForm.value, () => isValid.value = formSchema.safeParse(userForm.value).success)
+
+const uploadAvatar = async (file: File) => {
   const imageUrl = await uploadAvatarToCloudinary(file);
 
   if (imageUrl) {
     console.log("Avatar uploaded:", imageUrl);
-    if (userId.value !== null) {
-      await updateAvatarOnServer(userId.value, imageUrl);
+    if (userInfo.value?.result.id) {
+      await updateAvatarOnServer(userInfo.value.result.id, imageUrl).then(() => refresh());
     }
-    userInfo.value.url_avatar = imageUrl; 
+    userForm.value.url_avatar = imageUrl;
     ElMessage.success("Cập nhật ảnh đại diện thành công!");
   } else {
     ElMessage.error("Tải ảnh thất bại!");
   }
-  loading.value = false;
 };
 
 const saveChanges = async () => {
-  console.log("Dữ liệu cập nhật:", userInfo.value);
-  if (!userId.value) return;
-  loading.value = true;
-  try {
-    const updatedData: Partial<UserType> = {
-      name: userInfo.value.name,
-      date_birth: userInfo.value.date_birth,
-      gender: userInfo.value.gender,
-      phone: userInfo.value.phone,
-    };
-    const response = await updateAccountInfo(userId.value, updatedData);
-    if (response.result) {
-      ElMessage.success("Cập nhật thông tin thành công!");
-    } else {
-      ElMessage.error("Lỗi khi cập nhật thông tin");
-    }
-  } catch (error) {
+  console.log("Dữ liệu cập nhật:", userForm.value);
+
+  if (!userInfo.value?.result.id) return;
+
+  const updatedData: Partial<UserType> = {
+    ...userForm.value
+  };
+
+  await updateAccountInfo(userInfo.value.result.id, updatedData).then(() => {
+    ElMessage.success("Cập nhật thông tin thành công!");
+  }).catch((error) => {
     console.error("Error updating account:", error);
-    ElMessage.error("Có lỗi xảy ra, vui lòng thử lại");
-  } finally {
-    loading.value = false;
-  }
+    ElMessage.error("Lỗi khi cập nhật thông tin");
+  });
 };
-
-watchEffect(async () => {
-  if (userStore.userData?.id) {
-    userId.value = Number(userStore.userData.id);
-    await fetchUserInfo();
-  }
-});
-onMounted(() => {
-  if (userStore.userData?.id) {
-    userId.value = Number(userStore.userData.id);
-    fetchUserInfo();
-  }
-});
-
 </script>
 
 <template>
   <NuxtLayout name="layout-v1">
-    <!--    <ContentAccountCustomer/>-->
     <h2 class="text-lg">Thông tin cá nhân</h2>
-    <div class="bg-white rounded-lg w-full py-2" v-loading="loading">
+    <div class="bg-white rounded-lg w-full py-2" v-loading="status == 'pending'">
       <div class="mx-5 my-5 flex items-center">
         <div class="flex flex-col w-full">
           <span class="text-sm font-semibold mb-2">Ảnh đại diện</span>
           <div class="flex items-center mb-6">
-            <el-avatar :size="70" :src="userInfo.url_avatar" />
-            <el-upload class="upload-demo mx-3" 
-              :auto-upload="true" 
-              :show-file-list="false" 
-              :before-upload="beforeAvatarUpload"
-              accept="image/*"
-            >
+            <el-avatar :size="70" :src="userData?.url_avatar" />
+            <el-upload class="upload-demo mx-3" :auto-upload="true" :show-file-list="false"
+              :before-upload="uploadAvatar" accept="image/*">
               <el-button type="info">
                 Cập nhật ảnh mới
               </el-button>
@@ -121,19 +79,18 @@ onMounted(() => {
             <div class="w-1/2 mr-2">
               <div class="flex flex-col w-full ">
                 <span class="text-sm font-semibold mb-2">Họ và tên</span>
-                <el-input v-model="userInfo.name" size="large" placeholder="Họ và tên" />
+                <el-input v-model="userForm.name" size="large" placeholder="Họ và tên" />
               </div>
               <div class="flex flex-col w-full my-5">
                 <span class="text-sm font-semibold mb-2">Ngày sinh</span>
-                <el-date-picker v-model="userInfo.date_birth" type="date" placeholder="Ngày sinh" class="w-full"
+                <el-date-picker v-model="userForm.date_birth" type="date" placeholder="Ngày sinh" class="w-full"
                   size="large" />
               </div>
               <div class="flex flex-col w-full">
                 <span class="text-sm font-semibold mb-2">Giới tính</span>
-                <el-radio-group v-model="userInfo.gender">
-                  <el-radio size="large" :value="1">Nam</el-radio>
-                  <el-radio size="large" :value="2">Nữ</el-radio>
-                  <el-radio size="large" :value="3">Khác</el-radio>
+                <el-radio-group v-model="userForm.gender">
+                  <el-radio size="large" value="male">Nam</el-radio>
+                  <el-radio size="large" value="female">Nữ</el-radio>
                 </el-radio-group>
               </div>
             </div>
@@ -141,11 +98,11 @@ onMounted(() => {
             <div class="w-1/2 ml-2">
               <div class="flex flex-col w-full">
                 <span class="text-sm font-semibold mb-2">Số điện thoại</span>
-                <el-input v-model="userInfo.phone" size="large" placeholder="Số điện thoại" />
+                <el-input v-model="userForm.phone" size="large" placeholder="Số điện thoại" />
               </div>
               <div class="flex flex-col w-full my-5">
                 <span class="text-sm font-semibold mb-2">Email</span>
-                <el-input v-model="userInfo.email" size="large" placeholder="Email" disabled />
+                <el-input v-model="userForm.email" size="large" placeholder="Email" disabled />
               </div>
               <div class="flex flex-col w-full">
                 <span class="text-sm font-semibold mb-2">Mật khẩu</span>
@@ -154,7 +111,9 @@ onMounted(() => {
             </div>
           </div>
           <div class="mt-5">
-            <el-button type="primary" size="large" class="w-[250px]" @click="saveChanges">Lưu thay đổi</el-button>
+            <el-button type="primary" size="large" class="w-[250px]" @click="saveChanges" :disabled="isValid">
+              Lưu thay đổi
+            </el-button>
           </div>
         </div>
       </div>
