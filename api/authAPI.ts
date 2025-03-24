@@ -7,7 +7,7 @@ export const loginWithGoogle = async (accessToken: string): Promise<ApiResponse<
         throw new Error("Access token is required");
     }
     try {
-        return await $fetch<ApiResponse<UserType>>(`${API_BASE_URL}/auth/google-login`, {
+        return await $fetch<ApiResponse<UserType>>(`${API_BASE_URL}/v1/auth/google-login`, {
             method: "POST",
             body: { accessToken },
         });
