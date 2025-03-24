@@ -6,7 +6,7 @@ const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 
 export const getAccountInfo = async (
-  userId: number
+  userId?: number
 ): Promise<ApiResponse<UserType>> => {
   if (!userId) {
     throw new Error("userId is required");
