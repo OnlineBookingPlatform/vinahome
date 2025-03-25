@@ -131,11 +131,11 @@ onMounted(fetchCompanies);
       >
     </div>
     <el-table :data="tableData" style="width: 100%" v-loading="loading">
-      <el-table-column type="index" label="No" width="50" />
-      <el-table-column prop="name" label="Name" />
-      <el-table-column prop="phone" label="Phone" />
-      <el-table-column prop="address" label="Address" />
-      <el-table-column prop="status" label="Status" width="150">
+      <el-table-column type="index" label="STT" width="50" />
+      <el-table-column prop="name" label="Tên nhà xe" />
+      <el-table-column prop="phone" label="Số điện thoại" />
+      <el-table-column prop="address" label="Địa chỉ" />
+      <el-table-column prop="status" label="Trạng thái" width="150">
         <template #default="{ row }">
           <el-tag
             :type="row.status ? 'success' : 'danger'"
@@ -147,10 +147,10 @@ onMounted(fetchCompanies);
         </template>
       </el-table-column>
 
-      <el-table-column prop="tax_code" label="Tax Code" />
-      <el-table-column prop="code" label="Code" />
-      <el-table-column prop="note" label="Note" />
-      <el-table-column fixed="right" label="Operations">
+      <el-table-column prop="tax_code" label="Mã số thuế" />
+      <el-table-column prop="code" label="Mã nhà xe" />
+      <el-table-column prop="note" label="Ghi chú" />
+      <el-table-column fixed="right" label="Tùy chọn">
         <template #default="{ row }">
           <el-button
             link

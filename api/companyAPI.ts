@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:3002";
 
 export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/companies/create`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/create`, {
             method: "POST",
             body: companyInfo,
         });
@@ -16,7 +16,7 @@ export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<Api
 }
 export const updateCompanyAPI = async (companyId: number, companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/companies/update/${companyId}`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/update/${companyId}`, {
             method: "PUT",
             body: companyInfo,
         });
@@ -27,7 +27,7 @@ export const updateCompanyAPI = async (companyId: number, companyInfo: BusCompan
 }
 export const getCompanyAPI = async (): Promise<ApiResponse<BusCompanyType[]>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType[]>>(`${API_BASE_URL}/companies/get-all`, {
+        return await $fetch<ApiResponse<BusCompanyType[]>>(`${API_BASE_URL}/v2/company/get-all`, {
             method: "GET",
         });
     } catch (error) {
