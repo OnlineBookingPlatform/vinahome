@@ -22,6 +22,40 @@ const validateField = (field: keyof typeof form.value) => {
   }
 };
 
+const validateAllFields = () => {
+  const requiredFields: (keyof typeof form.value)[] = ['name', 'phone', 'address'];
+  let isValid = true;
+
+  requiredFields.forEach(field => {
+    if (form.value[field].trim() === '') {
+      errors.value[field as keyof typeof errors.value] = true;
+      isValid = false;
+    }
+  });
+
+  // Validate phone number format
+  if (form.value.phone && !/^[0-9]{10}$/.test(form.value.phone)) {
+    errors.value.phone = true;
+    isValid = false;
+  }
+
+  // Validate email format if provided
+  if (form.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+const handleSubmit = () => {
+  if (validateAllFields()) {
+    // TODO: Add your form submission logic here
+    console.log('Form is valid, submitting:', form.value);
+  } else {
+    console.log('Form validation failed');
+  }
+};
+
 // Create a reusable error message component
 const ErrorMessage = (props: { show: boolean }) => {
   return props.show 
@@ -88,7 +122,13 @@ const ErrorMessage = (props: { show: boolean }) => {
         </div>
       </div>
 
-      <el-button type="primary" class="submit-button" >Đăng ký mở bán</el-button>
+      <el-button 
+        type="primary" 
+        class="submit-button"
+        @click="handleSubmit"
+      >
+        Đăng ký mở bán
+      </el-button>
     </form>
   </div>
 </template>

@@ -97,7 +97,7 @@ const handleLogin = () => {
       <ul class="flex space-x-2">
         <li>
           <NuxtLink to="/tra-cuu-ve">
-            <el-button text class="button-link">Tra cứu vé</el-button>
+            <el-button text class="button-link ">Tra cứu vé</el-button>
           </NuxtLink>
         </li>
         <li>
@@ -128,7 +128,6 @@ const handleLogin = () => {
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-
         </li>
         <li>
           <el-button type="warning" :icon="Headset" plain round>Hỗ trợ 24/7</el-button>

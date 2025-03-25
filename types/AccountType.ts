@@ -9,3 +9,13 @@ export interface UserType {
     date_birth: string;
     token: string;
 }
+
+export interface AccountByCompanyBusType {
+    id: number;
+    name: string;
+    username: string;
+    phone: string;
+    gender: number;
+    role: number;
+    email: string;
+}

@@ -1,4 +1,4 @@
-import type {UserType} from "~/types/UserType";
+import type {UserType} from "~/types/AccountType";
 import type {ApiResponse} from "~/api/APIResponse";
 // const API_BASE_URL = "https://vinahome-server.onrender.com";
 const API_BASE_URL = "http://localhost:3002";
