@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:3002";
 
 export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/create`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/create-company`, {
             method: "POST",
             body: companyInfo,
         });
@@ -16,7 +16,7 @@ export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<Api
 }
 export const updateCompanyAPI = async (companyId: number, companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/update/${companyId}`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/update-company/${companyId}`, {
             method: "PUT",
             body: companyInfo,
         });
@@ -32,6 +32,16 @@ export const getCompanyAPI = async (): Promise<ApiResponse<BusCompanyType[]>> =>
         });
     } catch (error) {
         console.error("Get company failed: ", error);
+        throw error;
+    }
+}
+export const deleteCompanyAPI = async (companyId: number): Promise<ApiResponse<void>> => {
+    try {
+        return await $fetch<ApiResponse<void>>(`${API_BASE_URL}/v2/company/delete-company/${companyId}`, {
+            method: "DELETE",
+        });
+    } catch (error) {
+        console.error("Delete company: ", error);
         throw error;
     }
 }

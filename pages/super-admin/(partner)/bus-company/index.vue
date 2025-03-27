@@ -2,18 +2,28 @@
 definePageMeta({
   layout: "superadmin",
 });
-import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  ElMessage,
+  ElMessageBox,
+} from "element-plus";
+import type { FormInstance, FormRules } from 'element-plus'
+import { th } from "element-plus/es/locales.mjs";
 import { ref } from "vue";
 import {
   createCompanyAPI,
+  deleteCompanyAPI,
   getCompanyAPI,
   updateCompanyAPI,
 } from "~/api/companyAPI";
 import type { BusCompanyType } from "~/types/CompanyType";
 
 const isEditing = ref(false);
+const isSaving = ref(false);
 const dialogVisible = ref(false);
-const dialogData = ref<BusCompanyType>({
+const tableData = ref<BusCompanyType[]>([]);
+const loading = ref(false);
+const isDeleting = ref(false);
+const form = ref<BusCompanyType>({
   id: 0,
   name: "",
   phone: "",
@@ -25,64 +35,113 @@ const dialogData = ref<BusCompanyType>({
   url_logo: "",
   created_at: "",
 });
-const tableData = ref<BusCompanyType[]>([]);
-const loading = ref(false);
-
+const ruleFormRef = ref<FormInstance>();
+const rules = reactive<FormRules<BusCompanyType>>({
+  name: [
+    { required: true, message: "Vui lòng nhập tên nhà xe", trigger: "blur" },
+  ],
+  phone: [
+    { required: true, message: "Vui lòng nhập số điện thoại", trigger: "blur" },
+  ],
+  code: [
+    { required: true, message: "Vui lòng nhập mã nhà xe", trigger: "blur" },
+  ],
+});
 const openEditDialog = (row: BusCompanyType) => {
   isEditing.value = true;
-  dialogData.value = { ...row };
+  form.value = { ...row };
   dialogVisible.value = true;
 };
 const router = useRouter();
 const openDetailCompanyBus = (row: BusCompanyType) => {
   router.push(`/super-admin/company-bus/${row.id}`);
 };
-
 const saveData = async () => {
+  if (!ruleFormRef.value) return;
+  try {
+    await ruleFormRef.value.validate();
+  } catch (error) {
+    console.log("Lỗi validation:", error);
+    return;
+  }
   try {
     loading.value = true;
+    isSaving.value = true;
+
     if (isEditing.value) {
-      if (!dialogData.value.id) {
-        ElMessage.error("Không tìm thấy ID của công ty cần cập nhật!");
+      if (!form.value.id) {
+        ElMessage.error("Không tìm thấy dữ liệu công ty cần cập nhật!");
         return;
       }
 
-      const response = await updateCompanyAPI(
-        dialogData.value.id,
-        dialogData.value
-      );
+      const response = await updateCompanyAPI(form.value.id, form.value);
+
       if (response.result) {
         const index = tableData.value.findIndex(
-          (item) => item.id === dialogData.value.id
+          (item) => item.id === form.value.id
         );
         if (index !== -1) {
-          tableData.value.splice(index, 1, { ...dialogData.value });
+          tableData.value.splice(index, 1, { ...form.value });
         }
         ElMessage.success("Cập nhật thành công!");
+        dialogVisible.value = false;
+        resetForm();
       } else {
         ElMessage.error(response.message || "Lỗi cập nhật dữ liệu!");
       }
     } else {
-      const response = await createCompanyAPI(dialogData.value);
-      console.log("Data send to server:", dialogData.value);
+      const response = await createCompanyAPI(form.value);
+      console.log("Data sent to server:", form.value);
       if (response.result) {
         tableData.value.push(response.result);
         ElMessage.success("Thêm mới thành công!");
+        dialogVisible.value = false;
+        resetForm();
       } else {
         ElMessage.error(response.message || "Lỗi thêm mới dữ liệu!");
       }
     }
   } catch (error) {
     ElMessage.error("Lỗi hệ thống, vui lòng thử lại!");
+    console.error("Lỗi khi gọi API:", error);
   } finally {
     loading.value = false;
+    isSaving.value = false;
+  }
+};
+
+
+const handleDelete = async () => {
+  if (!form.value.id) {
+    ElMessage.error("Không tìm thấy dữ liệu công ty để xóa!");
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(
+      "Bạn có chắc chắn muốn xóa công ty này?",
+      "Xác nhận",
+      {
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
+        type: "warning",
+      }
+    );
+    isDeleting.value = true;
+    await deleteCompanyAPI(form.value.id);
+    ElMessage.success("Xóa công ty thành công!");
+    tableData.value = tableData.value.filter(
+      (item) => item.id !== form.value.id
+    );
     dialogVisible.value = false;
-    resetForm();
+  } catch (error) {
+    ElMessage.error("Xóa công ty thất bại!");
+  } finally {
+    isDeleting.value = false;
   }
 };
 const resetForm = () => {
   isEditing.value = false;
-  dialogData.value = {
+  form.value = {
     id: 0,
     name: "",
     phone: "",
@@ -96,7 +155,7 @@ const resetForm = () => {
   };
 };
 const handleClose = (done: () => void) => {
-  ElMessageBox.confirm("Are you sure to close this dialog?")
+  ElMessageBox.confirm("Bạn có chắc chắn muốn thoát không?")
     .then(() => {
       done();
       resetForm();
@@ -119,6 +178,13 @@ const fetchCompanies = async () => {
   } finally {
     loading.value = false;
   }
+};
+const closeDialog = () => {
+  dialogVisible.value = false;
+  if (ruleFormRef.value) {
+    ruleFormRef.value.resetFields();
+  }
+  resetForm();
 };
 onMounted(fetchCompanies);
 </script>
@@ -166,7 +232,6 @@ onMounted(fetchCompanies);
             @click="openEditDialog(row)"
             >Edit</el-button
           >
-          
         </template>
       </el-table-column>
     </el-table>
@@ -179,37 +244,43 @@ onMounted(fetchCompanies);
       }}</span>
     </template>
 
-    <el-form label-width="120px">
-      <el-form-item label="Tên nhà xe">
-        <el-input v-model="dialogData.name" />
+    <el-form
+      label-width="120px"
+      ref="ruleFormRef" :model="form" :rules="rules"
+    >
+      <el-form-item label="Tên nhà xe" prop="name">
+        <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="Số điện thoại">
-        <el-input v-model="dialogData.phone" />
+      <el-form-item label="Số điện thoại" prop="phone">
+        <el-input v-model="form.phone" />
       </el-form-item>
       <el-form-item label="Địa chỉ">
-        <el-input v-model="dialogData.address" />
+        <el-input v-model="form.address" />
       </el-form-item>
       <el-form-item label="Trạng thái">
-        <el-select v-model="dialogData.status" placeholder="Chọn trạng thái">
+        <el-select v-model="form.status" placeholder="Chọn trạng thái">
           <el-option label="Hoạt động" :value="true" />
           <el-option label="Ngưng hoạt động" :value="false" />
         </el-select>
       </el-form-item>
       <el-form-item label="Mã số thuế">
-        <el-input v-model="dialogData.tax_code" />
+        <el-input v-model="form.tax_code" />
       </el-form-item>
-      <el-form-item label="Mã nhà xe">
-        <el-input v-model="dialogData.code" />
+      <el-form-item label="Mã nhà xe" prop="code">
+        <el-input v-model="form.code" />
       </el-form-item>
       <el-form-item label="Ghi chú">
-        <el-input v-model="dialogData.note" type="textarea" />
+        <el-input v-model="form.note" type="textarea" />
       </el-form-item>
     </el-form>
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">Thoát</el-button>
-        <el-button type="primary" @click="saveData">
+        <el-button type="danger" :loading="isDeleting" @click="handleDelete" v-if="isEditing"
+          >Xóa</el-button
+        >
+        <el-button @click="closeDialog">Thoát</el-button>
+        <el-button type="primary" @click="saveData" :loading="isSaving">
           {{ isEditing ? "Cập nhật" : "Thêm mới" }}
         </el-button>
       </div>
