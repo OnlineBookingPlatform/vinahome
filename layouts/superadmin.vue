@@ -1,10 +1,11 @@
 <script lang="ts">
+
 </script>
 <template>
     <div>
     <el-container>
       <el-aside width="200px">
-        <AdminMenuAdmin/>
+        <SuperAdminMenu/>
       </el-aside>
       <el-container>
         <el-header>Header</el-header>
