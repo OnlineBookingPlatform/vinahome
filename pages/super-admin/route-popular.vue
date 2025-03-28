@@ -1,9 +1,7 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'superadmin'
-});
 </script>
-
 <template>
-    aaa
+    <div>
+        <h1>Route Populer</h1>
+    </div>
 </template>

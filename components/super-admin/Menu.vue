@@ -1,8 +1,13 @@
 <template>
   <el-menu default-active="2" class="el-menu-vertical-demo">
-    <NuxtLink to="/admin/dashboard">
+    <NuxtLink to="/super-admin/dashboard">
       <el-menu-item index="2">
         <span>Tổng quan</span>
+      </el-menu-item>
+    </NuxtLink>
+    <NuxtLink to="/super-admin/route-popular">
+      <el-menu-item index="3">
+        <span>Tuyến đường phổ biến</span>
       </el-menu-item>
     </NuxtLink>
 
@@ -10,7 +15,7 @@
       <template #title>
         <span>Danh sách đối tác</span>
       </template>
-      <NuxtLink to="/admin/list-bus-company">
+      <NuxtLink to="/super-admin/bus-company">
         <el-menu-item index="1-1">Xe khách</el-menu-item>
       </NuxtLink>
 
