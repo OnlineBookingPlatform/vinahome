@@ -17,8 +17,31 @@ const formSchema = z.object({
   avatar: z.string().url(),
 })
 
+<<<<<<< HEAD
 const userForm = ref<Partial<UserType>>({});
 const isValid = ref(true);
+=======
+const fetchUserInfo = async () => {
+  if (!userId.value) return;
+  loading.value = true;
+  try {
+    const response = await getAccountInfo(userId.value);
+    console.log("response", response);
+    if (response) {
+      userInfo.value = response.result;
+      // ElMessage.success("Tải thông tin người dùng thành công!");
+    } else {
+      console.error("Failed to fetch user data:", response);
+      ElMessage.error("Lỗi khi tải thông tin người dùng");
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    ElMessage.error("Có lỗi xảy ra, vui lòng thử lại");
+  } finally {
+    loading.value = false;
+  }
+};
+>>>>>>> main
 
 const { userData } = useUserStore();
 const { data: userInfo, status, error, refresh } = await useAsyncData('userInfo', () => getAccountInfo(userData?.id));
@@ -34,7 +57,15 @@ const uploadAvatar = async (file: File) => {
     if (userInfo.value?.result.id) {
       await updateAvatarOnServer(userInfo.value.result.id, imageUrl).then(() => refresh());
     }
+<<<<<<< HEAD
     userForm.value.url_avatar = imageUrl;
+=======
+    userInfo.value.url_avatar = imageUrl; 
+    userStore.setUserData({
+        ...userStore.userData,
+        url_avatar: imageUrl,
+      });
+>>>>>>> main
     ElMessage.success("Cập nhật ảnh đại diện thành công!");
   } else {
     ElMessage.error("Tải ảnh thất bại!");
@@ -57,6 +88,23 @@ const saveChanges = async () => {
     ElMessage.error("Lỗi khi cập nhật thông tin");
   });
 };
+<<<<<<< HEAD
+=======
+
+watchEffect(async () => {
+  if (userStore.userData?.id) {
+    userId.value = userStore.userData.id;
+    await fetchUserInfo();
+  }
+});
+onMounted(() => {
+  if (userStore.userData?.id) {
+    userId.value = userStore.userData.id;
+    fetchUserInfo();
+  }
+});
+
+>>>>>>> main
 </script>
 
 <template>
