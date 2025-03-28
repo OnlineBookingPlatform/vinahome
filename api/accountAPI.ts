@@ -7,7 +7,11 @@ const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 
 export const getAccountInfo = async (
+<<<<<<< HEAD
+  userId?: number
+=======
   userId: string
+>>>>>>> main
 ): Promise<ApiResponse<UserType>> => {
   if (!userId) {
     ElMessage.error("Thông tin người dùng không hợp lệ");
