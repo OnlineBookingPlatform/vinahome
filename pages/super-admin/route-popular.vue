@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
-import { ElMessageBox } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 definePageMeta({
     layout: "superadmin",
@@ -21,10 +21,11 @@ const routes = ref<Route[]>([
     { id: 9, image: "https://res.cloudinary.com/dsw7kuodi/image/upload/v1742804367/account/v1/hn0gvv67zf0kua468qge.jpg", name: "Hải Phòng - Quảng Ninh", price: 20000, status: true }
 ]);
 
-//modal
+// Modal
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const selectedRouteId = ref<number | null>(null);
+const routeForm = ref<any>(null);
 
 const newRoute = ref<Route>({
     id: 0,
@@ -34,11 +35,29 @@ const newRoute = ref<Route>({
     status: true,
 });
 
+// Rules
+const rules = {
+    name: [{ required: true, message: "Tên tuyến không được để trống", trigger: "blur" }],
+    price: [
+        { required: true, message: "Giá vé không được để trống", trigger: "blur" },
+        {
+            validator: (_rule: any, value: number, callback: Function) => {
+                if (value <= 0) callback(new Error("Giá vé phải lớn hơn 0"));
+                else callback();
+            }, trigger: "blur"
+        }
+    ],
+    image: [
+        { required: true, message: "Vui lòng nhập URL hình ảnh", trigger: "blur" },
+        { type: "url", message: "URL hình ảnh không hợp lệ", trigger: "blur" },
+    ],
+};
+
 // Mở modal add
 const openAddModal = () => {
     isEditMode.value = false;
     selectedRouteId.value = null;
-    newRoute.value = { id: 0, image: "", name: "", price: 0, status: true };
+    Object.assign(newRoute.value, { id: 0, image: "", name: "", price: 0, status: true });
     isModalOpen.value = true;
 };
 
@@ -46,43 +65,44 @@ const openAddModal = () => {
 const openEditModal = (route: Route) => {
     isEditMode.value = true;
     selectedRouteId.value = route.id;
-    newRoute.value = { ...route };
+    Object.assign(newRoute.value, route);
     isModalOpen.value = true;
 };
 
 // Button Lưu
 const saveRoute = () => {
-  if (!newRoute.value.name || newRoute.value.price <= 0) return;
+    routeForm.value?.validate((valid: boolean) => {
+        if (!valid) return;
 
-  if (isEditMode.value && selectedRouteId.value !== null) {
-    const index = routes.value.findIndex((r) => r.id === selectedRouteId.value);
-    if (index !== -1) routes.value[index] = { ...newRoute.value };
-    console.log("Dữ liệu sau khi sửa:", newRoute.value);
-  } else {
-    // Lấy id lớn nhất hiện có và tăng thêm 1 để đảm bảo ID không trùng lặp
-    const maxId = routes.value.length > 0 ? Math.max(...routes.value.map((r) => r.id)) : 0;
-    newRoute.value.id = maxId + 1;
-    routes.value = [...routes.value, { ...newRoute.value }];
-    console.log("Dữ liệu sau khi thêm:", newRoute.value);
-  }
+        if (isEditMode.value && selectedRouteId.value !== null) {
+            const index = routes.value.findIndex((r) => r.id === selectedRouteId.value);
+            if (index !== -1) routes.value[index] = { ...newRoute.value };
+            ElMessage.success("Cập nhật tuyến xe thành công!");
+        } else {
+            const maxId = routes.value.length > 0 ? Math.max(...routes.value.map((r) => r.id)) : 0;
+            newRoute.value.id = maxId + 1;
+            routes.value.push({ ...newRoute.value });
+            ElMessage.success("Thêm tuyến xe thành công!");
+        }
 
-  isModalOpen.value = false;
+        isModalOpen.value = false;
+    });
 };
-
 
 // Button Xóa
 const deleteRoute = (routeId: number) => {
-  ElMessageBox.confirm("Bạn có chắc chắn muốn xóa tuyến xe này?", "Xác nhận", {
-    confirmButtonText: "Xóa",
-    cancelButtonText: "Hủy",
-    type: "warning",
-  })
-    .then(() => {
-      routes.value = routes.value.filter((route) => route.id !== routeId);
+    ElMessageBox.confirm("Bạn có chắc chắn muốn xóa tuyến xe này?", "Xác nhận", {
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
+        type: "warning",
     })
-    .catch(() => {
-      console.log("Hủy xóa");
-    });
+        .then(() => {
+            routes.value = routes.value.filter((route) => route.id !== routeId);
+            ElMessage.success("Xóa tuyến xe thành công!");
+        })
+        .catch(() => {
+            console.log("Hủy xóa");
+        });
 };
 
 // Xác nhận trước khi đóng modal
@@ -98,7 +118,9 @@ const handleBeforeClose = (done?: () => void) => {
         })
         .catch(() => { });
 };
+
 </script>
+
 
 <template>
     <el-card class="box-card">
@@ -140,29 +162,36 @@ const handleBeforeClose = (done?: () => void) => {
         </el-table>
     </el-card>
 
-    <!-- Modal-->
+    <!-- Modal -->
     <el-dialog v-model="isModalOpen" :title="isEditMode ? 'Chỉnh Sửa Tuyến Xe' : 'Thêm Tuyến Xe'" width="500px"
         :close-on-click-modal="false" :before-close="handleBeforeClose">
-        <el-form label-width="120px">
-            <el-form-item label="Tên tuyến">
+
+        <el-form ref="routeForm" :model="newRoute" :rules="rules" label-width="120px" @submit.prevent="saveRoute">
+            <el-form-item label="Tên tuyến" prop="name">
                 <el-input v-model="newRoute.name" placeholder="Nhập tên tuyến"></el-input>
             </el-form-item>
-            <el-form-item label="Giá vé">
-                <el-input v-model.number="newRoute.price" placeholder="Nhập giá vé" type="number"></el-input>
+
+            <el-form-item label="Giá vé" prop="price">
+                <el-input v-model="newRoute.price" placeholder="Nhập giá vé" type="number"
+                    @input="newRoute.price = Number(newRoute.price) || 0">
+                </el-input>
             </el-form-item>
-            <el-form-item label="Hình ảnh">
+
+            <el-form-item label="Hình ảnh" prop="image">
                 <el-input v-model="newRoute.image" placeholder="Nhập URL hình ảnh"></el-input>
             </el-form-item>
+
             <el-form-item label="Trạng thái">
                 <el-switch v-model="newRoute.status" active-text="Hiện" inactive-text="Ẩn" />
             </el-form-item>
         </el-form>
 
         <template #footer>
-            <el-button @click="handleBeforeClose">Hủy</el-button>
+            <el-button @click="isModalOpen = false">Hủy</el-button>
             <el-button type="primary" @click="saveRoute">Lưu</el-button>
         </template>
     </el-dialog>
+
 </template>
 
 <style scoped>
