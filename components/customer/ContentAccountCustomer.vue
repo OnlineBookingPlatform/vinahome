@@ -1,7 +1,56 @@
+<script setup lang="ts">
+import { z } from 'zod';
+
+const formSchema = z.object({
+  name: z.string(),
+  birthdate: z.string().date(),
+  gender: z.enum(["male", "female"]),
+  phone: z.string(),
+  email: z.string().email(),
+  password: z.string(),
+  avatar: z.string().url(),
+})
+
+const defaultAvatar = 'https://i.pinimg.com/originals/c6/e5/65/c6e56503cfdd87da299f72dc416023d4.jpg';
+
+const customer = ref<z.infer<typeof formSchema>>({
+  name: 'Nguyễn Văn A',
+  birthdate: '1990-05-15',
+  gender: 'male',
+  phone: '0982460352',
+  email: 'nguyenvana@example.com',
+  password: '********',
+  avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDI5h1MYhsDtHz8OHPTEKVBc_unp6tPtUOr6ym1E_azguPoUl-jsT4K0KmNQQYsfRalMo&usqp=CAU',
+});
+
+const maskedPhone = computed(() => customer.value.phone.replace(/(\d{3})\d{4}(\d{1})(\d{2})/, '*** **** *$3'));
+
+const fileInput = ref<HTMLInputElement | null>(null);
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const updateAvatar = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+
+  if (file && file.size <= 5 * 1024 * 1024) { // Giới hạn 5MB
+    customer.value.avatar = URL.createObjectURL(file);
+  } else {
+    alert("Vui lòng chọn ảnh có dung lượng tối đa 5MB!");
+  }
+};
+
+const isValid = computed(() => formSchema.safeParse(customer.value).success);
+
+const saveChanges = () => {
+  // Send ref up to api or whatever
+};
+</script>
+
 <template>
   <h1 class="text-2xl font-bold mb-4">Thông tin khách hàng</h1>
-
-  <div class="p-6 bg-white rounded-lg shadow max-w-6xl mx-auto">
+  <ValidateForm class="p-6 bg-white rounded-lg shadow max-w-6xl mx-auto">
     <div class="flex items-center mb-6">
       <!-- Ảnh đại diện -->
       <div class="flex flex-col items-center mr-6">
@@ -28,12 +77,12 @@
         <div>
           <label class="block text-lg font-medium mb-2">Họ và tên</label>
           <input v-model="customer.name" type="text"
-            class="w-5/6 border border-gray-300 rounded p-2 font-medium text-lg rounded-lg" placeholder="Khách hàng" />
+            class="w-5/6 border border-gray-300 p-2 font-medium text-lg rounded-lg" placeholder="Khách hàng" />
         </div>
         <div>
           <label class="block text-lg font-medium mb-2">Ngày sinh</label>
           <input v-model="customer.birthdate" type="date"
-            class="w-5/6 border border-gray-300 rounded p-2 font-medium text-lg rounded-lg" />
+            class="w-5/6 border border-gray-300 p-2 font-medium text-lg rounded-lg" />
         </div>
         <div>
           <label class="block text-lg font-medium mb-2">Giới tính</label>
@@ -69,59 +118,14 @@
       </div>
     </div>
     <div class="mt-8 flex justify-end">
-      <button :class="{ 'bg-blue-500 text-white': isChanged, 'bg-gray-200 text-gray-400 cursor-not-allowed': !isChanged }"
-        :disabled="!isChanged" @click="saveChanges" class="px-6 py-2 rounded shadow font-medium text-lg">
+      <button :class="[
+        'px-6 py-2 rounded shadow font-medium text-lg bg-blue-500 text-white',
+        'disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed'
+      ]" :disabled="isValid" @click="saveChanges">
         Lưu thay đổi
       </button>
     </div>
-  </div>
+  </ValidateForm>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-const defaultAvatar = 'https://i.pinimg.com/originals/c6/e5/65/c6e56503cfdd87da299f72dc416023d4.jpg';
-
-const maskedPhone = computed(() => {
-  return customer.value.phone.replace(/(\d{3})\d{4}(\d{1})(\d{2})/, '*** **** *$3');
-});
-
-const customer = ref({
-  name: 'Nguyễn Văn A',
-  birthdate: '1990-05-15',
-  gender: 'male',
-  phone: '0982460352',
-  email: 'nguyenvana@example.com',
-  password: '********',
-  avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDI5h1MYhsDtHz8OHPTEKVBc_unp6tPtUOr6ym1E_azguPoUl-jsT4K0KmNQQYsfRalMo&usqp=CAU',
-});
-
-
-const fileInput = ref<HTMLInputElement | null>(null);
-const triggerFileInput = () => {
-  fileInput.value?.click();
-};
-const updateAvatar = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (file && file.size <= 5 * 1024 * 1024) { // Giới hạn 5MB
-    customer.value.avatar = URL.createObjectURL(file);
-  } else {
-    alert("Vui lòng chọn ảnh có dung lượng tối đa 5MB!");
-  }
-};
-
-
-const isChanged = ref(false);
-const originalCustomer = ref({ ...customer.value });
-const checkChanges = () => {
-  isChanged.value = JSON.stringify(customer.value) !== JSON.stringify(originalCustomer.value);
-};
-const saveChanges = () => {
-  originalCustomer.value = { ...customer.value };
-  isChanged.value = false;
-};
-watch(customer, checkChanges, { deep: true });
-
-
-</script>
 
 <style scoped></style>
