@@ -1,40 +1,7 @@
 <script setup lang="ts">
-
 definePageMeta({
   layout: "default",
 });
-
-import { ref } from "vue";
-
-const activeIndex = ref(null);
-
-const faqs = ref([
-  {
-    question: "Lợi ích của việc trở thành đối tác bán vé trên sàn Vexere là gì?",
-    answer: "Thông tin về lợi ích khi trở thành đối tác trên sàn Vexere."
-  },
-  {
-    question: "Quy trình đăng ký xe mở bán vé trên Vexere như thế nào?",
-    answer: "Thông tin chi tiết về quy trình đăng ký mở bán vé trên Vexere."
-  },
-  {
-    question: "Vexere thu những khoản phí nào?",
-    answer: "Chi tiết về các khoản phí mà Vexere thu từ đối tác."
-  },
-  {
-    question: "Làm thế nào để tôi quản lý kho vé trên Vexere?",
-    answer: "Hướng dẫn cách quản lý kho vé trên nền tảng Vexere."
-  },
-  {
-    question: "Làm thế nào để tôi biết nếu một chỗ ngồi đã được đặt?",
-    answer: "Cách kiểm tra trạng thái đặt vé trên hệ thống."
-  },
-  {
-    question: "Làm thế nào để tôi nhận được thanh toán khi bán vé trên sàn Vexere?",
-    answer: "Vexere cam kết thanh toán đúng hẹn qua chuyển khoản ngân hàng."
-  }
-]);
-
 </script>
 
 <template>
@@ -102,19 +69,19 @@ const faqs = ref([
   </section>
 
   <!-- Phần 2: Nội dung (Màu trắng) -->
-  <section class="bg-gray-100 text-gray-800 py-16">
+  <section class="bg-white text-gray-800 py-16">
     <div class="container mx-auto text-center">
-      <h2 class="text-2xl font-bold mb-8">
-        Sự an tâm của Chủ nhà xe là ưu tiên hàng đầu của Vexere
-      </h2>
-      <div class="grid md:grid-cols-3 gap-12">
+      <h2 class="text-4xl font-bold text-center mb-4">Sự an tâm của Chủ nhà xe là ưu tiên hàng đầu của Vinahome</h2>
+
+      <div class="grid md:grid-cols-3 gap-12 mt-16">
         <div class="px-8 flex flex-col text-left items-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
-          <h3 class="text-lg font-semibold mb-2 text-center">Tỷ lệ khách đặt vé mà không đi qua sàn Vexere rất thấp chỉ
+          <h3 class="text-xl font-semibold mb-3 text-center">Tỷ lệ khách đặt vé mà không đi qua sàn Vinahome rất thấp
+            chỉ
             0.2%</h3>
-          <p class="text-sm leading-relaxed flex-1">99.8% khách hàng đặt vé trên sàn Vexere là khách thật, giúp nhà xe
+          <p class="text-lg leading-relaxed flex-1">99.8% khách hàng đặt vé trên sàn Vinahome là khách thật, giúp nhà xe
             cắt giảm tình trạng đặt ảo giữ ghế mà không đi, không bán được cho khách khác gây thất thoát doanh thu của
             nhà xe.</p>
         </div>
@@ -122,46 +89,172 @@ const faqs = ref([
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
-          <h3 class="text-lg font-semibold mb-2 text-center">Quy trình đối soát, thanh toán công nợ đúng hạn</h3>
-          <p class="text-sm leading-relaxed flex-1">Vexere đảm bảo thanh toán đúng hạn, giúp nhà xe yên tâm về dòng tiền
+          <h3 class="text-xl font-semibold mb-2 text-center">Quy trình đối soát, thanh toán công nợ đúng hạn</h3>
+          <p class="text-lg leading-relaxed flex-1">Vinahome đảm bảo thanh toán đúng hạn, giúp nhà xe yên tâm về dòng
+            tiền
             và dễ dàng kiểm soát công nợ với các phương thức thanh toán linh hoạt.</p>
         </div>
         <div class="px-8 flex flex-col text-left items-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
-          <h3 class="text-lg font-semibold mb-2 text-center">Được hỗ trợ tận tình từ đội ngũ chuyên viên Vexere</h3>
-          <p class="text-sm leading-relaxed flex-1">Sau khi đăng ký mở bán, nhà xe được đội ngũ Vexere hỗ trợ hướng dẫn
+          <h3 class="text-xl font-semibold mb-2 text-center">Được hỗ trợ tận tình từ đội ngũ chuyên viên Vinahome</h3>
+          <p class="text-lg leading-relaxed flex-1">Sau khi đăng ký mở bán, nhà xe được đội ngũ Vinahome hỗ trợ hướng
+            dẫn
             quy trình từ thiết lập dịch vụ đến thanh toán trong suốt quá trình hoạt động.</p>
         </div>
       </div>
 
       <div class="grid md:grid-cols-2 gap-12 mt-12 place-items-center">
-        <div class="px-8 flex flex-col text-left items-center">
+        <div class="px-32 flex flex-col text-left items-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
-          <h3 class="text-lg font-semibold mb-2 text-center">Nhà xe có thể đăng bán một số lượng tuyến/chuyến ghế trống
+          <h3 class="text-xl font-semibold mb-2 text-center">Nhà xe có thể đăng bán một số lượng tuyến/chuyến ghế trống
             nhất định</h3>
-          <p class="text-sm leading-relaxed flex-1">Vexere không bắt buộc nhà xe bán tất cả các tuyến/chuyến/ghế trống,
+          <p class="text-lg leading-relaxed flex-1">Vinahome không bắt buộc nhà xe bán tất cả các tuyến/chuyến/ghế
+            trống,
             linh hoạt theo nhu cầu của nhà xe mà vẫn đảm bảo doanh thu tối ưu.</p>
         </div>
-        <div class="px-8 flex flex-col text-left items-center">
+        <div class="px-32 flex flex-col text-left items-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
-          <h3 class="text-lg font-semibold mb-2 text-center">Sàn bán vé xe khách trực tuyến uy tín, đáng tin cậy</h3>
-          <p class="text-sm leading-relaxed flex-1">Vexere là nền tảng đặt vé xe khách hoạt động từ năm 2013, giúp nhà
+          <h3 class="text-xl font-semibold mb-2 text-center">Sàn bán vé xe khách trực tuyến uy tín, đáng tin cậy</h3>
+          <p class="text-lg leading-relaxed flex-1">Vinahome là nền tảng đặt vé xe khách hoạt động từ năm 2013, giúp nhà
             xe tăng độ phủ thương hiệu và tiếp cận lượng khách hàng tiềm năng lớn.</p>
         </div>
       </div>
       <div class="mt-12">
-        <el-button type="warning" size="large">Đăng ký mở bán</el-button>
+        <button
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
+          Đăng ký mở bán
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- Phần 3: Lợi ích (Màu xám) -->
+  <!-- Phần 3: Lắng nghe khách hàng (Màu trắng) -->
+  <section class="bg-gray-100 text-gray-800 py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-4">Lắng nghe khách hàng nói về Vina Home</h2>
+      <p class="text-center text-gray-600 mb-10">
+        Hơn 2000 nhà xe đang mở bán trên sàn Vinahome - Sàn bán vé số 1 Việt Nam
+      </p>
+
+      <div class="space-y-10">
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row items-center md:items-start">
+          <div class="flex flex-col items-center">
+            <img src="" alt="Khách hàng 1" class="w-32 h-32 rounded-full object-cover border-4 border-yellow-400" />
+            <p class="font-semibold mt-3">Anh Hoàng Khánh Chiến</p>
+            <p class="text-gray-500 text-sm">Nhà xe Tiến Oanh</p>
+          </div>
+          <div class="mt-4 md:mt-0 md:ml-6">
+            <p class="text-gray-700 italic">
+              "Vinahome đã là đối tác vô cùng quý giá trong hành trình thành công của chúng tôi. Doanh thu và quy mô của
+              chúng tôi đã tăng đáng kể từ 2 lên 20 xe kể từ khi bán vé trên nền tảng của Vinahome. Với sự hỗ trợ và hướng
+              dẫn từ Vinahome, chúng tôi đã và đang là top nhà xe được khách hàng yêu thích tại tuyến Sài Gòn - Buôn Mê
+              Thuột. <br><br>
+              Điểm đặc biệt của Vinahome là đội ngũ rất chuyên nghiệp. Họ đã luôn đồng hành cùng chúng tôi, phân tích
+              chiến lược các tuyến đường và xác định những điểm cần cải thiện trong hoạt động của chúng tôi. Việc có một
+              đại diện của Vinahome ngồi cùng chúng tôi, cung cấp thông tin và hướng dẫn đã đóng vai trò quan trọng trong
+              thành công của chúng tôi. Họ thấu hiểu sự quan trọng của việc cộng tác chặt chẽ để giúp chúng tôi đạt được
+              mục tiêu. Chúng tôi đã tối ưu hóa hoạt động, nâng cao chất lượng dịch vụ và thu hút nhiều khách hàng hơn.
+              Sự chuyên môn và hỗ trợ của họ đã tạo ra giá trị không thể đo đạc trong việc thúc đẩy kinh doanh của chúng
+              tôi. Chúng tôi rất biết ơn sự cam kết và tận tụy của họ đối với thành công của chúng tôi. <br><br>
+              Chúng tôi giới thiệu Vinahome cho bất kỳ công ty vận chuyển nào muốn phát triển kinh doanh và đạt được kết
+              quả xuất sắc. Họ không chỉ đơn thuần là một nền tảng, mà còn là một đối tác chiến lược quan tâm đến thành
+              công của chúng tôi."
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row-reverse items-center md:items-start">
+          <div class="flex flex-col items-center">
+            <img src="" alt="Khách hàng 2" class="w-32 h-32 rounded-full object-cover border-4 border-yellow-400" />
+            <p class="font-semibold mt-3">Chị Huỳnh Thị Tường Vân</p>
+            <p class="text-gray-500 text-sm">Nhà xe An Anh Limousine</p>
+          </div>
+          <div class="mt-4 md:mt-0 md:mr-6">
+            <p class="text-gray-700 italic">
+              "Với sự hỗ trợ toàn diện từ Vinahome, nhà xe của chúng tôi đã có thể tăng doanh thu bán vé thông qua sàn
+              giao dịch. Vinahome cung cấp một loạt công cụ giúp tăng lượng truy cập vào gian hàng của chúng tôi trên nền
+              tảng, đồng thời hỗ trợ tăng số lượng khách hàng mua vé thông qua các chương trình ưu đãi hấp dẫn như ưu
+              đãi đặt sớm và ưu đãi phút chót. Nhờ đó, chúng tôi đã có cơ hội mở rộng quy mô kinh doanh và đạt được kết
+              quả đáng kinh ngạc. <br><br>
+              Bên cạnh đó, chúng tôi rất hài lòng với các chương trình độc quyền từ Vinahome. Nhà xe của chúng tôi đã được
+              tận hưởng bộ quyền lợi truyền thông trị giá lên đến 50 triệu đồng, được ưu tiên hiển thị trên các trang
+              bán vé của Vinahome và được hưởng ưu đãi đặc biệt trong hệ sinh thái Vinahome. Những quyền lợi này đã giúp
+              chúng tôi nổi bật và thu hút sự chú ý từ khách hàng. <br><br>
+              Việc đăng ký mở bán vé trên Vinahome cực kỳ đơn giản. Chỉ cần hoàn tất quy trình đăng ký, chúng tôi đã có
+              thể tận hưởng những lợi ích vô cùng đáng giá mà Vinahome mang lại. Chúng tôi thật sự biết ơn Vinahome vì sự hỗ
+              trợ và cơ hội phát triển kinh doanh tuyệt vời này!"
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phần 4: Đăng ký (Màu xám) -->
+  <section class="bg-gray-800 text-white py-16">
+    <h2 class="text-4xl font-bold text-center mb-10"> Đăng ký mở bán theo 4 bước đơn giản</h2>
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
+          <div
+            class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full mx-auto text-lg font-bold mb-4">
+            1</div>
+          <h3 class="text-xl font-semibold">Đăng ký thông tin</h3>
+          <p class="text-gray-600 mt-2 text-lg">
+            Quý khách vui lòng để lại thông tin hoặc liên hệ hotline để được tư vấn hỗ trợ.
+          </p>
+        </div>
+
+        <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
+          <div
+            class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full mx-auto text-lg font-bold mb-4">
+            2</div>
+          <h3 class="text-xl font-semibold">Tư vấn</h3>
+          <p class="text-gray-600 mt-2 text-lg">
+            Vinahome sẽ liên hệ xác minh thông tin và tư vấn sớm nhất. Giải đáp tất cả thắc mắc của nhà xe về tệp khách
+            hàng mục tiêu và kỷ vọng của nhà xe.
+          </p>
+        </div>
+
+        <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
+          <div
+            class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full mx-auto text-lg font-bold mb-4">
+            3</div>
+          <h3 class="text-xl font-semibold">Ký hợp đồng</h3>
+          <p class="text-gray-600 mt-2 text-lg">
+            Sau khi tư vấn thành công, Chủ nhà xe và Vinahome sẽ tiến hành ký kết hợp đồng.
+          </p>
+        </div>
+
+        <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
+          <div
+            class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full mx-auto text-lg font-bold mb-4">
+            4</div>
+          <h3 class="text-xl font-semibold">Mở bán tại Vinahome</h3>
+          <p class="text-gray-600 mt-2 text-lg">
+            Chúng tôi luôn đồng hành và hỗ trợ nhà xe cho đến khi phát sinh doanh thu. Chủ
+            nhà xe hoàn toàn kiểm soát được nội dung hiển thị trên sàn về thương hiệu nhà xe.
+          </p>
+        </div>
+      </div>
+      <div class="flex justify-center mt-8">
+        <button
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
+          Đăng ký mở bán
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Phần 5: Lợi ích (Màu xám) -->
   <section class="bg-white text-gray-900 py-16">
     <div class="max-w-7xl mx-auto">
       <h2 class="text-4xl font-bold text-center mb-10">Giải đáp thắc mắc của bạn</h2>
