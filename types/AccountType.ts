@@ -14,8 +14,10 @@ export interface AccountByCompanyBusType {
     id: string;
     name: string;
     username: string;
+    password: string;
     phone: string;
     gender: number;
     role: number;
     email: string;
+    company_id:number;
 }

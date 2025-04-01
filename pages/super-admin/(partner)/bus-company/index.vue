@@ -54,7 +54,7 @@ const openEditDialog = (row: BusCompanyType) => {
 };
 const router = useRouter();
 const openDetailCompanyBus = (row: BusCompanyType) => {
-  router.push(`/super-admin/company-bus/${row.id}`);
+  router.push(`/super-admin/bus-company/${row.id}`);
 };
 const saveData = async () => {
   if (!ruleFormRef.value) return;
