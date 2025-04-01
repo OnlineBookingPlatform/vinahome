@@ -80,7 +80,7 @@ const rules = {
 const openAddModal = () => {
   isEditMode.value = false;
   selectedAccountId.value = null;
-  Object.assign(newAccount.value, { id: '', name: '', username: '', password: '', phone: '', email: '', company_id: companyId, gender: 1, role: 2 });
+  Object.assign(newAccount.value, { id: '', name: '', username: '', password: '', phone: '', email: '', company_id: Number(companyId), gender: 1, role: 2 });
   isModalOpen.value = true;
 };
 
@@ -101,10 +101,12 @@ const saveAccount = () => {
       const index = accounts.value.findIndex((acc) => acc.id === selectedAccountId.value);
       if (index !== -1) accounts.value[index] = { ...newAccount.value };
       ElMessage.success("Cập nhật tài khoản thành công!");
+      console.log("Cập nhật tài khoản với ID:", newAccount.value);
     } else {
       newAccount.value.id = generateUniqueId();
       accounts.value.push({ ...newAccount.value });
       ElMessage.success("Thêm tài khoản thành công!");
+      console.log("Thêm tài khoản mới:", newAccount.value);
     }
 
     isModalOpen.value = false;
