@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { ElMessage, ElMessageBox, ElForm } from "element-plus"; 
+import { ElMessage, ElMessageBox } from "element-plus";
 import TableListAccount from "~/components/super-admin/company-bus/TableListAccount.vue";
 import { getListsAccountByCompanyAPI } from "~/api/accountAPI";
 import type { AccountByCompanyBusType } from "~/types/AccountType";
@@ -12,7 +12,7 @@ definePageMeta({
 const route = useRoute();
 const loading = ref(false);
 const accounts = ref<AccountByCompanyBusType[]>([]);
-
+const userForm = ref<any>(null);
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const companyId = route.params.id;
@@ -29,7 +29,6 @@ const selectedAccount = ref<AccountByCompanyBusType>({
   company_id: Number(companyId),
 });
 
-const userForm = ref<InstanceType<typeof ElForm> | null>(null);
 
 onMounted(() => {
   const companyId = route.params.id;
@@ -62,7 +61,7 @@ const openAddModal = () => {
     company_id: Number(companyId),
   };
   if (userForm.value) {
-    userForm.value.resetFields(); 
+    userForm.value.resetFields();
   }
   isModalOpen.value = true;
 };
@@ -71,7 +70,7 @@ const openEditModal = (account: AccountByCompanyBusType) => {
   isEditMode.value = true;
   selectedAccount.value = { ...account };
   if (userForm.value) {
-    userForm.value.resetFields(); 
+    userForm.value.resetFields();
   }
   isModalOpen.value = true;
 };
@@ -79,7 +78,7 @@ const openEditModal = (account: AccountByCompanyBusType) => {
 const closeModal = () => {
   isModalOpen.value = false;
   if (userForm.value) {
-    userForm.value.resetFields(); 
+    userForm.value.resetFields();
   }
 };
 
@@ -88,7 +87,6 @@ const generateUniqueId = () => {
 };
 
 const saveUser = () => {
-  if (userForm.value) {
     userForm.value.validate((valid: boolean) => {
       if (valid) {
         if (isEditMode.value) {
@@ -109,11 +107,8 @@ const saveUser = () => {
           ElMessage.success("Thêm tài khoản thành công!");
         }
         isModalOpen.value = false;
-      } else {
-        ElMessage.error("Vui lòng điền đầy đủ thông tin!");
-      }
+      } 
     });
-  }
 };
 
 const handleDelete = (accountId: string) => {
