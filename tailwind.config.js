@@ -17,9 +17,20 @@ export default {
           DEFAULT: "hsl(180,4%,5%)",
         },
         primary: {
-          DEFAULT: "hsl(204,82%,55%)",
-          600: "hsl(204,82%,40%)",
+          DEFAULT: "hsla(200, 100%, 51%, 1)",
         },
+        muted: {
+          DEFAULT: "hsla(213, 2%, 57%, 1)",
+        },
+        timeline: {
+          DEFAULT: "hsla(216, 2%, 57%, 1)",
+        },
+        grey: {
+          600: "hsla(215, 18%, 34%, 1)",
+        },
+      },
+      borderColor: {
+        DEFAULT: "hsla(213, 29%, 92%, 1)",
       },
     },
   },
@@ -54,6 +65,12 @@ export default {
           fontSize: theme("fontSize.sm"),
           fontWeight: theme("fontWeight.semibold"),
           display: "block",
+        },
+      });
+      addUtilities({
+        ".button-gradient": {
+          background:
+            "linear-gradient(90deg, #205AFF -9.84%, #01B0FF 24.16%, #147BFF 72.58%, #02AFFF 105.17%);",
         },
       });
     }),
