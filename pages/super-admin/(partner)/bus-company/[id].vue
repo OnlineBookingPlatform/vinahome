@@ -11,114 +11,98 @@ definePageMeta({
 
 const route = useRoute();
 const loading = ref(false);
-const accounts = ref<AccountByCompanyBusType[]>([]);
-const userForm = ref<any>(null);
-const isModalOpen = ref(false);
-const isEditMode = ref(false);
 const companyId = route.params.id;
 
-const selectedAccount = ref<AccountByCompanyBusType>({
+// Dữ liệu tài khoản
+const accounts = ref<AccountByCompanyBusType[]>([ 
+  { id: "1", name: "Nguyễn Văn A", username: "nguyenvana", password: "123456", phone: "0901234567", email: "a@gmail.com", company_id: Number(companyId), gender: 1, role: 2 },
+  { id: "2", name: "Trần Thị B", username: "tranthib", password: "123456", phone: "0907654321", email: "b@gmail.com", company_id: Number(companyId), gender: 2, role: 4 },
+]);
+
+// Modal
+const isModalOpen = ref(false);
+const isEditMode = ref(false);
+const selectedAccountId = ref<string | null>(null);
+const userForm = ref<any>(null);
+
+const newAccount = ref<AccountByCompanyBusType>({
   id: '',
   name: '',
   username: '',
   password: '',
   phone: '',
-  gender: 1,
-  role: 2,
   email: '',
   company_id: Number(companyId),
+  gender: 1,
+  role: 2,
 });
 
-
-onMounted(() => {
-  const companyId = route.params.id;
-  // fetchAccounts(Number(companyId));
-});
-
-const fetchAccounts = async (companyId: number) => {
-  loading.value = true;
-  try {
-    const response = await getListsAccountByCompanyAPI(companyId);
-    accounts.value = response.result;
-  } catch (error) {
-    ElMessage.error("Lỗi hệ thống, vui lòng thử lại!");
-  } finally {
-    loading.value = false;
-  }
+// Validation Rules
+const rules = {
+  name: [{ required: true, message: "Tên không được để trống", trigger: "blur" }],
+  username: [
+    { required: true, message: "Tài khoản không được để trống", trigger: "blur" },
+    { min: 6, message: "Tài khoản phải có ít nhất 6 ký tự", trigger: "blur" }
+  ],
+  password: [
+    { required: true, message: "Mật khẩu không được để trống", trigger: "blur" },
+    { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự", trigger: "blur" }
+  ],
+  phone: [
+    { required: true, message: "Số điện thoại không được để trống", trigger: "blur" },
+    { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ", trigger: "blur" }
+  ],
+  email: [
+    { required: true, message: "Email không được để trống", trigger: "blur" },
+    { type: "email", message: "Email không hợp lệ", trigger: "blur" }
+  ],
+  role: [{ required: true, message: "Vui lòng chọn vai trò", trigger: "change" }]
 };
 
+// Mở modal thêm
 const openAddModal = () => {
   isEditMode.value = false;
-  selectedAccount.value = {
-    id: '',
-    name: '',
-    username: '',
-    password: '',
-    phone: '',
-    gender: 1,
-    role: 2,
-    email: '',
-    company_id: Number(companyId),
-  };
-  if (userForm.value) {
-    userForm.value.resetFields();
-  }
+  selectedAccountId.value = null;
+  Object.assign(newAccount.value, { id: '', name: '', username: '', password: '', phone: '', email: '', company_id: companyId, gender: 1, role: 2 });
   isModalOpen.value = true;
 };
 
+// Mở modal chỉnh sửa
 const openEditModal = (account: AccountByCompanyBusType) => {
   isEditMode.value = true;
-  selectedAccount.value = { ...account };
-  if (userForm.value) {
-    userForm.value.resetFields();
-  }
+  selectedAccountId.value = account.id;
+  Object.assign(newAccount.value, account);
   isModalOpen.value = true;
 };
 
-const closeModal = () => {
-  isModalOpen.value = false;
-  if (userForm.value) {
-    userForm.value.resetFields();
-  }
+// Lưu tài khoản
+const saveAccount = () => {
+  userForm.value?.validate((valid: boolean) => {
+    if (!valid) return;
+
+    if (isEditMode.value && selectedAccountId.value) {
+      const index = accounts.value.findIndex((acc) => acc.id === selectedAccountId.value);
+      if (index !== -1) accounts.value[index] = { ...newAccount.value };
+      ElMessage.success("Cập nhật tài khoản thành công!");
+    } else {
+      newAccount.value.id = generateUniqueId(); 
+      accounts.value.push({ ...newAccount.value });
+      ElMessage.success("Thêm tài khoản thành công!");
+    }
+
+    isModalOpen.value = false;
+  });
 };
 
-const generateUniqueId = () => {
-  return `id-${Math.floor(Math.random() * 1000000)}`;
-};
-
-const saveUser = () => {
-    userForm.value.validate((valid: boolean) => {
-      if (valid) {
-        if (isEditMode.value) {
-          if (!selectedAccount.value.id) {
-            ElMessage.error("Không tìm thấy ID của tài khoản để cập nhật.");
-            return;
-          }
-          const index = accounts.value.findIndex(acc => acc.id === selectedAccount.value.id);
-          if (index !== -1) {
-            accounts.value[index] = { ...selectedAccount.value };
-            ElMessage.success("Cập nhật tài khoản thành công!");
-          } else {
-            ElMessage.error("Tài khoản không tồn tại.");
-          }
-        } else {
-          const newAccount = { ...selectedAccount.value, id: generateUniqueId() };
-          accounts.value.push(newAccount);
-          ElMessage.success("Thêm tài khoản thành công!");
-        }
-        isModalOpen.value = false;
-      } 
-    });
-};
-
-const handleDelete = (accountId: string) => {
+// Xóa tài khoản
+const deleteAccount = (accountId: string) => {
   ElMessageBox.confirm("Bạn có chắc chắn muốn xóa tài khoản này?", "Xác nhận", {
     confirmButtonText: "Xóa",
     cancelButtonText: "Hủy",
     type: "warning",
   })
     .then(() => {
-      accounts.value = accounts.value.filter(account => account.id !== accountId);
+      accounts.value = accounts.value.filter((account) => account.id !== accountId);
       ElMessage.success("Xóa tài khoản thành công!");
     })
     .catch(() => {
@@ -126,23 +110,30 @@ const handleDelete = (accountId: string) => {
     });
 };
 
-const rules = {
-  name: [
-    { required: true, message: 'Vui lòng nhập tên', trigger: 'blur' },
-    { min: 3, message: 'Tên phải có ít nhất 3 ký tự', trigger: 'blur' }
-  ],
-  username: [
-    { required: true, message: 'Vui lòng nhập tài khoản', trigger: 'blur' },
-    { min: 3, message: 'Tài khoản phải có ít nhất 3 ký tự', trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: 'Vui lòng nhập số điện thoại', trigger: 'blur' },
-    { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: 'Vui lòng nhập mật khẩu', trigger: 'blur' },
-    { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự', trigger: 'blur' }
-  ],
+// Tạo ID ngẫu nhiên cho tài khoản mới
+const generateUniqueId = () => {
+  return `id-${Math.floor(Math.random() * 1000000)}`;
+};
+
+// Đóng modal
+const closeModal = () => {
+  isModalOpen.value = false;
+  userForm.value?.resetFields();
+};
+
+// Xác nhận trước khi đóng modal
+const handleBeforeClose = (done?: () => void) => {
+  ElMessageBox.confirm("Bạn có chắc chắn muốn thoát không?", "Xác nhận", {
+    confirmButtonText: "OK",
+    cancelButtonText: "Hủy",
+    type: "warning",
+  })
+    .then(() => {
+      isModalOpen.value = false;
+      userForm.value?.resetFields();
+      if (done) done();
+    })
+    .catch(() => { });
 };
 </script>
 
@@ -153,37 +144,38 @@ const rules = {
         <div>
           <el-button type="primary" @click="openAddModal">Thêm tài khoản</el-button>
         </div>
-        <TableListAccount :loading="loading" :accounts="accounts" @edit="openEditModal" @delete="handleDelete" />
+        <TableListAccount :loading="loading" :accounts="accounts" @edit="openEditModal" @delete="deleteAccount" />
         <!-- Modal -->
-        <el-dialog v-model="isModalOpen" :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'" width="500px">
-          <el-form :model="selectedAccount" ref="userForm" :rules="rules">
+        <el-dialog v-model="isModalOpen" :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'" width="500px"
+          :before-close="handleBeforeClose">
+          <el-form :model="newAccount" ref="userForm" :rules="rules">
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="Tài khoản" prop="username" label-position="top">
-                  <el-input v-model="selectedAccount.username" placeholder="Nhập tài khoản"></el-input>
+                  <el-input v-model="newAccount.username" placeholder="Nhập tài khoản"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="Tên" prop="name" label-position="top">
-                  <el-input v-model="selectedAccount.name" placeholder="Nhập họ tên"></el-input>
+                  <el-input v-model="newAccount.name" placeholder="Nhập họ tên"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="Mật khẩu" prop="password" label-position="top">
-                  <el-input v-model="selectedAccount.password" placeholder="Nhập mật khẩu" type="password"></el-input>
+                  <el-input v-model="newAccount.password" placeholder="Nhập mật khẩu" type="password"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="Số điện thoại" prop="phone" label-position="top">
-                  <el-input v-model="selectedAccount.phone" placeholder="Nhập số điện thoại"></el-input>
+                  <el-input v-model="newAccount.phone" placeholder="Nhập số điện thoại"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-form-item label="Giới tính" prop="gender">
-                <el-radio-group v-model="selectedAccount.gender">
+                <el-radio-group v-model="newAccount.gender">
                   <el-radio :value="1">Nam</el-radio>
                   <el-radio :value="2">Nữ</el-radio>
                 </el-radio-group>
@@ -192,7 +184,7 @@ const rules = {
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Vai trò" prop="role">
-                  <el-select v-model="selectedAccount.role" placeholder="Chọn vai trò">
+                  <el-select v-model="newAccount.role" placeholder="Chọn vai trò">
                     <el-option label="Phụ xe" :value="2"></el-option>
                     <el-option label="Tài xế" :value="3"></el-option>
                     <el-option label="Nhân viên" :value="4"></el-option>
@@ -202,13 +194,13 @@ const rules = {
               </el-col>
             </el-row>
             <el-form-item label="Email" prop="email">
-              <el-input v-model="selectedAccount.email" placeholder="Nhập email"></el-input>
+              <el-input v-model="newAccount.email" placeholder="Nhập email"></el-input>
             </el-form-item>
           </el-form>
 
           <template #footer>
             <el-button @click="closeModal">Hủy</el-button>
-            <el-button type="primary" @click="saveUser">Lưu</el-button>
+            <el-button type="primary" @click="saveAccount">Lưu</el-button>
           </template>
         </el-dialog>
       </el-tab-pane>
