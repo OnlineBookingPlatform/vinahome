@@ -13,8 +13,25 @@ const route = useRoute();
 const loading = ref(false);
 const companyId = route.params.id;
 
+onMounted(() => {
+  const companyId = route.params.id;
+  // fetchAccounts(Number(companyId));
+});
+
+const fetchAccounts = async (companyId: number) => {
+  loading.value = true;
+  try {
+    const response = await getListsAccountByCompanyAPI(companyId);
+    accounts.value = response.result;
+  } catch (error) {
+    ElMessage.error("Lỗi hệ thống, vui lòng thử lại!");
+  } finally {
+    loading.value = false;
+  }
+}
+
 // Dữ liệu tài khoản
-const accounts = ref<AccountByCompanyBusType[]>([ 
+const accounts = ref<AccountByCompanyBusType[]>([
   { id: "1", name: "Nguyễn Văn A", username: "nguyenvana", password: "123456", phone: "0901234567", email: "a@gmail.com", company_id: Number(companyId), gender: 1, role: 2 },
   { id: "2", name: "Trần Thị B", username: "tranthib", password: "123456", phone: "0907654321", email: "b@gmail.com", company_id: Number(companyId), gender: 2, role: 4 },
 ]);
@@ -85,7 +102,7 @@ const saveAccount = () => {
       if (index !== -1) accounts.value[index] = { ...newAccount.value };
       ElMessage.success("Cập nhật tài khoản thành công!");
     } else {
-      newAccount.value.id = generateUniqueId(); 
+      newAccount.value.id = generateUniqueId();
       accounts.value.push({ ...newAccount.value });
       ElMessage.success("Thêm tài khoản thành công!");
     }
