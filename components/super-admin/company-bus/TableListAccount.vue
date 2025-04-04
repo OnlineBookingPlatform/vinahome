@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from "vue";
+import { Edit, Delete } from "@element-plus/icons-vue";
 import type { AccountByCompanyBusType } from "~/types/AccountType";
 
 const props = defineProps({
@@ -58,8 +59,8 @@ const handleDelete = (accountId: string) => {
     <el-table-column label="Email" prop="email" />
     <el-table-column align="right">
       <template #default="scope">
-        <el-button size="small" @click="handleEdit(scope.row)">Sửa</el-button>
-        <el-button size="small" type="danger" @click="handleDelete(scope.row.id)">Xóa</el-button>
+        <el-button type="primary" :icon="Edit" circle @click="handleEdit(scope.row)"></el-button>
+        <el-button type="danger" :icon="Delete" circle @click="handleDelete(scope.row.id)"></el-button>
       </template>
     </el-table-column>
   </el-table>
