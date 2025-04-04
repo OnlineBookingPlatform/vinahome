@@ -47,10 +47,6 @@ const rules = {
             }, trigger: "blur"
         }
     ],
-    image: [
-        { required: true, message: "Vui lòng nhập URL hình ảnh", trigger: "blur" },
-        { type: "url", message: "URL hình ảnh không hợp lệ", trigger: "blur" },
-    ],
 };
 
 // Mở modal add
@@ -119,6 +115,23 @@ const handleBeforeClose = (done?: () => void) => {
         .catch(() => { });
 };
 
+// Tải ảnh
+const beforeAvatarUpload = async (file: File) => {
+    console.log("Đã vào hàm beforeAvatarUpload");
+    const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+    if (!validImageTypes.includes(file.type)) {
+        ElMessage.error("Vui lòng tải lên file hình ảnh hợp lệ (PNG, JPEG, GIF).");
+        return false;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    console.log("Image URL: ", imageUrl);
+    newRoute.value.image = imageUrl;
+    ElMessage.success("Tải ảnh lên thành công!");
+
+    return false;
+};
+
 </script>
 
 
@@ -178,7 +191,14 @@ const handleBeforeClose = (done?: () => void) => {
             </el-form-item>
 
             <el-form-item label="Hình ảnh" prop="image">
-                <el-input v-model="newRoute.image" placeholder="Nhập URL hình ảnh"></el-input>
+                <el-upload class="upload-demo mx-3" :auto-upload="true" :show-file-list="false"
+                    :before-upload="beforeAvatarUpload" accept="image/*">
+                    <div class="avatar-uploader-box">
+                        <el-image v-if="newRoute.image" :src="newRoute.image" fit="cover"
+                            style="width: 150px; height: 90px; border-radius: 5px" />
+                        <Plus v-else style="width: 1em; height: 1em;" />
+                    </div>
+                </el-upload>
             </el-form-item>
 
             <el-form-item label="Trạng thái">
@@ -204,5 +224,31 @@ const handleBeforeClose = (done?: () => void) => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+}
+
+.avatar-uploader-box {
+    width: 150px;
+    height: 90px;
+    border: 2px dashed #dcdfe6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #909399;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.avatar-uploader-box:hover {
+    border-color: #409eff;
+    background-color: #f1faff;
+}
+
+.el-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
 }
 </style>
