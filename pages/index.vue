@@ -33,8 +33,8 @@ const radio1 = ref('New York')
         </div>
       </div>
     </div>
-
   </section>
+
   <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-5">
     <el-radio-group v-model="radio1" size="large" class="flex gap-x-4" id="homepage-group">
       <el-radio-button value="New York">
@@ -65,7 +65,6 @@ const radio1 = ref('New York')
         <template #default>
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
-
               <path
                 d="M200 0c-30.6 0-56 54.7-56 86.1l0 106.5L7.8 274.3C2.9 277.2 0 282.4 0 288l0 64c0 5.1 2.4 9.8 6.4 12.8s9.3 3.9 14.1 2.5l123.4-37 0 81.2-50 40c-3.8 3-6 7.6-6 12.5l0 32c0 5.1 2.5 10 6.6 13s9.5 3.8 14.4 2.2L200 480.9 290.4 511c-1.6-4.7-2.4-9.8-2.4-15l0-32.6c-18.2-10.5-30.7-29.7-31.9-51.8l-.1-.1 0-3.5 0-82.5L256 184l0-1.1s0 0 0 0l0-96.9C256 54.7 231.5 0 200 0zm88 176l0 224c0 20.9 13.4 38.7 32 45.3l0 42.7c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-40 160 0 0 40c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-42.7c18.6-6.6 32-24.4 32-45.3l0-224c0-26.5-21.5-48-48-48l-256 0c-26.5 0-48 21.5-48 48zm79.8 78.7c3.3-8.7 11.2-14.7 20.5-14.7l151.4 0c9.2 0 17.2 6 20.5 14.7L576 304l-224 0 15.8-49.3zM568 352a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM336 376a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
             </svg>
@@ -77,7 +76,6 @@ const radio1 = ref('New York')
         <template #default>
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-
               <path
                 d="M192 0c-17.7 0-32 14.3-32 32l0 32 0 .2c-38.6 2.2-72.3 27.3-85.2 64.1L39.6 228.8C16.4 238.4 0 261.3 0 288L0 432l0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 320 0 0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 0-144c0-26.7-16.4-49.6-39.6-59.2L437.2 128.3c-12.9-36.8-46.6-62-85.2-64.1l0-.2 0-32c0-17.7-14.3-32-32-32L192 0zM165.4 128l181.2 0c13.6 0 25.7 8.6 30.2 21.4L402.9 224l-293.8 0 26.1-74.6c4.5-12.8 16.6-21.4 30.2-21.4zM96 288a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm288 32a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
             </svg>
@@ -89,7 +87,6 @@ const radio1 = ref('New York')
         <template #default>
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-
               <path
                 d="M383.5 192c.3-5.3 .5-10.6 .5-16c0-51-15.9-96-40.2-127.6C319.5 16.9 288.2 0 256 0s-63.5 16.9-87.8 48.4C143.9 80 128 125 128 176c0 5.4 .2 10.7 .5 16L240 192l0 128-32 0c-7 0-13.7 1.5-19.7 4.2L68.2 192l28.3 0c-.3-5.3-.5-10.6-.5-16c0-64 22.2-121.2 57.1-159.3C62 49.3 18.6 122.6 4.2 173.6C1.5 183.1 9 192 18.9 192l6 0L165.2 346.3c-3.3 6.5-5.2 13.9-5.2 21.7l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-7.8-1.9-15.2-5.2-21.7L487.1 192l6 0c9.9 0 17.4-8.9 14.7-18.4C493.4 122.6 450 49.3 358.9 16.7C393.8 54.8 416 112.1 416 176c0 5.4-.2 10.7-.5 16l28.3 0L323.7 324.2c-6-2.7-12.7-4.2-19.7-4.2l-32 0 0-128 111.5 0z" />
             </svg>
@@ -101,7 +98,6 @@ const radio1 = ref('New York')
         <template #default>
           <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-
               <path
                 d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
             </svg>
@@ -116,22 +112,21 @@ const radio1 = ref('New York')
       <SelectTrip_v2 />
     </div>
 
-
-    <div class="mt-[200px]">
+    <div class="mt-[200px] [@media(max-width:450px)]:mt-[100px]">
       <div class="mx-auto max-w-2xl lg:text-center">
-        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance">
+        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
           Đồng hành cùng VinaHome</p>
-        <p class="mt-6 text-lg text-gray-600">Chúng tôi giúp bạn kết nối đến mọi nơi, mang đến lựa chọn di chuyển tiện
+        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Chúng tôi giúp bạn kết nối đến mọi nơi, mang đến lựa chọn di chuyển tiện
           lợi và tiết kiệm chi phí.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 p-4">
         <div>
-          <div class="min-h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#FF5603] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
-
                 <path
                   d="M352 256c0 22.2-1.2 43.6-3.3 64l-185.3 0c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64l185.3 0c2.2 20.4 3.3 41.8 3.3 64zm28.8-64l123.1 0c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64l-123.1 0c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64zm112.6-32l-116.7 0c-10-63.9-29.8-117.4-55.3-151.6c78.3 20.7 142 77.5 171.9 151.6zm-149.1 0l-176.6 0c6.1-36.4 15.5-68.6 27-94.7c10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5c11.6 26 20.9 58.2 27 94.7zm-209 0L18.6 160C48.6 85.9 112.2 29.1 190.6 8.4C165.1 42.6 145.3 96.1 135.3 160zM8.1 192l123.1 0c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64L8.1 320C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64zM194.7 446.6c-11.6-26-20.9-58.2-27-94.6l176.6 0c-6.1 36.4-15.5 68.6-27 94.6c-10.5 23.6-22.2 40.7-33.5 51.5C272.6 508.8 263.3 512 256 512s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6C112.2 482.9 48.6 426.1 18.6 352l116.7 0zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6c25.5-34.2 45.2-87.7 55.3-151.6l116.7 0z" />
               </svg>
@@ -141,11 +136,11 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="min-h-[110px] bg-[#F2EFFF] p-4 rounded-lg border border-[#D8CFFF] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#F2EFFF] p-4 rounded-lg border border-[#D8CFFF] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#866BF8] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="h-6 w-6" fill="#fff">
-
                 <path
                   d="M288 0C422.4 0 512 35.2 512 80l0 16 0 32c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32l0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-192 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32c0 0 0 0 0 0l0-32s0 0 0 0l0-16C64 35.2 153.6 0 288 0zM128 160l0 96c0 17.7 14.3 32 32 32l112 0 0-160-112 0c-17.7 0-32 14.3-32 32zM304 288l112 0c17.7 0 32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-112 0 0 160zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16L208 64c-8.8 0-16 7.2-16 16s7.2 16 16 16l160 0c8.8 0 16-7.2 16-16z" />
               </svg>
@@ -155,7 +150,8 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="min-h-[110px] bg-[#FFFAE9] p-4 rounded-lg border border-[#FCD8CF] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#FFFAE9] p-4 rounded-lg border border-[#FCD8CF] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#F5C207] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="h-6 w-6" fill="#fff">
@@ -169,7 +165,8 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="min-h-[110px] bg-[#F2FDF7] p-4 rounded-lg border border-[#C7FDDE] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#F2FDF7] p-4 rounded-lg border border-[#C7FDDE] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#0AD561] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -183,7 +180,8 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="min-h-[110px] bg-[#F1F8FE] p-4 rounded-lg border border-[#0382F7] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#F1F8FE] p-4 rounded-lg border border-[#0382F7] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#0382F7] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -197,7 +195,8 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="min-h-[110px] bg-[#FFF6FB] p-4 rounded-lg border border-[#FFDAE9] flex flex-col relative pl-10 pr-2">
+          <div
+            class="min-h-[110px] bg-[#FFF6FB] p-4 rounded-lg border border-[#FFDAE9] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#F05697] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -214,13 +213,11 @@ const radio1 = ref('New York')
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p
-            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance">
+          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Tuyến đường phổ biến</p>
-          <p class="mt-6 text-lg text-gray-600">Những tuyến đường được yêu thích nhất, mang đến trải nghiệm di chuyển
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Những tuyến đường được yêu thích nhất, mang đến trải nghiệm di chuyển
             thoải mái, tiết kiệm và thuận tiện cho mọi hành trình!</p>
         </div>
-
 
         <div class="mt-10 mb-10">
           <el-carousel :interval="4000" type="card" height="200px">
@@ -229,20 +226,18 @@ const radio1 = ref('New York')
             </el-carousel-item>
           </el-carousel>
         </div>
-
       </div>
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p
-            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance">
+          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Các bước đơn giản để tận hưởng chuyến đi</p>
-          <p class="mt-6 text-lg text-gray-600">Hãy tận hưởng hành trình của bạn, trân trọng từng khoảnh khắc và khám
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Hãy tận hưởng hành trình của bạn, trân trọng từng khoảnh khắc và khám
             phá vẻ đẹp từ những điều giản đơn.
           </p>
         </div>
         <div
-          class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 pt-10 sm:mt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+          class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <article
             class="relative flex max-w-xl flex-col items-start justify-between bg-white rounded-md p-4 border border-transparent hover:border-[#0382F7] transition">
             <div class="absolute top-2 right-2 h-20 w-20 flex items-center justify-center">
@@ -317,7 +312,6 @@ const radio1 = ref('New York')
             class="relative flex max-w-xl flex-col items-start justify-between bg-white rounded-md p-4 border border-transparent hover:border-[#0382F7] transition">
             <div class="absolute top-2 right-2 h-20 w-20 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="#F5F5F6">
-
                 <path
                   d="M512 80c8.8 0 16 7.2 16 16l0 32L48 128l0-32c0-8.8 7.2-16 16-16l448 0zm16 144l0 192c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16l0-192 480 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm56 304c-13.3 0-24 10.7-24 24s10.7 24 24 24l48 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-48 0zm128 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-112 0z" />
               </svg>
@@ -326,7 +320,6 @@ const radio1 = ref('New York')
             <div class="flex flex-col gap-2 w-full">
               <div class="flex items-center justify-center w-12 h-12 bg-[#FF5603] p-3 rounded-md">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="h-10 w-10" fill="#fff">
-
                   <path
                     d="M512 80c8.8 0 16 7.2 16 16l0 32L48 128l0-32c0-8.8 7.2-16 16-16l448 0zm16 144l0 192c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16l0-192 480 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm56 304c-13.3 0-24 10.7-24 24s10.7 24 24 24l48 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-48 0zm128 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-112 0z" />
                 </svg>
@@ -349,24 +342,18 @@ const radio1 = ref('New York')
               </div>
             </div>
           </article>
-
         </div>
-
-
       </div>
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p
-            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance">
+          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Những địa điểm được ghé thăm nhiều</p>
-          <p class="mt-6 text-lg text-gray-600">Khám phá những cảnh quan ngoạn mục, di tích lịch sử và những thành phố
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Khám phá những cảnh quan ngoạn mục, di tích lịch sử và những thành phố
             sôi động trên khắp Việt Nam.</p>
         </div>
 
-
         <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-
           <div class="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
             <div class="relative lg:row-span-2 h-full">
               <div class="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
@@ -375,9 +362,6 @@ const radio1 = ref('New York')
                 <img class="w-full h-full object-cover object-top rounded-lg" src="/ha-long.jpg" alt="" />
               </div>
             </div>
-
-
-
 
             <div class="relative max-lg:row-start-1">
               <img class="w-full h-full object-cover object-top rounded-lg" src="/ha-long.jpg" alt="" />
@@ -388,26 +372,20 @@ const radio1 = ref('New York')
             </div>
 
             <div class="relative lg:row-span-2">
-              <div
-                class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
+              <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
                 <img class="w-full h-full object-cover object-top rounded-lg" src="/ha-long.jpg" alt="" />
               </div>
-
             </div>
-
           </div>
         </div>
       </div>
-
-
     </div>
-
 
     <div class="mt-[100px] mb-10">
       <div class="mx-auto max-w-2xl lg:text-center">
-        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance">
+        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
           Thanh toán đa dạng</p>
-        <p class="mt-6 text-lg text-gray-600">Thanh toán dễ dàng, nhanh chóng và bảo mật với nhiều phương thức tiện
+        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Thanh toán dễ dàng, nhanh chóng và bảo mật với nhiều phương thức tiện
           lợi.</p>
       </div>
 
@@ -434,17 +412,12 @@ const radio1 = ref('New York')
           <div class="col-span-2 col-start-2 sm:col-start-auto lg:col-span-1 overflow-hidden rounded-lg">
             <img class="max-h-[80px] w-full object-cover" src="/vn-pay.jpg" alt="Statamic" />
           </div>
-
         </div>
       </div>
-
-
-
-
     </div>
 
-    <div class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px]">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8 py-10 sm:py-10 lg:py-14">
+    <div class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px] min-h-[350px] [@media(max-width:450px)]:mt-[100px]">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8 py-10 sm:py-10 lg:py-14 relative z-10">
         <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
           <div class="max-w-xl lg:max-w-lg">
             <h2 class="text-4xl font-semibold tracking-tight text-white">Đăng ký nhận bản tin</h2>
@@ -459,18 +432,11 @@ const radio1 = ref('New York')
           </div>
         </div>
       </div>
-
-      <div class="absolute bottom-0 right-[-50px]">
-        <img src="/static/a1.png" class="w-[620px]">
-      </div>
+      <div class="absolute bottom-0 z-0 md:z-10 right-0 md:right-[-50px]">
+        <img src="/static/a1.png" class="w-full max-w-[620px]" />
+      </div>      
     </div>
-
-
-
-
-
   </section>
-
 </template>
 
 <style>
@@ -494,4 +460,14 @@ const radio1 = ref('New York')
 .el-carousel__item:nth-child(2n + 1) {
   background-color: #d3dce6;
 }
+
+@media (max-width: 768px) {
+  .el-carousel__indicators,
+  .el-carousel__indicator,
+  .el-carousel__indicator--horizontal,
+  .el-carousel__indicator.is-active {
+    display: none !important;
+  }
+}
+
 </style>
