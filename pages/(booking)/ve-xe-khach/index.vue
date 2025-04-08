@@ -22,6 +22,7 @@ import {
   getTripOnPlatform,
 } from "~/api/tripAPI";
 import { useRoute, useRouter } from "vue-router";
+import type { SelectedTicket } from "~/types/TicketType";
 
 const route = useRoute();
 const router = useRouter();
@@ -40,7 +41,7 @@ onMounted(async () => {
     numberOfTickets,
   });
 
-  // Chuẩn bị params để gọi API
+  // params để gọi API
   const searchParams = {
     departureId: departureId ? Number(departureId) : null,
     destinationId: destinationId ? Number(destinationId) : null,
@@ -112,24 +113,35 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 
 const activeTabs = ref<Record<string, number | null>>({});
 const tripDetail = ref<DetailTripType | null>(null);
-
 const selectedTripId = ref<number | null>(null);
 const selectedTicket = ref<SelectedTicket[]>([]);
+const valuePointUp = ref("");
+const optionsPointUp = ref<TripPointType[]>([]);
+const selectedStep = ref(1);
+const valuePointDown = ref("");
+const optionsPointDown = ref<TripPointType[]>([]);
+
 const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
     selectedTicket.value = [];
+    activeStep.value = 0;
     activeTabs.value[String(selectedTripId.value)] = null;
   }
 
   (activeTabs.value as Record<number, number | null>)[tripId] = 1;
   selectedTripId.value = tripId;
 
+  // Reset point chọn
+  valuePointUp.value = "";
+  valuePointDown.value = "";
+  activeStep.value = 0;
+
   const response = await getTripDeatil(tripId);
-  console.log("API response:", response.result);
   if (response.result) {
     tripDetail.value = response.result;
   }
 };
+
 const handleClick = async (tripId: number, tab: any) => {
   console.log("Tab được chọn:", tab.props.name);
   console.log(
@@ -139,10 +151,25 @@ const handleClick = async (tripId: number, tab: any) => {
   if (tab.props.name === 1) {
     if (selectedTripId.value !== tripId) {
       selectedTicket.value = [];
+      activeStep.value = 0;
     }
+    selectedStep.value = 1;
+    selectedTicket.value = [];
     await openTrip(tripId);
   } else if (tab.props.name === 2) {
     console.log("API response cho tab 2:");
+    const responsePointUp = await getPointUpByTrip(tripId);
+    if (responsePointUp.result) {
+      optionsPointUp.value = responsePointUp.result;
+    } else {
+      optionsPointUp.value = [];
+    }
+    const responsePointDown = await getPointDownByTrip(tripId);
+    if (responsePointDown.result) {
+      optionsPointDown.value = responsePointDown.result;
+    } else {
+      optionsPointDown.value = [];
+    }
   } else if (tab.props.name === 3) {
     console.log("API response cho tab 3:");
   } else if (tab.props.name === 4) {
@@ -157,6 +184,7 @@ const closeTrip = (tripId: number) => {
   activeTabs.value[tripId] = null;
   selectedTripId.value = null;
   tripDetail.value = null;
+  activeStep.value = 0;
 
   selectedTicket.value = [];
 };
@@ -198,16 +226,6 @@ const getSeatName = (floor: number, row: number, col: number) => {
   return seat ? seat.seat_name : "";
 };
 
-const getSeatStatus = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return false;
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-  return seat ? seat.seat_status : false;
-};
 const getBasePrice = (floor: number, row: number, col: number) => {
   if (!tripDetail.value) return "0 ₫";
 
@@ -226,12 +244,6 @@ const getBasePrice = (floor: number, row: number, col: number) => {
   }).format(seat.base_price);
 };
 
-interface SelectedTicket {
-  id: number;
-  seat_name: string;
-  price: number;
-}
-
 const toggleSeatSelection = (floor: number, row: number, col: number) => {
   if (!tripDetail.value) return;
 
@@ -246,7 +258,7 @@ const toggleSeatSelection = (floor: number, row: number, col: number) => {
 
   const index = selectedTicket.value.findIndex((s) => s.id === seat.id);
   if (index !== -1) {
-    selectedTicket.value.splice(index, 1); // Bỏ chọn nếu đã chọn trước đó
+    selectedTicket.value.splice(index, 1);
   } else {
     selectedTicket.value.push({
       id: seat.id,
@@ -299,19 +311,15 @@ watch(
   }
 );
 
-const selectedStep = ref(1);
 const nextStep = () => {
   selectedStep.value = 2;
-  activeStep.value = 1;
+  activeStep.value = 2;
 };
 const preStep = () => {
   selectedStep.value = 1;
   activeStep.value = 1;
 };
 
-
-const valuePointUp = ref("");
-const optionsPointUp = ref<TripPointType[]>([]);
 const fetchPointUpOptions = async () => {
   try {
     if (selectedTripId.value !== null) {
@@ -328,8 +336,6 @@ const fetchPointUpOptions = async () => {
   }
 };
 
-const valuePointDown = ref("");
-const optionsPointDown = ref<TripPointType[]>([]);
 const fetchPointDownOptions = async () => {
   try {
     if (selectedTripId.value !== null) {
@@ -352,22 +358,13 @@ watch(
       fetchPointUpOptions();
       fetchPointDownOptions();
       valuePointDown.value = "";
-      valuePointUp.value = ""; 
+      valuePointUp.value = "";
       activeStep.value = 0;
       selectedStep.value = 1;
     }
   },
   { immediate: true }
 );
-watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
-  if (newUp && newDown) {
-    activeStep.value = 2;
-  } else {
-    activeStep.value = 1;
-  }
-});
-
-
 </script>
 
 <template>
@@ -798,6 +795,11 @@ watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
                         </div>
                       </el-col>
                     </el-row>
+                    <div class="flex justify-center items-center mt-5 mb-5">
+                      <span class="text-sm italic text-gray-500">
+                        * Vui lòng chọn hoặc nhập điểm đón và điểm trả
+                      </span>
+                    </div>
                   </div>
                   <div class="w-full bg-[#4D5054] rounded-b-[14px] px-5">
                     <div class="flex justify-between items-center py-2">
@@ -821,7 +823,10 @@ watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
                         <span class="text-white text-sm mr-5"
                           >Tổng cộng: {{ totalPrice }}</span
                         >
-                        <el-button color="#fff" @click="nextStep"
+                        <el-button
+                          color="#fff"
+                          @click="nextStep"
+                          v-if="selectedTicket.length >= 1"
                           >Tiếp tục</el-button
                         >
                       </div>
@@ -830,18 +835,70 @@ watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
                 </el-tab-pane>
                 <el-tab-pane label="Lịch trình" :name="2">
                   <div class="p-4">
-                    Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
-                    Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
-                    thông trong thành phố và sẽ kết hợp đón nhiều điểm khác nhau
-                    nên thời gian đón cụ thể tài xế sẽ liên hệ hẹn giờ. - Hẻm
-                    nhỏ xe không quay đầu được : Xe trung chuyển sẽ đón Khách
-                    đầu hẻm/ đầu đường. - Khu vực có biển cấm dừng đỗ xe không
-                    đón được : Xe trung chuyển sẽ đón tại vị trí gần nhất có
-                    thể. - Hành lý : Hành lý nhỏ gọn dưới 20 kg, không vận
-                    chuyển kèm động vật , thú cưng, không mang đồ có mùi, đồ
-                    chảy nước trên xe.nn
-                  </div></el-tab-pane
-                >
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <h3 class="text-lg font-semibold mb-2">Điểm đón</h3>
+                        <ul class="list-disc pl-5">
+                          <el-scrollbar height="400px">
+                            <li
+                              v-for="point in optionsPointUp"
+                              :key="point.id"
+                              class="mb-2"
+                            >
+                              <div class="flex flex-col">
+                                <span class="font-semibold text-base">{{
+                                  point.name
+                                }}</span>
+                                <span class="text-sm text-gray-500">{{
+                                  point.address
+                                }}</span>
+                                <span class="text-sm text-gray-400">
+                                  Thời gian:
+                                  {{
+                                    calculateTotalTime(
+                                      point.start_time,
+                                      point.time_point
+                                    )
+                                  }}
+                                </span>
+                              </div>
+                            </li>
+                          </el-scrollbar>
+                        </ul>
+                      </el-col>
+                      <el-col :span="12">
+                        <h3 class="text-lg font-semibold mb-2">Điểm trả</h3>
+                        <ul class="list-disc pl-5">
+                          <el-scrollbar height="400px">
+                            <li
+                              v-for="point in optionsPointDown"
+                              :key="point.id"
+                              class="mb-2"
+                            >
+                              <div class="flex flex-col">
+                                <span class="font-semibold text-base">{{
+                                  point.name
+                                }}</span>
+                                <span class="text-sm text-gray-500">{{
+                                  point.address
+                                }}</span>
+                                <span class="text-sm text-gray-400">
+                                  Thời gian:
+                                  {{
+                                    calculateTotalTime(
+                                      point.start_time,
+                                      point.time_point
+                                    )
+                                  }}
+                                </span>
+                              </div>
+                            </li>
+                          </el-scrollbar>
+                        </ul>
+                      </el-col>
+                    </el-row>
+                  </div>
+                </el-tab-pane>
                 <el-tab-pane label="Trung chuyển" :name="3">
                   <div class="p-4">
                     Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -

@@ -8,3 +8,8 @@ export interface TicketType {
   seat_name: string;
   base_price: number;
 }
+export interface SelectedTicket {
+  id: number;
+  seat_name: string;
+  price: number;
+}
