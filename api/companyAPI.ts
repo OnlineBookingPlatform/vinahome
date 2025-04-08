@@ -46,3 +46,25 @@ export const deleteCompanyAPI = async (companyId: number): Promise<ApiResponse<v
     }
 }
 
+export const createPolicyAPI = async (companyId: number, policyInfo: any): Promise<ApiResponse<any>> => {
+    try {
+        return await $fetch<ApiResponse<any>>(`${API_BASE_URL}/v2/company/create-policy/${companyId}`, {
+            method: "POST",
+            body: policyInfo,
+        });
+    } catch (error) {
+        console.error("Create policy: ", error);
+        throw error;
+    }
+}
+
+export const getPolicyAPI = async (companyId: number): Promise<ApiResponse<any>> => {
+    try {
+        return await $fetch<ApiResponse<any>>(`${API_BASE_URL}/v2/company/get-policy/${companyId}`, {
+            method: "GET",
+        });
+    } catch (error) {
+        console.error("Get policy failed: ", error);
+        throw error;
+    }
+}

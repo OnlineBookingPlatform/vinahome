@@ -4,7 +4,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import TableListAccount from "~/components/super-admin/company-bus/TableListAccount.vue";
 import { getListsAccountByCompanyAPI } from "~/api/accountAPI";
 import type { AccountByCompanyBusType } from "~/types/AccountType";
-
+import Quill from "~/components/Quill.vue";
 definePageMeta({
   layout: "superadmin",
 });
@@ -28,12 +28,32 @@ const fetchAccounts = async (companyId: number) => {
   } finally {
     loading.value = false;
   }
-}
+};
 
 // Dữ liệu tài khoản
 const accounts = ref<AccountByCompanyBusType[]>([
-  { id: "1", name: "Nguyễn Văn A", username: "nguyenvana", password: "123456", phone: "0901234567", email: "a@gmail.com", company_id: Number(companyId), gender: 1, role: 2 },
-  { id: "2", name: "Trần Thị B", username: "tranthib", password: "123456", phone: "0907654321", email: "b@gmail.com", company_id: Number(companyId), gender: 2, role: 4 },
+  {
+    id: "1",
+    name: "Nguyễn Văn A",
+    username: "nguyenvana",
+    password: "123456",
+    phone: "0901234567",
+    email: "a@gmail.com",
+    company_id: Number(companyId),
+    gender: 1,
+    role: 2,
+  },
+  {
+    id: "2",
+    name: "Trần Thị B",
+    username: "tranthib",
+    password: "123456",
+    phone: "0907654321",
+    email: "b@gmail.com",
+    company_id: Number(companyId),
+    gender: 2,
+    role: 4,
+  },
 ]);
 
 // Modal
@@ -43,12 +63,12 @@ const selectedAccountId = ref<string | null>(null);
 const userForm = ref<any>(null);
 
 const newAccount = ref<AccountByCompanyBusType>({
-  id: '',
-  name: '',
-  username: '',
-  password: '',
-  phone: '',
-  email: '',
+  id: "",
+  name: "",
+  username: "",
+  password: "",
+  phone: "",
+  email: "",
   company_id: Number(companyId),
   gender: 1,
   role: 2,
@@ -56,31 +76,61 @@ const newAccount = ref<AccountByCompanyBusType>({
 
 // Validation Rules
 const rules = {
-  name: [{ required: true, message: "Tên không được để trống", trigger: "blur" }],
+  name: [
+    { required: true, message: "Tên không được để trống", trigger: "blur" },
+  ],
   username: [
-    { required: true, message: "Tài khoản không được để trống", trigger: "blur" },
-    { min: 6, message: "Tài khoản phải có ít nhất 6 ký tự", trigger: "blur" }
+    {
+      required: true,
+      message: "Tài khoản không được để trống",
+      trigger: "blur",
+    },
+    { min: 6, message: "Tài khoản phải có ít nhất 6 ký tự", trigger: "blur" },
   ],
   password: [
-    { required: true, message: "Mật khẩu không được để trống", trigger: "blur" },
-    { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự", trigger: "blur" }
+    {
+      required: true,
+      message: "Mật khẩu không được để trống",
+      trigger: "blur",
+    },
+    { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự", trigger: "blur" },
   ],
   phone: [
-    { required: true, message: "Số điện thoại không được để trống", trigger: "blur" },
-    { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ", trigger: "blur" }
+    {
+      required: true,
+      message: "Số điện thoại không được để trống",
+      trigger: "blur",
+    },
+    {
+      pattern: /^[0-9]{10}$/,
+      message: "Số điện thoại không hợp lệ",
+      trigger: "blur",
+    },
   ],
   email: [
     { required: true, message: "Email không được để trống", trigger: "blur" },
-    { type: "email", message: "Email không hợp lệ", trigger: "blur" }
+    { type: "email", message: "Email không hợp lệ", trigger: "blur" },
   ],
-  role: [{ required: true, message: "Vui lòng chọn vai trò", trigger: "change" }]
+  role: [
+    { required: true, message: "Vui lòng chọn vai trò", trigger: "change" },
+  ],
 };
 
 // Mở modal thêm
 const openAddModal = () => {
   isEditMode.value = false;
   selectedAccountId.value = null;
-  Object.assign(newAccount.value, { id: '', name: '', username: '', password: '', phone: '', email: '', company_id: Number(companyId), gender: 1, role: 2 });
+  Object.assign(newAccount.value, {
+    id: "",
+    name: "",
+    username: "",
+    password: "",
+    phone: "",
+    email: "",
+    company_id: Number(companyId),
+    gender: 1,
+    role: 2,
+  });
   isModalOpen.value = true;
 };
 
@@ -98,7 +148,9 @@ const saveAccount = () => {
     if (!valid) return;
 
     if (isEditMode.value && selectedAccountId.value) {
-      const index = accounts.value.findIndex((acc) => acc.id === selectedAccountId.value);
+      const index = accounts.value.findIndex(
+        (acc) => acc.id === selectedAccountId.value
+      );
       if (index !== -1) accounts.value[index] = { ...newAccount.value };
       ElMessage.success("Cập nhật tài khoản thành công!");
       console.log("Cập nhật tài khoản với ID:", newAccount.value);
@@ -121,7 +173,9 @@ const deleteAccount = (accountId: string) => {
     type: "warning",
   })
     .then(() => {
-      accounts.value = accounts.value.filter((account) => account.id !== accountId);
+      accounts.value = accounts.value.filter(
+        (account) => account.id !== accountId
+      );
       ElMessage.success("Xóa tài khoản thành công!");
     })
     .catch(() => {
@@ -152,8 +206,10 @@ const handleBeforeClose = (done?: () => void) => {
       userForm.value?.resetFields();
       if (done) done();
     })
-    .catch(() => { });
+    .catch(() => {});
 };
+
+
 </script>
 
 <template>
@@ -161,34 +217,70 @@ const handleBeforeClose = (done?: () => void) => {
     <el-tabs type="border-card">
       <el-tab-pane label="Tài khoản">
         <div>
-          <el-button type="primary" @click="openAddModal">Thêm tài khoản</el-button>
+          <el-button type="primary" @click="openAddModal"
+            >Thêm tài khoản</el-button
+          >
         </div>
-        <TableListAccount :loading="loading" :accounts="accounts" @edit="openEditModal" @delete="deleteAccount" />
+        <TableListAccount
+          :loading="loading"
+          :accounts="accounts"
+          @edit="openEditModal"
+          @delete="deleteAccount"
+        />
         <!-- Modal -->
-        <el-dialog v-model="isModalOpen" :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'" width="500px"
-          :before-close="handleBeforeClose">
+        <el-dialog
+          v-model="isModalOpen"
+          :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'"
+          width="500px"
+          :before-close="handleBeforeClose"
+        >
           <el-form :model="newAccount" ref="userForm" :rules="rules">
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="Tài khoản" prop="username" label-position="top">
-                  <el-input v-model="newAccount.username" placeholder="Nhập tài khoản"></el-input>
+                <el-form-item
+                  label="Tài khoản"
+                  prop="username"
+                  label-position="top"
+                >
+                  <el-input
+                    v-model="newAccount.username"
+                    placeholder="Nhập tài khoản"
+                  ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="Tên" prop="name" label-position="top">
-                  <el-input v-model="newAccount.name" placeholder="Nhập họ tên"></el-input>
+                  <el-input
+                    v-model="newAccount.name"
+                    placeholder="Nhập họ tên"
+                  ></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="Mật khẩu" prop="password" label-position="top">
-                  <el-input v-model="newAccount.password" placeholder="Nhập mật khẩu" type="password"></el-input>
+                <el-form-item
+                  label="Mật khẩu"
+                  prop="password"
+                  label-position="top"
+                >
+                  <el-input
+                    v-model="newAccount.password"
+                    placeholder="Nhập mật khẩu"
+                    type="password"
+                  ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="Số điện thoại" prop="phone" label-position="top">
-                  <el-input v-model="newAccount.phone" placeholder="Nhập số điện thoại"></el-input>
+                <el-form-item
+                  label="Số điện thoại"
+                  prop="phone"
+                  label-position="top"
+                >
+                  <el-input
+                    v-model="newAccount.phone"
+                    placeholder="Nhập số điện thoại"
+                  ></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -203,7 +295,10 @@ const handleBeforeClose = (done?: () => void) => {
             <el-row>
               <el-col :span="12">
                 <el-form-item label="Vai trò" prop="role">
-                  <el-select v-model="newAccount.role" placeholder="Chọn vai trò">
+                  <el-select
+                    v-model="newAccount.role"
+                    placeholder="Chọn vai trò"
+                  >
                     <el-option label="Phụ xe" :value="2"></el-option>
                     <el-option label="Tài xế" :value="3"></el-option>
                     <el-option label="Nhân viên" :value="4"></el-option>
@@ -213,7 +308,10 @@ const handleBeforeClose = (done?: () => void) => {
               </el-col>
             </el-row>
             <el-form-item label="Email" prop="email">
-              <el-input v-model="newAccount.email" placeholder="Nhập email"></el-input>
+              <el-input
+                v-model="newAccount.email"
+                placeholder="Nhập email"
+              ></el-input>
             </el-form-item>
           </el-form>
 
@@ -223,7 +321,10 @@ const handleBeforeClose = (done?: () => void) => {
           </template>
         </el-dialog>
       </el-tab-pane>
-      <el-tab-pane label="Tuyến">Config</el-tab-pane>
+      <el-tab-pane label="Chính sách">
+        
+        <Quill />
+      </el-tab-pane>
       <el-tab-pane label="Role">Role</el-tab-pane>
       <el-tab-pane label="Task">Task</el-tab-pane>
     </el-tabs>
