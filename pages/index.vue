@@ -219,7 +219,6 @@ const radio1 = ref('New York')
             thoải mái, tiết kiệm và thuận tiện cho mọi hành trình!</p>
         </div>
 
-
         <div class="mt-10 mb-10">
           <el-carousel :interval="4000" type="card" height="200px">
             <el-carousel-item v-for="item in 6" :key="item">
@@ -227,7 +226,6 @@ const radio1 = ref('New York')
             </el-carousel-item>
           </el-carousel>
         </div>
-
       </div>
 
       <div class="mt-[100px]">
@@ -383,7 +381,6 @@ const radio1 = ref('New York')
       </div>
     </div>
 
-
     <div class="mt-[100px] mb-10">
       <div class="mx-auto max-w-2xl lg:text-center">
         <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
@@ -440,7 +437,6 @@ const radio1 = ref('New York')
       </div>      
     </div>
   </section>
-
 </template>
 
 <style>
@@ -464,4 +460,14 @@ const radio1 = ref('New York')
 .el-carousel__item:nth-child(2n + 1) {
   background-color: #d3dce6;
 }
+
+@media (max-width: 768px) {
+  .el-carousel__indicators,
+  .el-carousel__indicator,
+  .el-carousel__indicator--horizontal,
+  .el-carousel__indicator.is-active {
+    display: none !important;
+  }
+}
+
 </style>
