@@ -112,7 +112,7 @@ const radio1 = ref('New York')
       <SelectTrip_v2 />
     </div>
 
-    <div class="mt-[200px]">
+    <div class="mt-[200px] [@media(max-width:450px)]:mt-[100px]">
       <div class="mx-auto max-w-2xl lg:text-center">
         <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
           Đồng hành cùng VinaHome</p>
@@ -237,7 +237,7 @@ const radio1 = ref('New York')
           </p>
         </div>
         <div
-          class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 pt-10 sm:mt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+          class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <article
             class="relative flex max-w-xl flex-col items-start justify-between bg-white rounded-md p-4 border border-transparent hover:border-[#0382F7] transition">
             <div class="absolute top-2 right-2 h-20 w-20 flex items-center justify-center">
@@ -416,7 +416,7 @@ const radio1 = ref('New York')
       </div>
     </div>
 
-    <div class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px] min-h-[350px]">
+    <div class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px] min-h-[350px] [@media(max-width:450px)]:mt-[100px]">
       <div class="mx-auto max-w-7xl px-6 lg:px-8 py-10 sm:py-10 lg:py-14 relative z-10">
         <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
           <div class="max-w-xl lg:max-w-lg">
