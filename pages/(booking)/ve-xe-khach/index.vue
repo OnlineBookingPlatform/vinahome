@@ -351,6 +351,10 @@ watch(
     if (newVal !== null) {
       fetchPointUpOptions();
       fetchPointDownOptions();
+      valuePointDown.value = "";
+      valuePointUp.value = ""; 
+      activeStep.value = 0;
+      selectedStep.value = 1;
     }
   },
   { immediate: true }
@@ -358,8 +362,11 @@ watch(
 watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
   if (newUp && newDown) {
     activeStep.value = 2;
+  } else {
+    activeStep.value = 1;
   }
 });
+
 
 </script>
 
