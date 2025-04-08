@@ -457,7 +457,7 @@ onMounted(() => {
       </div>
 
       <!-- Nút đổi chỗ -->
-      <div class="flex items-center justify-center md:mt-[28px] mt-0 md:mx-[-23px] mx-auto z-0">
+      <div class="flex items-center justify-center md:mt-[28px] mt-0 z-0 md:mx-[-23px] mx-auto md:z-10">
         <el-button circle class="shadow-md" size="default" @click="swapLocations">
           <el-icon class="transition-transform duration-300 hover:rotate-180" color="#0072bc">
             <Switch />
