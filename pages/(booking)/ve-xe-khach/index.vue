@@ -12,9 +12,15 @@ import {
   type DetailTripType,
   type DTO_RP_TripInfo,
   type SearchTripParams,
+  type TripPointType,
 } from "~/types/TripType";
 import { ElMessage } from "element-plus";
-import { getTripDeatil, getTripOnPlatform } from "~/api/tripAPI";
+import {
+  getPointDownByTrip,
+  getPointUpByTrip,
+  getTripDeatil,
+  getTripOnPlatform,
+} from "~/api/tripAPI";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -303,30 +309,58 @@ const preStep = () => {
   activeStep.value = 1;
 };
 
-const value = ref("");
 
-const options = [
-  {
-    value: "Option1",
-    label: "Option1",
+const valuePointUp = ref("");
+const optionsPointUp = ref<TripPointType[]>([]);
+const fetchPointUpOptions = async () => {
+  try {
+    if (selectedTripId.value !== null) {
+      const response = await getPointUpByTrip(selectedTripId.value);
+      optionsPointUp.value = response.result || [];
+    } else {
+      console.error("selectedTripId is null");
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin điểm đón:", error);
+    ElMessage.error(
+      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
+    );
+  }
+};
+
+const valuePointDown = ref("");
+const optionsPointDown = ref<TripPointType[]>([]);
+const fetchPointDownOptions = async () => {
+  try {
+    if (selectedTripId.value !== null) {
+      const response = await getPointDownByTrip(selectedTripId.value);
+      optionsPointDown.value = response.result || [];
+    } else {
+      console.error("selectedTripId is null");
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin điểm đón:", error);
+    ElMessage.error(
+      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
+    );
+  }
+};
+watch(
+  selectedTripId,
+  (newVal) => {
+    if (newVal !== null) {
+      fetchPointUpOptions();
+      fetchPointDownOptions();
+    }
   },
-  {
-    value: "Option2",
-    label: "Option2",
-  },
-  {
-    value: "Option3",
-    label: "Option3",
-  },
-  {
-    value: "Option4",
-    label: "Option4",
-  },
-  {
-    value: "Option5",
-    label: "Option5",
-  },
-];
+  { immediate: true }
+);
+watch([valuePointUp, valuePointDown], ([newUp, newDown]) => {
+  if (newUp && newDown) {
+    activeStep.value = 2;
+  }
+});
+
 </script>
 
 <template>
@@ -532,27 +566,11 @@ const options = [
                         >
                       </div>
                     </div>
-                    <!-- <div class="ml-5">
-                      <ul>
-                        <li>
-                          <div class="flex items-center gap-2">
-                            <el-icon style="color: #108AB1"><Check /></el-icon>
-                            <span class="text-sm text-gray-500">Xác nhận tức thì</span>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="flex items-center gap-2">
-                            <el-icon style="color: #108AB1"><Check /></el-icon>
-                            <span class="text-sm text-gray-500">Không cần thanh toán trước</span>
-                          </div>
-                        </li>
-                      </ul>
-                    </div> -->
                     <div
                       class="text-white px-3 py-1 rounded ml-auto flex items-end"
                     >
                       <span class="text-amber-600 text-md"
-                        >Còn 24 chỗ trống</span
+                        >Còn {{ trip.tickets_available }} chỗ trống</span
                       >
                     </div>
                   </div>
@@ -704,32 +722,71 @@ const options = [
                         <div class="rounded-xl bg-gray-100 p-4 m-2 mt-5">
                           <span>Thông tin điểm đón</span>
                           <el-select
-                            v-model="value"
+                            v-model="valuePointUp"
+                            filterable
+                            allow-create
+                            default-first-option
                             class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           >
                             <el-option
-                              v-for="item in options"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value"
-                            />
+                              v-for="item in optionsPointUp"
+                              :key="item.id"
+                              :label="item.name"
+                              :value="item.name"
+                              class="mb-[2px]"
+                            >
+                              <div class="flex flex-col">
+                                <span class="font-semibold text-sm">
+                                  •
+                                  {{
+                                    calculateTotalTime(
+                                      item.start_time,
+                                      item.time_point
+                                    )
+                                  }}
+                                  - {{ item.name }}</span
+                                >
+                                <span class="text-xs text-gray-600">{{
+                                  item.address
+                                }}</span>
+                              </div>
+                            </el-option>
                           </el-select>
-
                         </div>
                       </el-col>
                       <el-col :span="12">
                         <div class="bg-gray-100 rounded-xl p-4 m-2 mt-5">
                           <span>Thông tin điểm trả</span>
                           <el-select
-                            v-model="value"
+                            v-model="valuePointDown"
+                            filterable
+                            allow-create
+                            default-first-option
                             class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           >
                             <el-option
-                              v-for="item in options"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value"
-                            />
+                              v-for="item in optionsPointDown"
+                              :key="item.id"
+                              :label="item.name"
+                              :value="item.name"
+                              class="mb-[2px]"
+                            >
+                              <div class="flex flex-col">
+                                <span class="font-semibold text-sm">
+                                  •
+                                  {{
+                                    calculateTotalTime(
+                                      item.start_time,
+                                      item.time_point
+                                    )
+                                  }}
+                                  - {{ item.name }}</span
+                                >
+                                <span class="text-xs text-gray-600">{{
+                                  item.address
+                                }}</span>
+                              </div>
+                            </el-option>
                           </el-select>
                         </div>
                       </el-col>
@@ -843,8 +900,7 @@ const options = [
   margin: 0 !important;
   margin-top: 10px !important;
 }
-.el-select__selected-item{
+.el-select__selected-item {
   margin-left: 10px;
-} 
-
+}
 </style>

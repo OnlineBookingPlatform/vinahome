@@ -2,6 +2,7 @@ import type {
   DetailTripType,
   DTO_RP_TripInfo,
   SearchTripParams,
+  TripPointType,
   TripType,
 } from "~/types/TripType";
 import type { ApiResponse } from "./APIResponse";
@@ -40,3 +41,35 @@ export const getTripDeatil = async (
     throw error;
   }
 };
+
+export const getPointUpByTrip = async (
+  tripId: number
+): Promise<ApiResponse<TripPointType[]>> => {
+  try {
+    return await $fetch<ApiResponse<TripPointType[]>>(
+      `${API_GATEWAY_URL}/v2/trip/get-point-up-by-trip/${tripId}`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin chuyến đi:", error);
+    throw error;
+  }
+}
+
+export const getPointDownByTrip = async (
+  tripId: number
+): Promise<ApiResponse<TripPointType[]>> => {
+  try {
+    return await $fetch<ApiResponse<TripPointType[]>>(
+      `${API_GATEWAY_URL}/v2/trip/get-point-down-by-trip/${tripId}`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin chuyến đi:", error);
+    throw error;
+  }
+}
