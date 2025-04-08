@@ -7,7 +7,7 @@ const radio1 = ref('New York')
 </script>
 
 <template>
-  <section class="container mx-auto">
+  <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-0">
     <div class="relative overflow-hidden from-white to-blue-50 px-8 py-16">
       <img src="/static/xe-khach/Star3.png" class="absolute top-10 left-20 h-6 w-6 " />
       <img src="/static/xe-khach/Star3.png" class="absolute top-16 right-32 h-6 w-6 " />
@@ -35,7 +35,7 @@ const radio1 = ref('New York')
     </div>
 
   </section>
-  <section class="container mx-auto px-24">
+  <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-5">
     <el-radio-group v-model="radio1" size="large" class="flex gap-x-4" id="homepage-group">
       <el-radio-button value="New York">
         <template #default>
