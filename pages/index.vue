@@ -124,9 +124,10 @@ const radio1 = ref('New York')
         <p class="mt-6 text-lg text-gray-600">Chúng tôi giúp bạn kết nối đến mọi nơi, mang đến lựa chọn di chuyển tiện
           lợi và tiết kiệm chi phí.</p>
       </div>
-      <div class="grid grid-cols-3 gap-12 p-4">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 p-4">
         <div>
-          <div class="h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#FF5603] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -140,7 +141,7 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="h-[110px] bg-[#F2EFFF] p-4 rounded-lg border border-[#D8CFFF] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#F2EFFF] p-4 rounded-lg border border-[#D8CFFF] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#866BF8] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="h-6 w-6" fill="#fff">
@@ -154,7 +155,7 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="h-[110px] bg-[#FFFAE9] p-4 rounded-lg border border-[#FCD8CF] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#FFFAE9] p-4 rounded-lg border border-[#FCD8CF] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#F5C207] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="h-6 w-6" fill="#fff">
@@ -168,7 +169,7 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="h-[110px] bg-[#F2FDF7] p-4 rounded-lg border border-[#C7FDDE] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#F2FDF7] p-4 rounded-lg border border-[#C7FDDE] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#0AD561] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -182,7 +183,7 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="h-[110px] bg-[#F1F8FE] p-4 rounded-lg border border-[#0382F7] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#F1F8FE] p-4 rounded-lg border border-[#0382F7] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#0382F7] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">
@@ -196,7 +197,7 @@ const radio1 = ref('New York')
           </div>
         </div>
         <div>
-          <div class="h-[110px] bg-[#FFF6FB] p-4 rounded-lg border border-[#FFDAE9] flex flex-col relative pl-10 pr-2">
+          <div class="min-h-[110px] bg-[#FFF6FB] p-4 rounded-lg border border-[#FFDAE9] flex flex-col relative pl-10 pr-2">
             <div
               class="w-[64px] h-[64px] bg-[#F05697] rounded-full flex items-center justify-center absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-6 w-6" fill="#fff">

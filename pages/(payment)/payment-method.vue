@@ -172,7 +172,7 @@ onMounted(() => {
       </div>
 
       <!--Form số tiền cần thanh toán -->
-      <div class="bg-white rounded-xl shadow border text-sm" v-if="showFormTripInfo">
+      <div class="bg-white rounded-xl shadow border text-sm w-72" v-if="showFormTripInfo">
         <div class="p-4 border-b flex justify-between items-center cursor-pointer"
           @click="showTripInfo = !showTripInfo">
           <p class="font-semibold text-xl">Thông tin chuyến đi</p>
@@ -182,9 +182,10 @@ onMounted(() => {
         </div>
 
         <div v-show="showTripInfo" class="p-4 space-y-4">
-          <div class="rounded-xl overflow-hidden">
-            <img class="w-full object-cover" src="https://placehold.co/10x10" alt="bus image">
+          <div class="w-26 h-24 rounded-xl overflow-hidden">
+            <img class="w-full h-full object-cover" src="https://placehold.co/200x160" alt="bus image">
           </div>
+          
           <div>
             <h5 class="text-base font-semibold">{{ mockTripDetail.destination }}</h5>
             <p class="text-muted">{{ mockTripDetail.bus }}</p>
@@ -192,11 +193,11 @@ onMounted(() => {
 
           <div class="relative ">
             <!-- Đường dọc -->
-            <div class="absolute top-[22px] left-[7px] h-[60px] w-px bg-gray-400"></div>
+            <div class="absolute top-[26px] left-[7px] h-[94px] w-px bg-gray-400"></div>
 
             <!-- Điểm đón -->
             <div class="flex gap-2 items-start mb-6">
-              <div class="size-4 border-2 border-black rounded-full mt-1 z-10 bg-white"></div>
+              <div class="size-5 my-1 border-2 bg-white border-black rounded-full"></div>
               <div>
                 <div class="flex gap-2 items-center font-semibold">
                   <span>{{ mockTripDetail.pickupInfo.time }}</span>
@@ -209,7 +210,7 @@ onMounted(() => {
 
             <!-- Điểm trả -->
             <div class="flex gap-2 items-start">
-              <div class="size-4 mt-1 text-black z-10 flex items-center justify-center">
+              <div class="size-5 mt-1 text-black z-10 flex items-center justify-center">
                 <Icon name="fa6-solid:location-dot" class="size-4" />
               </div>
               <div>

@@ -8,7 +8,7 @@ definePageMeta({
   <!-- Phần 1: Header (Màu xanh) -->
   <section class="bg-blue-600 text-white py-20">
     <el-row class="container mx-auto">
-      <el-col :span="14" class="flex items-center">
+      <el-col :xs="24" :md="14" class="flex items-center">
         <div class="px-10">
           <h1 class="text-5xl font-bold leading-tight">
             Tăng 30% lượng khách đặt vé khi mở bán online trên Vinahome ngay hôm nay!
@@ -19,51 +19,53 @@ definePageMeta({
         </div>
       </el-col>
 
-      <el-col :span="10" class="flex justify-center">
-        <el-card class="p-8 w-[500px] bg-white shadow-lg rounded-lg border border-gray-300">
-          <h2 class="text-lg font-bold leading-tight text-center mb-5">
-            Bắt đầu lấp đầy chỗ trống trên xe của bạn với hơn 10 triệu lượt khách đi thành công trên Vinahome
-          </h2>
-          <el-form>
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="Họ và tên" label-position="top" required>
-                  <el-input placeholder="Nhập họ và tên" size="large" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Số điện thoại liên hệ" label-position="top" required>
-                  <el-input placeholder="Nhập số điện thoại" size="large" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="Email" label-position="top">
-                  <el-input placeholder="Nhập email" size="large" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="Tên nhà xe" label-position="top">
-                  <el-input placeholder="Nhập tên nhà xe" size="large" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-form-item label="Tỉnh (Thành phố) / Tuyến đường" label-position="top" required>
-              <el-input placeholder="Nhập thông tin" size="large" />
-            </el-form-item>
-            <el-form-item label="Nội dung tư vấn" label-position="top">
-              <el-input type="textarea" placeholder="Nhập nội dung tư vấn" size="large" />
-            </el-form-item>
-            <el-button type="primary" size="large" class="w-full">
-              Đăng ký mở bán
-            </el-button>
-          </el-form>
-          <div class="text-center mt-4 text-sm text-gray-500">
-            <span class="text-orange-500 font-bold">Create your own free forms</span> to generate leads from your
-            website.
-          </div>
-        </el-card>
+      <el-col :xs="24" :md="10">
+        <div class="flex justify-center [@media(min-width:1200px)]:justify-start mt-[20px]">
+          <el-card class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300">
+            <h2 class="text-base md:text-lg font-bold leading-tight text-center mb-5">
+              Bắt đầu lấp đầy chỗ trống trên xe của bạn với hơn 10 triệu lượt khách đi thành công trên Vinahome
+            </h2>
+            <el-form>
+              <el-row :gutter="20">
+                <el-col :xs="24" :md="12">
+                  <el-form-item label="Họ và tên" label-position="top" required>
+                    <el-input placeholder="Nhập họ và tên" size="large" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :md="12">
+                  <el-form-item label="Số điện thoại liên hệ" label-position="top" required>
+                    <el-input placeholder="Nhập số điện thoại" size="large" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="24" :md="12">
+                  <el-form-item label="Email" label-position="top">
+                    <el-input placeholder="Nhập email" size="large" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :md="12">
+                  <el-form-item label="Tên nhà xe" label-position="top">
+                    <el-input placeholder="Nhập tên nhà xe" size="large" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-form-item label="Tỉnh (Thành phố) / Tuyến đường" label-position="top" required>
+                <el-input placeholder="Nhập thông tin" size="large" />
+              </el-form-item>
+              <el-form-item label="Nội dung tư vấn" label-position="top">
+                <el-input type="textarea" placeholder="Nhập nội dung tư vấn" size="large" />
+              </el-form-item>
+              <el-button type="primary" size="large" class="w-full">
+                Đăng ký mở bán
+              </el-button>
+            </el-form>
+            <div class="text-center mt-4 text-sm text-gray-500">
+              <span class="text-orange-500 font-bold">Create your own free forms</span> to generate leads from your
+              website.
+            </div>
+          </el-card>
+        </div>
       </el-col>
     </el-row>
   </section>
@@ -152,12 +154,14 @@ definePageMeta({
           <div class="mt-4 md:mt-0 md:ml-6">
             <p class="text-gray-700 italic">
               "Vinahome đã là đối tác vô cùng quý giá trong hành trình thành công của chúng tôi. Doanh thu và quy mô của
-              chúng tôi đã tăng đáng kể từ 2 lên 20 xe kể từ khi bán vé trên nền tảng của Vinahome. Với sự hỗ trợ và hướng
+              chúng tôi đã tăng đáng kể từ 2 lên 20 xe kể từ khi bán vé trên nền tảng của Vinahome. Với sự hỗ trợ và
+              hướng
               dẫn từ Vinahome, chúng tôi đã và đang là top nhà xe được khách hàng yêu thích tại tuyến Sài Gòn - Buôn Mê
               Thuột. <br><br>
               Điểm đặc biệt của Vinahome là đội ngũ rất chuyên nghiệp. Họ đã luôn đồng hành cùng chúng tôi, phân tích
               chiến lược các tuyến đường và xác định những điểm cần cải thiện trong hoạt động của chúng tôi. Việc có một
-              đại diện của Vinahome ngồi cùng chúng tôi, cung cấp thông tin và hướng dẫn đã đóng vai trò quan trọng trong
+              đại diện của Vinahome ngồi cùng chúng tôi, cung cấp thông tin và hướng dẫn đã đóng vai trò quan trọng
+              trong
               thành công của chúng tôi. Họ thấu hiểu sự quan trọng của việc cộng tác chặt chẽ để giúp chúng tôi đạt được
               mục tiêu. Chúng tôi đã tối ưu hóa hoạt động, nâng cao chất lượng dịch vụ và thu hút nhiều khách hàng hơn.
               Sự chuyên môn và hỗ trợ của họ đã tạo ra giá trị không thể đo đạc trong việc thúc đẩy kinh doanh của chúng
@@ -178,16 +182,19 @@ definePageMeta({
           <div class="mt-4 md:mt-0 md:mr-6">
             <p class="text-gray-700 italic">
               "Với sự hỗ trợ toàn diện từ Vinahome, nhà xe của chúng tôi đã có thể tăng doanh thu bán vé thông qua sàn
-              giao dịch. Vinahome cung cấp một loạt công cụ giúp tăng lượng truy cập vào gian hàng của chúng tôi trên nền
+              giao dịch. Vinahome cung cấp một loạt công cụ giúp tăng lượng truy cập vào gian hàng của chúng tôi trên
+              nền
               tảng, đồng thời hỗ trợ tăng số lượng khách hàng mua vé thông qua các chương trình ưu đãi hấp dẫn như ưu
               đãi đặt sớm và ưu đãi phút chót. Nhờ đó, chúng tôi đã có cơ hội mở rộng quy mô kinh doanh và đạt được kết
               quả đáng kinh ngạc. <br><br>
-              Bên cạnh đó, chúng tôi rất hài lòng với các chương trình độc quyền từ Vinahome. Nhà xe của chúng tôi đã được
+              Bên cạnh đó, chúng tôi rất hài lòng với các chương trình độc quyền từ Vinahome. Nhà xe của chúng tôi đã
+              được
               tận hưởng bộ quyền lợi truyền thông trị giá lên đến 50 triệu đồng, được ưu tiên hiển thị trên các trang
               bán vé của Vinahome và được hưởng ưu đãi đặc biệt trong hệ sinh thái Vinahome. Những quyền lợi này đã giúp
               chúng tôi nổi bật và thu hút sự chú ý từ khách hàng. <br><br>
               Việc đăng ký mở bán vé trên Vinahome cực kỳ đơn giản. Chỉ cần hoàn tất quy trình đăng ký, chúng tôi đã có
-              thể tận hưởng những lợi ích vô cùng đáng giá mà Vinahome mang lại. Chúng tôi thật sự biết ơn Vinahome vì sự hỗ
+              thể tận hưởng những lợi ích vô cùng đáng giá mà Vinahome mang lại. Chúng tôi thật sự biết ơn Vinahome vì
+              sự hỗ
               trợ và cơ hội phát triển kinh doanh tuyệt vời này!"
             </p>
           </div>
