@@ -583,7 +583,8 @@ watch(
 
               <!-- Tabs -->
               <div class="relative">
-                <el-divider />
+                <div class="border-t border-gray-300"></div>
+
 
                 <el-button
                   v-if="!activeTabs[trip.id]"
@@ -936,7 +937,7 @@ watch(
   </section>
 </template>
 
-<style>
+<style >
 .el-tabs__nav {
   float: left !important;
 }
@@ -960,10 +961,10 @@ watch(
 .el-tabs__nav-wrap:after {
   height: 0 !important;
 }
-.el-divider--horizontal {
+/* .el-divider--horizontal {
   margin: 0 !important;
   margin-top: 10px !important;
-}
+} */
 .el-select__selected-item {
   margin-left: 10px;
 }
