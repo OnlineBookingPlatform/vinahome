@@ -28,6 +28,9 @@ export default {
         grey: {
           600: "hsla(215, 18%, 34%, 1)",
         },
+        warning: {
+          DEFAULT: "hsla(12, 100%, 51%, 1)",
+        },
       },
       borderColor: {
         DEFAULT: "hsla(213, 29%, 92%, 1)",

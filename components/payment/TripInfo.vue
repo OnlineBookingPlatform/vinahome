@@ -17,7 +17,7 @@ interface TripInfo {
 defineProps<{ tripInfo: TripInfo }>()
 </script>
 <template>
-  <div class="mt-4 p-6 grid grid-cols-[1fr_240px] gap-x-4 gap-y-[18px]">
+  <div class="mt-4 p-6 trip-info gap-x-4 gap-y-[18px]">
     <div class="space-y-2">
       <h5>{{ tripInfo.destination }}</h5>
       <p class="text-lg text-muted">{{ tripInfo.bus }}</p>
@@ -51,5 +51,26 @@ defineProps<{ tripInfo: TripInfo }>()
         <button class="text-sm text-primary underline">Thay đổi</button>
       </div>
     </div>
+    <div class="flex items-center gap-2">
+      <Icon name="fa6-solid:user" />
+      <p class="text-sm">
+        Ghế:
+        <span class="font-bold">{{ tripInfo.seats }} khách</span>
+      </p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.trip-info {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+}
+
+@container (max-width: 600px) {
+  .trip-info {
+    display: flex;
+    flex-direction: column;
+  }
+}
+</style>
