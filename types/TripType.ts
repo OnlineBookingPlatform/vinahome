@@ -78,6 +78,7 @@ export interface DTO_RP_TripInfo {
   seat_map: DTO_RP_SeatMapInfo;
   departureInfo: DTO_RP_TripPointInfo;
   destinationInfo: DTO_RP_TripPointInfo;
+  tickets_available: number;
 }
 
 export interface DetailTripType {
@@ -87,4 +88,12 @@ export interface DetailTripType {
   total_row: number;
   total_column: number;
   tickets: TicketType[];
+}
+
+export interface TripPointType {
+  id: number;
+  name: string;
+  address: string;
+  time_point: string;
+  start_time: string;
 }
