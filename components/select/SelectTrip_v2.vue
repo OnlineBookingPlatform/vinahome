@@ -415,9 +415,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="bg-white p-5 rounded-xl shadow-lg flex flex-col gap-4 w-full relative"
-  >
+  <div class="bg-white p-5 rounded-xl shadow-lg flex flex-col gap-4 w-full relative">
     <!-- Hàng trên: Radio Group -->
     <div class="flex">
       <el-radio-group v-model="radio" class="flex gap-4">
@@ -427,51 +425,29 @@ onMounted(() => {
     </div>
 
     <!-- Hàng dưới: Các ô nhập thông tin -->
-    <div class="flex flex-wrap gap-4 items-center mb-[40px]">
+    <div class="flex flex-wrap gap-4 items-center mb-[40px] md:flex-row flex-col">
       <!-- Điểm đi -->
-      <div class="flex flex-col h-[70px] flex-1">
+      <div class="flex flex-col h-[70px] w-full md:flex-1">
         <span class="text-[13px] mb-1 text-black mx-2">Điểm đi</span>
-        <div
-          @click="isOpenDeparture = true"
-          :class="{ 'ring-2 ring-blue-400': isOpenDeparture }"
-          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 flex-1 h-[60px] cursor-text"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-            class="w-5 h-5 mx-2"
-            fill="#03ACFF"
-          >
+        <div @click="isOpenDeparture = true" :class="{ 'ring-2 ring-blue-400': isOpenDeparture }"
+          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 w-full md:flex-1 h-[60px] cursor-text">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="w-5 h-5 mx-2" fill="#03ACFF">
             <path
-              d="M16 144a144 144 0 1 1 288 0A144 144 0 1 1 16 144zM160 80c8.8 0 16-7.2 16-16s-7.2-16-16-16c-53 0-96 43-96 96c0 8.8 7.2 16 16 16s16-7.2 16-16c0-35.3 28.7-64 64-64zM128 480l0-162.9c10.4 1.9 21.1 2.9 32 2.9s21.6-1 32-2.9L192 480c0 17.7-14.3 32-32 32s-32-14.3-32-32z"
-            />
+              d="M16 144a144 144 0 1 1 288 0A144 144 0 1 1 16 144zM160 80c8.8 0 16-7.2 16-16s-7.2-16-16-16c-53 0-96 43-96 96c0 8.8 7.2 16 16 16s16-7.2 16-16c0-35.3 28.7-64 64-64zM128 480l0-162.9c10.4 1.9 21.1 2.9 32 2.9s21.6-1 32-2.9L192 480c0 17.7-14.3 32-32 32s-32-14.3-32-32z" />
           </svg>
-          <input
-            type="text"
-            v-model="departureQuery"
-            @input="isOpenDeparture = true"
-            @focus="openDepartureDropdown"
+          <input type="text" v-model="departureQuery" @input="isOpenDeparture = true" @focus="openDepartureDropdown"
             class="text-lg bg-white text-[15px] outline-none w-full"
-            :placeholder="selectedDeparture ? '' : 'Nhập để tìm kiếm'"
-          />
-          <div
-            v-if="isOpenDeparture"
-            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2"
-          >
+            :placeholder="selectedDeparture ? '' : 'Nhập để tìm kiếm'" />
+          <div v-if="isOpenDeparture"
+            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2">
             <el-scrollbar height="350px">
               <ul class="mt-2 space-y-1">
-                <li
-                  v-if="filteredDepartures.length === 0"
-                  class="text-gray-500 p-2 text-center"
-                >
+                <li v-if="filteredDepartures.length === 0" class="text-gray-500 p-2 text-center">
                   Không tìm thấy kết quả
                 </li>
-                <li
-                  v-for="city in filteredDepartures"
-                  :key="city.id"
+                <li v-for="city in filteredDepartures" :key="city.id"
                   class="p-2 cursor-pointer hover:bg-blue-50 rounded-md transition duration-150"
-                  @click="selectDeparture(city)"
-                >
+                  @click="selectDeparture(city)">
                   <div class="font-medium">{{ city.name }}</div>
                 </li>
               </ul>
@@ -481,69 +457,37 @@ onMounted(() => {
       </div>
 
       <!-- Nút đổi chỗ -->
-      <div class="flex items-center justify-center mt-[28px] mx-[-23px] z-10">
-        <el-button
-          circle
-          class="shadow-md"
-          size="default"
-          @click="swapLocations"
-        >
-          <el-icon
-            class="transition-transform duration-300 hover:rotate-180"
-            color="#0072bc"
-          >
+      <div class="flex items-center justify-center md:mt-[28px] mt-0 md:mx-[-23px] mx-auto z-0">
+        <el-button circle class="shadow-md" size="default" @click="swapLocations">
+          <el-icon class="transition-transform duration-300 hover:rotate-180" color="#0072bc">
             <Switch />
           </el-icon>
         </el-button>
       </div>
 
       <!-- Điểm đến -->
-      <div class="flex flex-col h-[70px] flex-1">
+      <div class="flex flex-col h-[70px] w-full md:flex-1">
         <span class="text-[13px] mb-1 text-black mx-2">Điểm đến</span>
-        <div
-          @click="isOpenDestination = true"
-          :class="{ 'ring-2 ring-blue-400': isOpenDestination }"
-          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 flex-1 h-[60px] cursor-text"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 384 512"
-            class="w-5 h-5 mx-2"
-            fill="#03ACFF"
-          >
+        <div @click="isOpenDestination = true" :class="{ 'ring-2 ring-blue-400': isOpenDestination }"
+          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 w-full md:flex-1 h-[60px] cursor-text">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="w-5 h-5 mx-2" fill="#03ACFF">
             <path
-              d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"
-            />
+              d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
           </svg>
-          <input
-            type="text"
-            v-model="destinationQuery"
-            @input="isOpenDestination = true"
-            @focus="openDestinationDropdown"
-            class="text-lg bg-white text-[15px] outline-none w-full"
-            :placeholder="selectedDestination ? '' : 'Nhập để tìm kiếm'"
-          />
-          <div
-            v-if="isOpenDestination"
-            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2"
-          >
-            <span class="text-sm font-semibold text-gray-700"
-              >TỈNH/THÀNH PHỐ</span
-            >
+          <input type="text" v-model="destinationQuery" @input="isOpenDestination = true"
+            @focus="openDestinationDropdown" class="text-lg bg-white text-[15px] outline-none w-full"
+            :placeholder="selectedDestination ? '' : 'Nhập để tìm kiếm'" />
+          <div v-if="isOpenDestination"
+            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2">
+            <span class="text-sm font-semibold text-gray-700">TỈNH/THÀNH PHỐ</span>
             <el-scrollbar height="350px">
               <ul class="mt-2 space-y-1">
-                <li
-                  v-if="filteredDestinations.length === 0"
-                  class="text-gray-500 p-2 text-center"
-                >
+                <li v-if="filteredDestinations.length === 0" class="text-gray-500 p-2 text-center">
                   Không tìm thấy kết quả
                 </li>
-                <li
-                  v-for="city in filteredDestinations"
-                  :key="city.id"
+                <li v-for="city in filteredDestinations" :key="city.id"
                   class="p-2 cursor-pointer hover:bg-blue-50 rounded-md transition duration-150"
-                  @click="selectDestination(city)"
-                >
+                  @click="selectDestination(city)">
                   <div class="font-medium">{{ city.name }}</div>
                 </li>
               </ul>
@@ -552,65 +496,39 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="flex flex-col h-[70px] flex-1">
+      <div class="flex flex-col h-[70px] w-full md:flex-1">
         <span class="text-[13px] mb-1 text-black mx-2">Ngày đi</span>
-        <div
-          @click="toggleDropdownDepartureDate"
-          :class="{ 'ring-2 ring-blue-400': isOpenDepartureDate }"
-          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 flex-1 h-[60px] cursor-text"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-            class="w-5 h-5 mx-2"
-            fill="#03ACFF"
-          >
+        <div @click="toggleDropdownDepartureDate" :class="{ 'ring-2 ring-blue-400': isOpenDepartureDate }"
+          class="relative flex items-center border border-gray-300 rounded-lg p-1 py-[10px] px-2 w-full md:flex-1 h-[60px] cursor-text">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-5 h-5 mx-2" fill="#03ACFF">
             <path
-              d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"
-            />
+              d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z" />
           </svg>
           <span class="text-lg mx-2">{{ displayDate }}</span>
-          <div
-            v-if="isOpenDepartureDate"
-            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2"
-          >
+          <div v-if="isOpenDepartureDate"
+            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2">
             <div class="flex justify-between mb-2">
               <el-button @click.stop="prevMonth" :icon="ArrowLeftBold" circle />
               <div class="text-center font-semibold">
-                <span class="text-md"
-                  >{{ monthNames[selectedMonth] }}, {{ selectedYear }}</span
-                >
+                <span class="text-md">{{ monthNames[selectedMonth] }}, {{ selectedYear }}</span>
               </div>
-              <el-button
-                @click.stop="nextMonth"
-                :icon="ArrowRightBold"
-                circle
-              />
+              <el-button @click.stop="nextMonth" :icon="ArrowRightBold" circle />
             </div>
 
             <div>
-              <div
-                class="grid grid-cols-7 gap-2 text-center text-sm font-semibold border-b py-2"
-              >
-                <div
-                  v-for="(day, index) in weekDays"
-                  :key="index"
-                  :class="index >= weekDays.length - 2 ? 'text-red-500' : ''"
-                >
+              <div class="grid grid-cols-7 gap-2 text-center text-sm font-semibold border-b py-2">
+                <div v-for="(day, index) in weekDays" :key="index"
+                  :class="index >= weekDays.length - 2 ? 'text-red-500' : ''">
                   {{ day }}
                 </div>
               </div>
 
               <div class="grid grid-cols-7 gap-2 mt-2">
-                <div
-                  v-for="(day, index) in daysInMonth"
-                  :key="index"
-                  @click="
-                    day.day !== null &&
-                      !isPastDate(day.day) &&
-                      selectDate(day.day)
-                  "
-                  :class="[
+                <div v-for="(day, index) in daysInMonth" :key="index" @click="
+                  day.day !== null &&
+                  !isPastDate(day.day) &&
+                  selectDate(day.day)
+                  " :class="[
                     'text-center cursor-pointer',
                     day.day !== null && isSelectedDay(day.day)
                       ? 'bg-yellow-500 text-black rounded py-[2px]'
@@ -622,19 +540,15 @@ onMounted(() => {
                       ? 'text-[#0072bc] rounded hover:bg-blue-100 hover:rounded hover:shadow'
                       : '',
                     day.day !== null &&
-                    !isSelectedDay(day.day) &&
-                    !isToday(day.day) &&
-                    !isPastDate(day.day)
+                      !isSelectedDay(day.day) &&
+                      !isToday(day.day) &&
+                      !isPastDate(day.day)
                       ? 'hover:bg-blue-100 hover:rounded hover:shadow'
                       : '',
-                  ]"
-                >
+                  ]">
                   <span v-if="day.day">{{ day.day }}</span>
                   <br />
-                  <small
-                    v-if="day.lunar"
-                    class="text-gray-500 block text-right mr-[5px] text-[11px] my-[2px]"
-                  >
+                  <small v-if="day.lunar" class="text-gray-500 block text-right mr-[5px] text-[11px] my-[2px]">
                     {{ day.lunar }}
                   </small>
                 </div>
@@ -644,59 +558,36 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="flex flex-col h-[70px] flex-1" v-if="radio === 2">
+      <div class="flex flex-col h-[70px] w-full md:flex-1" v-if="radio === 2">
         <span class="text-[13px] mb-1 text-black mx-2">Ngày về</span>
         <div
-          class="border border-gray-300 rounded-lg p-1 px-2 flex-1 h-[60px] focus-within:ring-2 focus-within:ring-blue-400 cursor-text"
-        >
-          <input
-            type="date"
-            class="block bg-white text-[15px] outline-none w-full h-full"
-          />
+          class="border border-gray-300 rounded-lg p-1 px-2 w-full md:flex-1 h-[60px] focus-within:ring-2 focus-within:ring-blue-400 cursor-text">
+          <input type="date" class="block bg-white text-[15px] outline-none w-full h-full" />
         </div>
       </div>
 
-      <div class="flex flex-col h-[70px] flex-1">
+      <div class="flex flex-col h-[70px] w-full md:flex-1">
         <span class="text-[13px] mb-1 text-black mx-2">Số vé</span>
-        <div
-          @click="toggleDropdownTicketNumber"
-          :class="{ 'ring-2 ring-blue-400': isOpenNumberTicket }"
-          class="relative border border-gray-300 flex items-center rounded-lg p-1 py-[10px] px-2 flex-1 h-[60px] cursor-text"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 576 512"
-            class="w-5 h-5"
-            fill="#03ACFF"
-          >
+        <div @click="toggleDropdownTicketNumber" :class="{ 'ring-2 ring-blue-400': isOpenNumberTicket }"
+          class="relative border border-gray-300 flex items-center rounded-lg p-1 py-[10px] px-2 w-full md:flex-1 h-[60px] cursor-text">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="w-5 h-5" fill="#03ACFF">
             <path
-              d="M64 64C28.7 64 0 92.7 0 128l0 64c0 8.8 7.4 15.7 15.7 18.6C34.5 217.1 48 235 48 256s-13.5 38.9-32.3 45.4C7.4 304.3 0 311.2 0 320l0 64c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-64c0-8.8-7.4-15.7-15.7-18.6C541.5 294.9 528 277 528 256s13.5-38.9 32.3-45.4c8.3-2.9 15.7-9.8 15.7-18.6l0-64c0-35.3-28.7-64-64-64L64 64zm64 112l0 160c0 8.8 7.2 16 16 16l288 0c8.8 0 16-7.2 16-16l0-160c0-8.8-7.2-16-16-16l-288 0c-8.8 0-16 7.2-16 16zM96 160c0-17.7 14.3-32 32-32l320 0c17.7 0 32 14.3 32 32l0 192c0 17.7-14.3 32-32 32l-320 0c-17.7 0-32-14.3-32-32l0-192z"
-            />
+              d="M64 64C28.7 64 0 92.7 0 128l0 64c0 8.8 7.4 15.7 15.7 18.6C34.5 217.1 48 235 48 256s-13.5 38.9-32.3 45.4C7.4 304.3 0 311.2 0 320l0 64c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-64c0-8.8-7.4-15.7-15.7-18.6C541.5 294.9 528 277 528 256s13.5-38.9 32.3-45.4c8.3-2.9 15.7-9.8 15.7-18.6l0-64c0-35.3-28.7-64-64-64L64 64zm64 112l0 160c0 8.8 7.2 16 16 16l288 0c8.8 0 16-7.2 16-16l0-160c0-8.8-7.2-16-16-16l-288 0c-8.8 0-16 7.2-16 16zM96 160c0-17.7 14.3-32 32-32l320 0c17.7 0 32 14.3 32 32l0 192c0 17.7-14.3 32-32 32l-320 0c-17.7 0-32-14.3-32-32l0-192z" />
           </svg>
           <span class="text-lg mx-2">{{ selectNumberTicket }}</span>
           <div
-            class="absolute top-1/2 right-2 -translate-y-1/2 flex items-center justify-center bg-gray-200 w-6 h-6 rounded pointer-events-none"
-          >
+            class="absolute top-1/2 right-2 -translate-y-1/2 flex items-center justify-center bg-gray-200 w-6 h-6 rounded pointer-events-none">
             <el-icon class="text-gray-600">
               <CaretBottom />
             </el-icon>
           </div>
-          <div
-            v-if="isOpenNumberTicket"
-            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10"
-          >
-            <div
-              v-for="option in optionsNumberTicket"
-              :key="option"
+          <div v-if="isOpenNumberTicket"
+            class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10">
+            <div v-for="option in optionsNumberTicket" :key="option"
               class="flex justify-between items-center px-4 py-2 text-[15px] hover:bg-blue-100 cursor-pointer w-full"
-              :class="{ 'bg-blue-200': option === selectNumberTicket }"
-              @click="(event) => selectOption(option, event)"
-            >
+              :class="{ 'bg-blue-200': option === selectNumberTicket }" @click="(event) => selectOption(option, event)">
               <span class="text-lg">{{ option }}</span>
-              <el-icon
-                v-if="option === selectNumberTicket"
-                class="text-blue-500"
-              >
+              <el-icon v-if="option === selectNumberTicket" class="text-blue-500">
                 <Check />
               </el-icon>
             </div>
@@ -705,7 +596,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="absolute bottom-[-25px] left-1/2 transform -translate-x-1/2">
+    <div
+      class="w-full flex justify-center mt-6 md:absolute md:bottom-[-25px] md:left-1/2 md:transform md:-translate-x-1/2">
       <button class="shadow-lg btn-search" @click="handleSearchTrip">
         Tìm chuyến xe
       </button>
@@ -717,7 +609,8 @@ onMounted(() => {
 .btn-search {
   width: 250px;
   height: 50px;
-  border-radius: 9999px; /* Bo tròn 2 bên */
+  border-radius: 9999px;
+  /* Bo tròn 2 bên */
   font-size: 17px;
   padding: 12px 24px;
   background-color: #03acff;
