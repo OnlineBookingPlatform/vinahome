@@ -120,7 +120,7 @@ const radio1 = ref('New York')
           lợi và tiết kiệm chi phí.</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10 p-4 [@media(max-width:450px)]:gap-y-4">
         <div>
           <div
             class="min-h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
@@ -236,8 +236,7 @@ const radio1 = ref('New York')
             phá vẻ đẹp từ những điều giản đơn.
           </p>
         </div>
-        <div
-          class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 [@media(max-width:450px)]:gap-y-4 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <article
             class="relative flex max-w-xl flex-col items-start justify-between bg-white rounded-md p-4 border border-transparent hover:border-[#0382F7] transition">
             <div class="absolute top-2 right-2 h-20 w-20 flex items-center justify-center">
@@ -247,7 +246,7 @@ const radio1 = ref('New York')
               </svg>
             </div>
 
-            <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-col gap-x-2 :gap-y-2 w-full">
               <div class="flex items-center justify-center w-12 h-12 bg-[#FF5603] p-3 rounded-md">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-5 w-5" fill="#fff">
                   <path
