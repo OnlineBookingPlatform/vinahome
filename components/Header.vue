@@ -175,6 +175,10 @@ const handleSelectMenu = () => {
     </div>
 
     <el-menu v-if="isMenuOpen" class="sm:hidden absolute w-full left-0 z-10 bg-white shadow" mode="vertical" @select="handleSelectMenu">
+      <el-menu-item index="/">
+        <NuxtLink to="/">Trang chủ</NuxtLink>
+      </el-menu-item>
+
       <el-menu-item index="/tra-cuu-ve">
         <NuxtLink to="/tra-cuu-ve">Tra cứu vé</NuxtLink>
       </el-menu-item>
