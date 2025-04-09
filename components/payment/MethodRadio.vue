@@ -1,4 +1,7 @@
 <script setup lang="ts">
+defineProps<{
+  pendingData: any;
+}>()
 const paymentMethod = defineModel();
 </script>
 

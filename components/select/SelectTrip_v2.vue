@@ -440,6 +440,7 @@ onMounted(() => {
             :placeholder="selectedDeparture ? '' : 'Nhập để tìm kiếm'" />
           <div v-if="isOpenDeparture"
             class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 p-2">
+            <span class="text-sm font-semibold text-gray-700">TỈNH/THÀNH PHỐ</span>
             <el-scrollbar height="350px">
               <ul class="mt-2 space-y-1">
                 <li v-if="filteredDepartures.length === 0" class="text-gray-500 p-2 text-center">

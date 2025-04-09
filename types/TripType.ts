@@ -29,6 +29,7 @@ export interface DTO_RP_TripCompanyInfo {
   urlLogo: string;
   code: string;
   note: string;
+  url_vehicle_online: string;
   createdAt: string;
 }
 

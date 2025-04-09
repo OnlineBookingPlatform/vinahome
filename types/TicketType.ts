@@ -13,3 +13,4 @@ export interface SelectedTicket {
   seat_name: string;
   price: number;
 }
+

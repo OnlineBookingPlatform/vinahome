@@ -10,7 +10,7 @@ export const useUserStore = defineStore('userStore', {
             if (process.client) {
                 const userDataStore = localStorage.getItem('userDataStore');
                 if (userDataStore) {
-                    this.userData = JSON.parse(userDataStore);
+                    this.userData = JSON.parse(userDataStore) as UserType;
                 }
             }
         },
@@ -26,7 +26,7 @@ export const useUserStore = defineStore('userStore', {
         clearUserData() {
             this.userData = null;
             if (process.client) {
-                localStorage.clear();
+                localStorage.removeItem("userDataStore");
             }
         },
     },

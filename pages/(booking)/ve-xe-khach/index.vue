@@ -23,7 +23,7 @@ import {
 } from "~/api/tripAPI";
 import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
-
+import type { BookingData } from "~/types/PendingType";
 const route = useRoute();
 const router = useRouter();
 const tripData = ref<DTO_RP_TripInfo[]>([]);
@@ -115,11 +115,12 @@ const activeTabs = ref<Record<string, number | null>>({});
 const tripDetail = ref<DetailTripType | null>(null);
 const selectedTripId = ref<number | null>(null);
 const selectedTicket = ref<SelectedTicket[]>([]);
-const valuePointUp = ref("");
-const optionsPointUp = ref<TripPointType[]>([]);
+
 const selectedStep = ref(1);
-const valuePointDown = ref("");
+const valuePointUp = ref<TripPointType | null>(null);
+const valuePointDown = ref<TripPointType | null>(null);
 const optionsPointDown = ref<TripPointType[]>([]);
+const optionsPointUp = ref<TripPointType[]>([]);
 
 const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
@@ -132,8 +133,8 @@ const openTrip = async (tripId: number) => {
   selectedTripId.value = tripId;
 
   // Reset point chọn
-  valuePointUp.value = "";
-  valuePointDown.value = "";
+  valuePointUp.value = null;
+  valuePointDown.value = null;
   activeStep.value = 0;
 
   const response = await getTripDeatil(tripId);
@@ -155,8 +156,18 @@ const handleClick = async (tripId: number, tab: any) => {
     }
     selectedStep.value = 1;
     selectedTicket.value = [];
+
     await openTrip(tripId);
   } else if (tab.props.name === 2) {
+    if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
+      selectedTicket.value = [];
+      activeStep.value = 0;
+      activeTabs.value[String(selectedTripId.value)] = null;
+    }
+
+    (activeTabs.value as Record<number, number | null>)[tripId] = 2;
+    selectedTripId.value = tripId;
+
     console.log("API response cho tab 2:");
     const responsePointUp = await getPointUpByTrip(tripId);
     if (responsePointUp.result) {
@@ -311,10 +322,6 @@ watch(
   }
 );
 
-const nextStep = () => {
-  selectedStep.value = 2;
-  activeStep.value = 2;
-};
 const preStep = () => {
   selectedStep.value = 1;
   activeStep.value = 1;
@@ -357,14 +364,63 @@ watch(
     if (newVal !== null) {
       fetchPointUpOptions();
       fetchPointDownOptions();
-      valuePointDown.value = "";
-      valuePointUp.value = "";
+      valuePointDown.value = null;
+      valuePointUp.value = null;
       activeStep.value = 0;
       selectedStep.value = 1;
     }
   },
   { immediate: true }
 );
+
+watch(
+  optionsPointUp,
+  (newVal) => {
+    if (newVal.length > 0) {
+      valuePointUp.value = newVal[0];
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  optionsPointDown,
+  (newVal) => {
+    if (newVal.length > 0) {
+      valuePointDown.value = newVal[0];
+    }
+  },
+  { immediate: true }
+);
+
+const pendingTicketStore = usePendingTicketStore();
+const nextStep = () => {
+  // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
+  // selectedStep = 2 là bước chọn điểm đón/trả
+  if (selectedStep.value === 2) {
+    const selectedTrip = tripData.value.find(
+      (trip) => trip.id === selectedTripId.value
+    );
+    const bookingData: BookingData = {
+      selectedTicket: selectedTicket.value,
+      pointUp: valuePointUp.value ?? { id: 0, name: '', address: '', time_point: '', start_time: '' },
+      pointDown: valuePointDown.value ?? { id: 0, name: '', address: '', time_point: '', start_time: '' },
+      selectedTripId: selectedTripId.value ?? 0,
+      tripData: selectedTrip ?? {} as DTO_RP_TripInfo,
+    };
+    pendingTicketStore.setPendingTicket(bookingData);
+    router.push("/payment-method");
+    console.log(
+      "Dữ liệu pendingTicketStore:",
+      pendingTicketStore.pendingTicket
+    );
+  } else {
+    // Nếu chưa phải bước 2, chuyển sang bước 2
+    // selectedStep = 1 là bước chọn ghế
+    selectedStep.value = 2;
+    activeStep.value = 2;
+  }
+};
 </script>
 
 <template>
@@ -459,8 +515,9 @@ watch(
                   class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]"
                 >
                   <img
-                    src="/static/a2.png"
-                    class="h-full w-full object-cover"
+                    :src="trip.company.url_vehicle_online"
+                    class="w-full object-cover"
+                    loading="eager"
                   />
                 </div>
                 <!-- Thông tin chuyến đi -->
@@ -584,7 +641,6 @@ watch(
               <!-- Tabs -->
               <div class="relative">
                 <div class="border-t border-gray-300"></div>
-
 
                 <el-button
                   v-if="!activeTabs[trip.id]"
@@ -937,7 +993,7 @@ watch(
   </section>
 </template>
 
-<style >
+<style>
 .el-tabs__nav {
   float: left !important;
 }

@@ -16,9 +16,9 @@ onMounted(() => {
     <el-main>
       <slot />
     </el-main>
-    <e-footer>
+    
       <Footer />
-    </e-footer>
+   
   </el-container>
 </template>
 

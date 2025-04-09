@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   ssr: true,
   css: ["~/assets/css/main.css", "~/assets/scss/main.scss"],
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "nuxt-vue3-google-signin", "@nuxt/icon"],
+  plugins: ['~/plugins/zindex'],
  
   icon: {
     customCollections: [
