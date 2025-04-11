@@ -7,13 +7,13 @@ definePageMeta({
 <template>
   <!-- Phần 1: Header (Màu xanh) -->
   <section class="bg-blue-600 text-white py-20">
-    <el-row class="container mx-auto">
+    <el-row class="container mx-auto [@media(max-width:450px)]:px-2">
       <el-col :xs="24" :md="14" class="flex items-center">
-        <div class="px-10">
-          <h1 class="text-5xl font-bold leading-tight">
+        <div class="px-10 [@media(max-width:450px)]:px-2">
+          <h1 class="text-5xl font-bold leading-tight [@media(max-width:450px)]:text-4xl">
             Tăng 30% lượng khách đặt vé khi mở bán online trên Vinahome ngay hôm nay!
           </h1>
-          <h2 class="text-2xl font-bold leading-tight mt-5">
+          <h2 class="text-2xl font-bold leading-tight mt-5 [@media(max-width:450px)]:text-1xl">
             Đăng ký miễn phí và chỉ mất 1 phút để hoàn tất
           </h2>
         </div>
@@ -22,7 +22,7 @@ definePageMeta({
       <el-col :xs="24" :md="10">
         <div class="flex justify-center [@media(min-width:1200px)]:justify-start mt-[20px]">
           <el-card class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300">
-            <h2 class="text-base md:text-lg font-bold leading-tight text-center mb-5">
+            <h2 class="text-base md:text-lg font-bold leading-tight text-center mb-5 [@media(max-width:450px)]:text-lg">
               Bắt đầu lấp đầy chỗ trống trên xe của bạn với hơn 10 triệu lượt khách đi thành công trên Vinahome
             </h2>
             <el-form>
@@ -72,11 +72,11 @@ definePageMeta({
 
   <!-- Phần 2: Nội dung (Màu trắng) -->
   <section class="bg-white text-gray-800 py-16">
-    <div class="container mx-auto text-center">
-      <h2 class="text-4xl font-bold text-center mb-4">Sự an tâm của Chủ nhà xe là ưu tiên hàng đầu của Vinahome</h2>
+    <div class="container mx-auto text-center [@media(max-width:450px)]:px-1">
+      <h2 class="text-4xl font-bold text-center mb-4 [@media(max-width:450px)]:text-2xl">Sự an tâm của Chủ nhà xe là ưu tiên hàng đầu của Vinahome</h2>
 
-      <div class="grid md:grid-cols-3 gap-12 mt-16">
-        <div class="px-8 flex flex-col text-left items-center">
+      <div class="grid md:grid-cols-3 gap-12 mt-16 [@media(max-width:450px)]:mt-12 [@media(max-width:450px)]:gap-10">
+        <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
@@ -87,7 +87,7 @@ definePageMeta({
             cắt giảm tình trạng đặt ảo giữ ghế mà không đi, không bán được cho khách khác gây thất thoát doanh thu của
             nhà xe.</p>
         </div>
-        <div class="px-8 flex flex-col text-left items-center">
+        <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
@@ -96,7 +96,7 @@ definePageMeta({
             tiền
             và dễ dàng kiểm soát công nợ với các phương thức thanh toán linh hoạt.</p>
         </div>
-        <div class="px-8 flex flex-col text-left items-center">
+        <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
@@ -108,7 +108,7 @@ definePageMeta({
       </div>
 
       <div class="grid md:grid-cols-2 gap-12 mt-12 place-items-center">
-        <div class="px-32 flex flex-col text-left items-center">
+        <div class="px-32 flex flex-col text-left items-center [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
@@ -118,7 +118,7 @@ definePageMeta({
             trống,
             linh hoạt theo nhu cầu của nhà xe mà vẫn đảm bảo doanh thu tối ưu.</p>
         </div>
-        <div class="px-32 flex flex-col text-left items-center">
+        <div class="px-32 flex flex-col text-left items-center  [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
             <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
           </div>
@@ -138,13 +138,13 @@ definePageMeta({
 
   <!-- Phần 3: Lắng nghe khách hàng (Màu trắng) -->
   <section class="bg-gray-100 text-gray-800 py-16">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold text-center mb-4">Lắng nghe khách hàng nói về Vina Home</h2>
+    <div class="container mx-auto px-4 [@media(max-width:450px)]:px-1">
+      <h2 class="text-4xl font-bold text-center mb-4 [@media(max-width:450px)]:text-2xl">Lắng nghe khách hàng nói về Vina Home</h2>
       <p class="text-center text-gray-600 mb-10">
         Hơn 2000 nhà xe đang mở bán trên sàn Vinahome - Sàn bán vé số 1 Việt Nam
       </p>
 
-      <div class="space-y-10">
+      <div class="space-y-10 [@media(max-width:450px)]:px-5">
         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row items-center md:items-start">
           <div class="flex flex-col items-center">
             <img src="" alt="Khách hàng 1" class="w-32 h-32 rounded-full object-cover border-4 border-yellow-400" />
@@ -205,9 +205,9 @@ definePageMeta({
 
   <!-- Phần 4: Đăng ký (Màu xám) -->
   <section class="bg-gray-800 text-white py-16">
-    <h2 class="text-4xl font-bold text-center mb-10"> Đăng ký mở bán theo 4 bước đơn giản</h2>
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="container mx-auto px-4 [@media(max-width:450px)]:px-1">
+      <h2 class="text-4xl font-bold text-center mb-10 [@media(max-width:450px)]:text-2xl"> Đăng ký mở bán theo 4 bước đơn giản</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 [@media(max-width:450px)]:px-5">
         <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
           <div
             class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full mx-auto text-lg font-bold mb-4">
@@ -263,10 +263,10 @@ definePageMeta({
 
   <!-- Phần 5: Lợi ích (Màu xám) -->
   <section class="bg-white text-gray-900 py-16">
-    <div class="max-w-7xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-10">Giải đáp thắc mắc của bạn</h2>
+    <div class="container mx-auto px-4 [@media(max-width:450px)]:px-1">
+      <h2 class="text-4xl font-bold text-center mb-10 [@media(max-width:450px)]:text-2xl">Giải đáp thắc mắc của bạn</h2>
 
-      <el-collapse class="bg-white" style="--el-collapse-border-color: transparent;">
+      <el-collapse class="bg-white [@media(max-width:450px)]:px-5" style="--el-collapse-border-color: transparent;">
         <el-collapse-item name="1" class="mb-4">
           <template #title>
             <span class="text-blue-600 text-xl font-semibold">
