@@ -10,7 +10,6 @@ const paymentMethod = defineModel();
 const bankCode = "MB";
 const bankName = "MB Bank";
 const accountNumber = "0877717575";
-const qrCanvas = ref<HTMLCanvasElement | null>(null);
 
 console.log("pendingData", pendingData.value);
 
@@ -40,7 +39,7 @@ const vietQRUrl = computed(() => {
   <div class="mt-4 p-6">
     <!-- {{ pendingData }} -->
     <el-radio-group v-model="paymentMethod" class="space-y-6">
-      <el-radio value="qr" border class="[&>*:first-child]:mt-1 w-full">
+      <!-- <el-radio value="qr" border class="[&>*:first-child]:mt-1 w-full">
         <template #default>
           <p class="flex items-center ">
             <Icon name="fa6-solid:qrcode" class="size-4 mr-1.5" />
@@ -53,7 +52,6 @@ const vietQRUrl = computed(() => {
           <div
             class="bg-blue-100 flex justify-between items-center p-4 mt-2 rounded-lg w-full"
           >
-            <!-- Added w-full here -->
             <div class="flex flex-col gap-1">
               <div class="flex gap-1">
                 <span class="text-gray-500">Ngân hàng:</span>
@@ -91,19 +89,22 @@ const vietQRUrl = computed(() => {
             </div>
           </div>
         </template>
-      </el-radio>
+      </el-radio> -->
       <el-radio
-        value="international"
+        value="vnpay"
         border
         class="[&>*:first-child]:mt-1 w-full"
       >
         <template #default>
           <p class="flex items-center payment-label">
             <Icon name="fa6-solid:credit-card" class="size-4 mr-1.5" />
-            <span class="font-bold">Thẻ thanh toán quốc tế</span>
+            <span class="font-bold">Thanh toán VNPAY - QR</span>
           </p>
-          <p class="text-grey-600">Thẻ Visa, MasterCard, JCB.</p>
+          <p class="text-grey-600">Thiết bị cần cài đặt Ứng dụng ngân hàng (Mobile Banking) hoặc Ví VNPAY</p>
         </template>
+
+
+        
       </el-radio>
       <el-radio value="national" border class="[&>*:first-child]:mt-1 w-full">
         <template #default>

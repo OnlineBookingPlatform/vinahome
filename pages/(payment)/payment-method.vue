@@ -8,7 +8,7 @@ const showPaymentMethods = ref(false);
 const showTripInfo = ref(false);
 const showFormTripInfo = ref(false);
 
-const paymentMethod = ref("qr");
+
 
 const mockTripDetail = {
   destination: "Thành Nhân - Hải Phòng",
@@ -35,11 +35,7 @@ const contactInfoForm = ref({
   note: "",
 });
 
-const submitForm = () => {
-  showPaymentMethods.value = true;
-  showFormTripInfo.value = true;
-  showTripInfo.value = true;
-};
+
 
 const showPriceDetail = ref(true);
 
@@ -76,6 +72,7 @@ const localUserData = ref({
   gender: userStore.userData?.gender || 1,
   note: "",
 });
+ 
 </script>
 
 <template>
