@@ -8,8 +8,6 @@ const showPaymentMethods = ref(false);
 const showTripInfo = ref(false);
 const showFormTripInfo = ref(false);
 
-
-
 const mockTripDetail = {
   destination: "Thành Nhân - Hải Phòng",
   bus: "Gường nằm 40 chỗ",
@@ -34,8 +32,6 @@ const contactInfoForm = ref({
   phoneNumber: "",
   note: "",
 });
-
-
 
 const showPriceDetail = ref(true);
 
@@ -72,7 +68,18 @@ const localUserData = ref({
   gender: userStore.userData?.gender || 1,
   note: "",
 });
- 
+const paymentMethod = ref("vnpay");
+const submitForm = () => {
+  showPaymentMethods.value = true;
+  if (showPaymentMethods.value = true) {
+    if (paymentMethod.value == "vnpay") {
+      console.log("VNPAY selected");
+    }
+    if (paymentMethod.value == "momo") {
+      console.log("MoMo selected");
+    }
+  }
+};
 </script>
 
 <template>
@@ -174,7 +181,7 @@ const localUserData = ref({
         class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"
         @click="submitForm"
       >
-        Thanh toán
+      {{ showPaymentMethods ? 'Xác nhận thanh toán' : 'Tiếp tục thanh toán' }}
       </button>
     </div>
 
@@ -288,8 +295,6 @@ const localUserData = ref({
           </div>
 
           <div class="relative">
-          
-
             <!-- Điểm đón -->
             <div class="flex gap-2 items-start mb-6">
               <div

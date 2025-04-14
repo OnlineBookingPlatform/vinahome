@@ -102,9 +102,32 @@ const vietQRUrl = computed(() => {
           </p>
           <p class="text-grey-600">Thiết bị cần cài đặt Ứng dụng ngân hàng (Mobile Banking) hoặc Ví VNPAY</p>
         </template>
-
-
-        
+      </el-radio>
+      <el-radio
+        value="momo"
+        border
+        class="[&>*:first-child]:mt-1 w-full"
+      >
+        <template #default>
+          <p class="flex items-center payment-label">
+            <Icon name="fa6-solid:credit-card" class="size-4 mr-1.5" />
+            <span class="font-bold">Ví MoMo</span>
+          </p>
+          <p class="text-grey-600">Điện thoại của bạn phải được cài đặt ứng dụng MoMo</p>
+        </template>
+      </el-radio>
+      <el-radio
+        value="zalopay"
+        border
+        class="[&>*:first-child]:mt-1 w-full"
+      >
+        <template #default>
+          <p class="flex items-center payment-label">
+            <img src="/icon/zalopay.jpeg" alt="ZaloPay" width="30" class="mr-1.5" />
+            <span class="font-bold">Ví ZaloPay</span>
+          </p>
+          <p class="text-grey-600">Điện thoại của bạn phải được cài đặt ứng dụng Zalopay</p>
+        </template>
       </el-radio>
       <el-radio value="national" border class="[&>*:first-child]:mt-1 w-full">
         <template #default>
