@@ -6,7 +6,7 @@ definePageMeta({
 
 <template>
   <!-- Phần 1: Header (Màu xanh) -->
-  <section class="bg-blue-600 text-white py-20">
+  <section class="bg-blue-600 text-white py-20 [@media(max-width:450px)]:py-10">
     <el-row class="container mx-auto [@media(max-width:450px)]:px-2">
       <el-col :xs="24" :md="14" class="flex items-center">
         <div class="px-10 [@media(max-width:450px)]:px-2">

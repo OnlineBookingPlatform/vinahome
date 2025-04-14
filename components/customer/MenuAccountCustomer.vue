@@ -1,26 +1,21 @@
 <template>
-<!--    <div class="w-full p-4 bg-white rounded-lg shadow">-->
-<!--        <ul>-->
-<!--            <li v-for="item in menuItems" :key="item.path" class="mb-4 flex items-center">-->
-<!--                <el-icon :class="isActive(item.path) ? 'text-blue-600' : 'text-gray-600'" class="mr-3">-->
-<!--                    <component :is="item.icon" />-->
-<!--                </el-icon>-->
-<!--                <router-link :to="item.path"-->
-<!--                    :class="isActive(item.path) ? 'text-blue-600 font-semibold' : 'text-gray-800'"-->
-<!--                    class="text-lg font-medium hover:text-yellow-500">-->
-<!--                    {{ item.label }}-->
-<!--                </router-link>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--    </div>-->
+  <!--    <div class="w-full p-4 bg-white rounded-lg shadow">-->
+  <!--        <ul>-->
+  <!--            <li v-for="item in menuItems" :key="item.path" class="mb-4 flex items-center">-->
+  <!--                <el-icon :class="isActive(item.path) ? 'text-blue-600' : 'text-gray-600'" class="mr-3">-->
+  <!--                    <component :is="item.icon" />-->
+  <!--                </el-icon>-->
+  <!--                <router-link :to="item.path"-->
+  <!--                    :class="isActive(item.path) ? 'text-blue-600 font-semibold' : 'text-gray-800'"-->
+  <!--                    class="text-lg font-medium hover:text-yellow-500">-->
+  <!--                    {{ item.label }}-->
+  <!--                </router-link>-->
+  <!--            </li>-->
+  <!--        </ul>-->
+  <!--    </div>-->
   <div>
-    <el-menu :default-active="route.path" class="el-menu-vertical-demo rounded-lg">
-      <NuxtLink
-          v-for="item in menuItems"
-          :key="item.index"
-          :to="item.to"
-          class="no-underline"
-      >
+    <el-menu :default-active="route.path" class="el-menu-vertical-demo rounded-lg hidden sm:block" v-if="!isMobile">
+      <NuxtLink v-for="item in menuItems" :key="item.index" :to="item.to" class="no-underline">
         <el-menu-item :index="item.index">
           <span v-html="item.icon" class="mr-2"></span>
           <span class="text-[1rem] font-bold">{{ item.label }}</span>
@@ -29,13 +24,41 @@
       <el-menu-item index="logout">
         <span class="mr-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20" fill="currentColor">
-          <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-          <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/>
-        </svg>
+            <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+            <path
+              d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+          </svg>
         </span>
         <span class="text-[1rem] font-bold">Đăng xuất</span>
       </el-menu-item>
     </el-menu>
+
+    <!-- Menu thu gọn cho màn hình nhỏ -->
+    <div class="block sm:hidden">
+      <el-dropdown trigger="click">
+        <el-button type="primary">
+          Menu <i class="el-icon-arrow-down el-icon--right"></i>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item v-for="item in menuItems" :key="item.index" @click="navigateTo(item.to)">
+              <span v-html="item.icon" class="mr-2"></span>
+              {{ item.label }}
+            </el-dropdown-item>
+            <el-dropdown-item divided>
+              <span class="mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20"
+                  fill="currentColor">
+                  <path
+                    d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+                </svg>
+              </span>
+              Đăng xuất
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
   </div>
 </template>
 
@@ -90,6 +113,11 @@ const menuItems: MenuItem[] = [
 // ]);
 // Kiểm tra xem đường dẫn hiện tại có khớp với menu không
 const isActive = (path: string) => route.path === path;
+
+const isMobile = ref(false)
+
+
+
 </script>
 
 <style scoped></style>
