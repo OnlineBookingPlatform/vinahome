@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ArrowLeft, Ticket } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { createZaloPayPayment } from "~/api/paymentAPI";
 import { calculateTotalTime } from "~/lib/calculateTotalTime";
 import type { UserType } from "~/types/AccountType";
 import type { BookingData } from "~/types/PendingType";
+import type { DTO_RQ_ZaloPay } from "~/types/ZaloPayType";
 const showPaymentMethods = ref(false);
 const showTripInfo = ref(false);
 const showFormTripInfo = ref(false);
@@ -50,11 +53,7 @@ const pendingTicketStore = usePendingTicketStore();
 const userStore = useUserStore();
 
 const isLoading = ref(true);
-onMounted(async () => {
-  pendingTicketStore.loadPendingTicket();
-  userStore.loadUserData();
-  isLoading.value = false;
-});
+
 const pendingData = computed(() => {
   if (!pendingTicketStore.pendingTicket) {
     console.warn("Pending ticket data is null");
@@ -63,16 +62,32 @@ const pendingData = computed(() => {
   return pendingTicketStore.pendingTicket as BookingData;
 });
 const localUserData = ref({
-  name: userStore.userData?.name || "",
-  email: userStore.userData?.email || "",
-  phone: userStore.userData?.phone || "",
-  gender: userStore.userData?.gender || 1,
+  name: "",
+  email: "",
+  phone: "",
+  gender: 1,
   note: "",
 });
+onMounted(async () => {
+  isLoading.value = true;
+
+  userStore.loadUserData();
+  pendingTicketStore.loadPendingTicket();
+
+  const user = userStore.userData;
+  if (user) {
+    localUserData.value.name = user.name || "";
+    localUserData.value.email = user.email || "";
+    localUserData.value.phone = user.phone || "";
+    localUserData.value.gender = user.gender || 1;
+  }
+
+  isLoading.value = false;
+});
 const paymentMethod = ref("vnpay");
-const submitForm = () => {
+const submitForm = async () => {
   showPaymentMethods.value = true;
-  if (showPaymentMethods.value = true) {
+  if ((showPaymentMethods.value = true)) {
     if (paymentMethod.value == "vnpay") {
       console.log("VNPAY selected");
     }
@@ -81,21 +96,34 @@ const submitForm = () => {
     }
     if (paymentMethod.value == "zalopay") {
       console.log("ZaloPay selected");
-      console.log(pendingTicketStore.pendingTicket)
+      console.log(pendingTicketStore.pendingTicket);
       const data = {
-        account_id: userStore.userData?.id,
-        service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id,
-        service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name,
-        ticket: pendingTicketStore.pendingTicket?.selectedTicket.map(
-          (ticket) => ({
+        account_id: userStore.userData?.id || "",
+        service_provider_id:
+          pendingTicketStore.pendingTicket?.tripData.company.id || 0,
+        service_provider_name:
+          pendingTicketStore.pendingTicket?.tripData.company.name || "",
+        ticket:
+          pendingTicketStore.pendingTicket?.selectedTicket.map((ticket) => ({
             id: ticket.id,
             seat_name: ticket.seat_name,
             price: ticket.price,
-          })
+          })) || [],
+      } as DTO_RQ_ZaloPay;
+      console.log(data);
+      try {
+        const response = await createZaloPayPayment(data);
+        console.log("ZaloPay API response:", response);
 
-        ),
+        if (response.result) {
+          console.log("ZaloPay payment created successfully:", response.result);
+          window.location.href = response.result.order_url;
+        } else {
+          ElMessage.error(response.message || "Thanh toán thất bại");
+        }
+      } catch (error) {
+        ElMessage.error("Có lỗi xảy ra khi tạo thanh toán ZaloPay");
       }
-      console.log(data)
     }
   }
 };
@@ -200,7 +228,7 @@ const submitForm = () => {
         class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"
         @click="submitForm"
       >
-      {{ showPaymentMethods ? 'Xác nhận thanh toán' : 'Tiếp tục thanh toán' }}
+        {{ showPaymentMethods ? "Xác nhận thanh toán" : "Tiếp tục thanh toán" }}
       </button>
     </div>
 
