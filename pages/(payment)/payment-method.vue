@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft } from "@element-plus/icons-vue";
+import { ArrowLeft, Ticket } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { calculateTotalTime } from "~/lib/calculateTotalTime";
 import type { UserType } from "~/types/AccountType";
@@ -48,6 +48,7 @@ const handleBack = () => {
 
 const pendingTicketStore = usePendingTicketStore();
 const userStore = useUserStore();
+
 const isLoading = ref(true);
 onMounted(async () => {
   pendingTicketStore.loadPendingTicket();
@@ -77,6 +78,24 @@ const submitForm = () => {
     }
     if (paymentMethod.value == "momo") {
       console.log("MoMo selected");
+    }
+    if (paymentMethod.value == "zalopay") {
+      console.log("ZaloPay selected");
+      console.log(pendingTicketStore.pendingTicket)
+      const data = {
+        account_id: userStore.userData?.id,
+        service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id,
+        service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name,
+        ticket: pendingTicketStore.pendingTicket?.selectedTicket.map(
+          (ticket) => ({
+            id: ticket.id,
+            seat_name: ticket.seat_name,
+            price: ticket.price,
+          })
+
+        ),
+      }
+      console.log(data)
     }
   }
 };
