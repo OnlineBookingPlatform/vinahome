@@ -24,16 +24,6 @@ const contactInfoForm = ref({
 const showPriceDetail = ref(true);
 
 const router = useRouter();
-const handleBack = () => {
-  if (showPaymentMethods.value) {
-    // Quay lại bước "Thông tin chuyến đi"
-    showPaymentMethods.value = false;
-  } else {
-    // Đã ở bước "Thông tin chuyến đi", quay về trang trước
-    router.back();
-    localStorage.removeItem("paymentStartTime");
-  }
-};
 
 const pendingTicketStore = usePendingTicketStore();
 const userStore = useUserStore();
@@ -115,7 +105,7 @@ const submitForm = async () => {
 const resetTrigger = ref(false);
 const timer = ref<NodeJS.Timeout | null>(null);
 const currentTimeleft = ref(0);
-const TOTAL_TIME = 1200; // 20 phút
+const TOTAL_TIME = 12000; // 20 phút
 
 const initCountdown = () => {
   const savedStartTime = localStorage.getItem("paymentStartTime");
@@ -186,6 +176,23 @@ onMounted(() => {
   }
 });
 onUnmounted(clearTimer);
+
+const handleBack = async () => {
+  if (showPaymentMethods.value) {
+    // Quay lại bước "Thông tin chuyến đi"
+    showPaymentMethods.value = false;
+  } else {
+    // Đã ở bước "Thông tin chuyến đi", quay về trang trước
+    try {
+      await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
+      localStorage.removeItem("paymentStartTime");
+      router.back();
+      pendingTicketStore.clearPendingTicket();
+    } catch (error) {
+      ElMessage.error("Lỗi hệ thống! Vui lòng thử lại sau.");
+    }
+  }
+};
 </script>
 
 <template>
