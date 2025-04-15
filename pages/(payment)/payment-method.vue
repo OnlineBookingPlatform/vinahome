@@ -3,6 +3,7 @@ import { ArrowLeft, Ticket } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { createZaloPayPayment } from "~/api/paymentAPI";
+import { changeTicketAvailableAPI } from "~/api/ticketAPI";
 import { calculateTotalTime } from "~/lib/calculateTotalTime";
 import type { UserType } from "~/types/AccountType";
 import type { BookingData } from "~/types/PendingType";
@@ -10,22 +11,6 @@ import type { DTO_RQ_ZaloPay } from "~/types/ZaloPayType";
 const showPaymentMethods = ref(false);
 const showTripInfo = ref(false);
 const showFormTripInfo = ref(false);
-
-const mockTripDetail = {
-  destination: "Thành Nhân - Hải Phòng",
-  bus: "Gường nằm 40 chỗ",
-  pickupInfo: {
-    time: "06:00",
-    locationName: "Văn phòng 65 Khuất Duy Tiến (Big C Mỹ Đình)",
-    address: "65 Khuất Duy Tiến, Phường Nhân Chính, Thanh Xuân, Hà Nội",
-  },
-  returnInfo: {
-    time: "06:00",
-    locationName: "Văn phòng 97 Hùng Vương (Bến xe Thượng Lý)",
-    address: "Số 97 Hùng Vương, Phường Sở Dầu, Hồng Bàng, Hải Phòng",
-  },
-  seats: 2,
-};
 
 const contactInfoForm = ref({
   gender: "male",
@@ -46,6 +31,7 @@ const handleBack = () => {
   } else {
     // Đã ở bước "Thông tin chuyến đi", quay về trang trước
     router.back();
+    localStorage.removeItem("paymentStartTime");
   }
 };
 
@@ -125,6 +111,81 @@ const submitForm = async () => {
     }
   }
 };
+
+const resetTrigger = ref(false);
+const timer = ref<NodeJS.Timeout | null>(null);
+const currentTimeleft = ref(0);
+const TOTAL_TIME = 1200; // 20 phút
+
+const initCountdown = () => {
+  const savedStartTime = localStorage.getItem("paymentStartTime");
+  const now = Math.floor(Date.now() / 1000);
+
+  if (savedStartTime) {
+    const elapsed = now - parseInt(savedStartTime);
+    const remaining = TOTAL_TIME - elapsed;
+    return Math.max(0, remaining);
+  }
+
+  localStorage.setItem("paymentStartTime", now.toString());
+  return TOTAL_TIME;
+};
+
+const startCountdown = () => {
+  currentTimeleft.value = initCountdown();
+
+  if (currentTimeleft.value > 0) {
+    timer.value = setInterval(async () => {
+      currentTimeleft.value -= 1;
+
+      if (currentTimeleft.value <= 0) {
+        clearInterval(timer.value as NodeJS.Timeout);
+        try {
+          await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
+          localStorage.removeItem("paymentStartTime");
+          router.back();
+          pendingTicketStore.clearPendingTicket();
+          ElMessage.warning("Thời gian thanh toán đã hết!");
+        } catch (error) {
+          ElMessage.error("Lỗi hệ thống! Vui lòng thử lại sau.");
+        }
+      }
+    }, 1000);
+  } else {
+    console.log("Thời gian đã hết ngay từ đầu!");
+  }
+};
+const resetCountdown = () => {
+  localStorage.removeItem("paymentStartTime");
+  clearTimer();
+  startCountdown();
+};
+const clearTimer = () => {
+  if (timer.value) {
+    clearInterval(timer.value);
+    timer.value = null;
+  }
+};
+const formattedTime = computed(() => {
+  const minutes = Math.floor(currentTimeleft.value / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = (currentTimeleft.value % 60).toString().padStart(2, "0");
+  return { minutes, seconds };
+});
+const background = computed(() =>
+  currentTimeleft.value < 600 ? "bg-warning" : "bg-primary"
+);
+watch(resetTrigger, () => {
+  resetCountdown();
+});
+onMounted(() => {
+  startCountdown();
+  if (currentTimeleft.value <= 12) {
+    currentTimeleft.value = 12;
+  }
+});
+onUnmounted(clearTimer);
 </script>
 
 <template>
@@ -147,7 +208,6 @@ const submitForm = async () => {
         </div>
         <PaymentTripInfo
           v-if="!showPaymentMethods"
-          :trip-info="mockTripDetail"
           :pending-data="pendingData"
         />
         <PaymentMethodRadio
@@ -231,7 +291,11 @@ const submitForm = async () => {
     </div>
 
     <aside class="min-w-72 ml-10 space-y-4">
-      <PaymentCountdown />
+      <PaymentCountdown
+        :minutes="formattedTime.minutes"
+        :seconds="formattedTime.seconds"
+        :background="background"
+      />
 
       <!--Form số tiền cần thanh toán -->
       <div class="bg-white border rounded-xl">

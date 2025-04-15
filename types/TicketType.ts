@@ -7,6 +7,7 @@ export interface TicketType {
   seat_status: boolean;
   seat_name: string;
   base_price: number;
+  status_booking_ticket: boolean;
 }
 export interface SelectedTicket {
   id: number;

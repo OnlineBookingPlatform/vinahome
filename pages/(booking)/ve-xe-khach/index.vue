@@ -24,6 +24,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
 import type { BookingData } from "~/types/PendingType";
+import { changeTicketBookedAPI } from "~/api/ticketAPI";
 const route = useRoute();
 const router = useRouter();
 const tripData = ref<DTO_RP_TripInfo[]>([]);
@@ -113,6 +114,7 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 
 const activeTabs = ref<Record<string, number | null>>({});
 const tripDetail = ref<DetailTripType | null>(null);
+
 const selectedTripId = ref<number | null>(null);
 const selectedTicket = ref<SelectedTicket[]>([]);
 
@@ -140,6 +142,7 @@ const openTrip = async (tripId: number) => {
   const response = await getTripDeatil(tripId);
   if (response.result) {
     tripDetail.value = response.result;
+    console.log("API response:", tripDetail.value);
   }
 };
 
@@ -253,6 +256,18 @@ const getBasePrice = (floor: number, row: number, col: number) => {
     currency: "VND",
     minimumFractionDigits: 0,
   }).format(seat.base_price);
+};
+const getSeatStatus = (floor: number, row: number, col: number): boolean => {
+  if (!tripDetail.value || !tripDetail.value.tickets) return false;
+
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+
+  return seat?.status_booking_ticket ?? false;
 };
 
 const toggleSeatSelection = (floor: number, row: number, col: number) => {
@@ -394,7 +409,7 @@ watch(
 );
 
 const pendingTicketStore = usePendingTicketStore();
-const nextStep = () => {
+const nextStep = async () => {
   // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
   // selectedStep = 2 là bước chọn điểm đón/trả
   if (selectedStep.value === 2) {
@@ -403,13 +418,34 @@ const nextStep = () => {
     );
     const bookingData: BookingData = {
       selectedTicket: selectedTicket.value,
-      pointUp: valuePointUp.value ?? { id: 0, name: '', address: '', time_point: '', start_time: '' },
-      pointDown: valuePointDown.value ?? { id: 0, name: '', address: '', time_point: '', start_time: '' },
+      pointUp: valuePointUp.value ?? {
+        id: 0,
+        name: "",
+        address: "",
+        time_point: "",
+        start_time: "",
+      },
+      pointDown: valuePointDown.value ?? {
+        id: 0,
+        name: "",
+        address: "",
+        time_point: "",
+        start_time: "",
+      },
       selectedTripId: selectedTripId.value ?? 0,
-      tripData: selectedTrip ?? {} as DTO_RP_TripInfo,
+      tripData: selectedTrip ?? ({} as DTO_RP_TripInfo),
     };
     pendingTicketStore.setPendingTicket(bookingData);
-    router.push("/payment-method");
+
+    try {
+      await changeTicketBookedAPI(selectedTicket.value);
+      router.push("/payment-method");
+    } catch (error) {
+      ElMessage.error("Vé đã được đặt vui lòng chọn vé khác!");
+    }
+
+    console.log("Dữ liệu bookingData:", selectedTicket.value);
+
     console.log(
       "Dữ liệu pendingTicketStore:",
       pendingTicketStore.pendingTicket
@@ -701,14 +737,6 @@ const nextStep = () => {
                             ></el-button>
                             Đã đặt
                           </div>
-                          <div class="mt-3">
-                            <el-button
-                              circle
-                              class="mx-2"
-                              type="warning"
-                            ></el-button>
-                            Không bán
-                          </div>
                         </div>
                       </el-col>
                       <el-col :span="16" class="flex justify-center">
@@ -750,9 +778,12 @@ const nextStep = () => {
                                       circle
                                       size="large"
                                       class="mx-2"
+                                      :disabled="getSeatStatus(floor, row, col)"
                                       :class="getButtonClass(floor, row, col)"
                                       :type="
-                                        isSeatSelected(floor, row, col)
+                                        getSeatStatus(floor, row, col)
+                                          ? 'info'
+                                          : isSeatSelected(floor, row, col)
                                           ? 'danger'
                                           : ''
                                       "
