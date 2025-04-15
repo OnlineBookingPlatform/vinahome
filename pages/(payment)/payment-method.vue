@@ -113,10 +113,8 @@ const submitForm = async () => {
       console.log(data);
       try {
         const response = await createZaloPayPayment(data);
-        console.log("ZaloPay API response:", response);
-
         if (response.result) {
-          console.log("ZaloPay payment created successfully:", response.result);
+          console.log("ZaloPay:", response.result);
           window.location.href = response.result.order_url;
         } else {
           ElMessage.error(response.message || "Thanh toán thất bại");
