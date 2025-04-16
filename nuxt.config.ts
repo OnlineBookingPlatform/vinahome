@@ -42,7 +42,7 @@ export default defineNuxtConfig({
           hid: "csp",
           "http-equiv": "Content-Security-Policy",
           content:
-            "default-src 'self'; img-src 'self' https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com; connect-src 'self' http://localhost:3002 https://api.cloudinary.com;",
+            "default-src 'self'; img-src 'self' https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com; connect-src 'self' http://localhost:3002 https://api-gateway-perj.onrender.com https://api.cloudinary.com;",
         },
         {
           name: "description",

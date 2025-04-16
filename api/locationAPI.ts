@@ -2,6 +2,7 @@ import type { Province } from "~/types/LocationType";
 import type { ApiResponse } from "./APIResponse";
 
 const API_GATEWAY_URL = "http://localhost:3002";
+// const API_GATEWAY_URL = "https://api-gateway-perj.onrender.com";
 
 export const getProvinces = async (): Promise<ApiResponse<Province[]>> => {
   try {

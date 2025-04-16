@@ -439,7 +439,7 @@ const nextStep = async () => {
 
     try {
       await changeTicketBookedAPI(selectedTicket.value);
-      router.push("/payment-method");
+      router.push("/payment-method-2");
     } catch (error) {
       ElMessage.error("Vé đã được đặt vui lòng chọn vé khác!");
     }
