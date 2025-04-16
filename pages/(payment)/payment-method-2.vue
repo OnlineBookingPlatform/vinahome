@@ -91,6 +91,7 @@ const submitForm = async () => {
         const response = await createZaloPayPayment(data);
         if (response.result) {
           console.log("ZaloPay:", response.result);
+          
           window.location.href = response.result.order_url;
         } else {
           ElMessage.error(response.message || "Thanh toán thất bại");

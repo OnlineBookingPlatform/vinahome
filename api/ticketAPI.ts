@@ -1,3 +1,4 @@
+import type { DTO_RQ_UpdateTicketOnPlatform } from "~/types/TicketType";
 import type { ApiResponse } from "./APIResponse";
 const API_GATEWAY_URL = "http://localhost:3002";
 
@@ -34,3 +35,20 @@ export const changeTicketAvailableAPI = async (
     throw error;
   }
 };
+
+export const updateTicketOnPlatformAPI = async (
+  data: DTO_RQ_UpdateTicketOnPlatform[]
+): Promise<ApiResponse<void>> => {
+  try {
+    return await $fetch<ApiResponse<void>>(
+      `${API_GATEWAY_URL}/v2/ticket/update-ticket-on-platform`,
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+  } catch (error) {
+    console.error("Error updating ticket on platform:", error);
+    throw error;
+  }
+}
