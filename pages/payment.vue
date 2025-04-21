@@ -133,8 +133,8 @@ const buttonAction = {
     <div>
       <el-button type="primary" :icon="ArrowLeft" link @click="router.back()">Quay lại</el-button>
     </div>
-    <div class="flex justify-center">
-      <div class="flex-1 max-w-3xl space-y-6">
+    <div class="flex flex-col sm:flex-row justify-center gap-6">
+      <div class="w-full sm:flex-1 max-w-3xl space-y-6">
         <!-- Thông tin thanh toán + Thông tin chuyến đi -->
         <NuxtPage v-model="paymentMethod" :pending-data="pendingData" />
         <!-- Form Thông tin liên hệ -->
@@ -181,13 +181,14 @@ const buttonAction = {
             </el-form-item>
           </el-form>
         </div>
-        <button class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"
+        <button
+          class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75 hidden sm:block"
           @click="buttonAction[route.fullPath.split('/').at(-1)! as keyof typeof buttonAction]">
           {{ showPaymentMethods ? "Xác nhận thanh toán" : "Tiếp tục thanh toán" }}
         </button>
       </div>
 
-      <aside class="min-w-72 ml-10 space-y-4">
+      <aside class="sm:min-w-72 sm:ml-10 space-y-4">
         <PaymentCountdown />
 
         <!--Form số tiền cần thanh toán -->
@@ -311,6 +312,13 @@ const buttonAction = {
               }}</span>
             </div>
           </div>
+        </div>
+        <!-- Nút dành cho màn hình mobile-->
+        <div class="block sm:hidden mt-6">
+          <button class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"
+            @click="buttonAction[route.fullPath.split('/').at(-1)! as keyof typeof buttonAction]">
+            {{ showPaymentMethods ? "Xác nhận thanh toán" : "Tiếp tục thanh toán" }}
+          </button>
         </div>
       </aside>
     </div>
