@@ -124,7 +124,7 @@ const buttonAction = {
 </script>
 
 <template>
-  <section class="container mx-auto my-10 gap-6">
+  <section class="container mx-auto my-10 gap-6 px-[25px] sm:px-[50px]">
     <div v-if="isLoading" class="text-center py-10">
       <el-spinner size="large" />
       <p>Đang tải thông tin vé...</p>
@@ -150,7 +150,7 @@ const buttonAction = {
             </p>
           </div>
           <el-form :model="contactInfoForm" require-asterisk-position="right" :disabled="showPaymentMethods">
-            <div class="flex gap-6 *:flex-1">
+            <div class="flex flex-col sm:flex-row sm:gap-6 gap-1 *:flex-1">
               <el-form-item label="Họ và tên" required>
                 <el-input placeholder="Nhập họ tên" v-model="contactInfoForm.name" />
               </el-form-item>
@@ -162,7 +162,7 @@ const buttonAction = {
                 </el-radio-group>
               </el-form-item>
             </div>
-            <div class="flex gap-6">
+            <div class="flex flex-col sm:flex-row sm:gap-6 gap-1">
               <el-form-item label="Email nhận thông tin đặt chỗ" required class="flex-1">
                 <el-input placeholder="Nhập email của bạn" class="w-full" v-model="contactInfoForm.email" />
               </el-form-item>
