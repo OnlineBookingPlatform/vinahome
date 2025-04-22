@@ -86,8 +86,8 @@ const submitForm = async () => {
             price: ticket.price,
           })) || [],
       } as DTO_RQ_ZaloPay;
-      console.log(data);
       try {
+        console.log("ZaloPay Data send to Server:", data);
         const response = await createZaloPayPayment(data);
         if (response.result) {
           console.log("ZaloPay:", response.result);
