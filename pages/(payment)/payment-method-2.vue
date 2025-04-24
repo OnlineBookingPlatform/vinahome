@@ -4,7 +4,7 @@ import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { createZaloPayPayment } from "~/api/paymentAPI";
 import { changeTicketAvailableAPI } from "~/api/ticketAPI";
-import { calculateTotalTime } from "~/lib/calculateTotalTime";
+import { calculateTotalTime } from "~/lib/libTime"
 import type { UserType } from "~/types/AccountType";
 import type { BookingData } from "~/types/PendingType";
 import type { DTO_RQ_ZaloPay } from "~/types/ZaloPayType";

@@ -5,6 +5,9 @@ export const useUserStore = defineStore('userStore', {
     state: () => ({
         userData: null as UserType | null,
     }),
+    getters: {
+        isLoggedIn: (state) => !!state.userData,
+    },
     actions: {
         loadUserData() {
             if (process.client) {

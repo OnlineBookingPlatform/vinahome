@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { calculateTotalTime } from "~/lib/calculateTotalTime";
+import { calculateTotalTime } from "~/lib/libTime";
 import type { BookingData } from "~/types/PendingType";
 
 defineProps<{

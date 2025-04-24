@@ -25,13 +25,30 @@ import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
 import type { BookingData } from "~/types/PendingType";
 import { changeTicketBookedAPI } from "~/api/ticketAPI";
+import { timeToSeconds, calculateTotalTime, calculateDuration } from "~/lib/libTime"
 const route = useRoute();
 const router = useRouter();
 const tripData = ref<DTO_RP_TripInfo[]>([]);
 const loading = ref(true);
+const userStore = useUserStore();
+const activeTabs = ref<Record<string, number | null>>({});
+const tripDetail = ref<DetailTripType | null>(null);
+const selectedTripId = ref<number | null>(null);
+const selectedTicket = ref<SelectedTicket[]>([]);
+const selectedStep = ref(1);
+const valuePointUp = ref<TripPointType | null>(null);
+const valuePointDown = ref<TripPointType | null>(null);
+const optionsPointDown = ref<TripPointType[]>([]);
+const optionsPointUp = ref<TripPointType[]>([]);
+const valuePoint = ref(1);
+const checked1 = ref(true);
+const checked2 = ref(false);
+const pendingTicketStore = usePendingTicketStore();
+const activeStep = ref(0);
 
+// Danh sách chuyến được gọi khi component được mount
 onMounted(async () => {
-  // Lấy params từ URL
+  // Lấy params từ URL 
   const { departureId, destinationId, departureDate, numberOfTickets } =
     route.query;
 
@@ -49,9 +66,7 @@ onMounted(async () => {
     departureDate: departureDate as string,
     numberOfTickets: numberOfTickets ? Number(numberOfTickets) : 1,
   };
-
   console.log("Formatted search params:", searchParams);
-
   loading.value = true;
   try {
     const response = await getTripOnPlatform(searchParams);
@@ -72,66 +87,53 @@ onMounted(async () => {
   }
 });
 
-const valuePoint = ref(1);
 
-const checked1 = ref(true);
-const checked2 = ref(false);
 
-const timeToSeconds = (timeStr: string): number => {
-  if (!timeStr) return 0;
-  const parts = timeStr.split(":").map((part) => parseInt(part) || 0);
-  return parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0);
-};
+// const timeToSeconds = (timeStr: string): number => {
+//   if (!timeStr) return 0;
+//   const parts = timeStr.split(":").map((part) => parseInt(part) || 0);
+//   return parts[ 0 ] * 3600 + parts[ 1 ] * 60 + (parts[ 2 ] || 0);
+// };
 
-// Chuyển đổi số giây thành chuỗi HH:MM
-const secondsToTime = (totalSeconds: number): string => {
-  const hours = Math.floor(totalSeconds / 3600) % 24;
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  return [
-    hours.toString().padStart(2, "0"),
-    minutes.toString().padStart(2, "0"),
-  ].join(":");
-};
+// // Chuyển đổi số giây thành chuỗi HH:MM
+// const secondsToTime = (totalSeconds: number): string => {
+//   const hours = Math.floor(totalSeconds / 3600) % 24;
+//   const minutes = Math.floor((totalSeconds % 3600) / 60);
+//   return [
+//     hours.toString().padStart(2, "0"),
+//     minutes.toString().padStart(2, "0"),
+//   ].join(":");
+// };
 
-// Tính tổng 2 mốc thời gian
-const calculateTotalTime = (time1: string, time2: string): string => {
-  const totalSeconds = timeToSeconds(time1) + timeToSeconds(time2);
-  return secondsToTime(totalSeconds);
-};
+// // Tính tổng 2 mốc thời gian
+// const calculateTotalTime = (time1: string, time2: string): string => {
+//   const totalSeconds = timeToSeconds(time1) + timeToSeconds(time2);
+//   return secondsToTime(totalSeconds);
+// };
 
-const calculateDuration = (startTime: string, endTime: string): string => {
-  const startSec = timeToSeconds(startTime);
-  const endSec = timeToSeconds(endTime);
+// const calculateDuration = (startTime: string, endTime: string): string => {
+//   const startSec = timeToSeconds(startTime);
+//   const endSec = timeToSeconds(endTime);
 
-  const durationSec =
-    endSec >= startSec ? endSec - startSec : 86400 - startSec + endSec;
+//   const durationSec =
+//     endSec >= startSec ? endSec - startSec : 86400 - startSec + endSec;
 
-  const hours = Math.floor(durationSec / 3600);
-  const minutes = Math.floor((durationSec % 3600) / 60);
+//   const hours = Math.floor(durationSec / 3600);
+//   const minutes = Math.floor((durationSec % 3600) / 60);
 
-  return `${hours}h${minutes.toString().padStart(2, "0")}`;
-};
+//   return `${hours}h${minutes.toString().padStart(2, "0")}`;
+// };
 
-const activeTabs = ref<Record<string, number | null>>({});
-const tripDetail = ref<DetailTripType | null>(null);
 
-const selectedTripId = ref<number | null>(null);
-const selectedTicket = ref<SelectedTicket[]>([]);
-
-const selectedStep = ref(1);
-const valuePointUp = ref<TripPointType | null>(null);
-const valuePointDown = ref<TripPointType | null>(null);
-const optionsPointDown = ref<TripPointType[]>([]);
-const optionsPointUp = ref<TripPointType[]>([]);
 
 const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
     selectedTicket.value = [];
     activeStep.value = 0;
-    activeTabs.value[String(selectedTripId.value)] = null;
+    activeTabs.value[ String(selectedTripId.value) ] = null;
   }
 
-  (activeTabs.value as Record<number, number | null>)[tripId] = 1;
+  (activeTabs.value as Record<number, number | null>)[ tripId ] = 1;
   selectedTripId.value = tripId;
 
   // Reset point chọn
@@ -146,11 +148,11 @@ const openTrip = async (tripId: number) => {
   }
 };
 
-const handleClick = async (tripId: number, tab: any) => {
+const handleClickTab = async (tripId: number, tab: any) => {
   console.log("Tab được chọn:", tab.props.name);
   console.log(
     "activeTabs trước khi cập nhật:",
-    activeTabs.value[String(tripId)]
+    activeTabs.value[ String(tripId) ]
   );
   if (tab.props.name === 1) {
     if (selectedTripId.value !== tripId) {
@@ -165,10 +167,10 @@ const handleClick = async (tripId: number, tab: any) => {
     if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
       selectedTicket.value = [];
       activeStep.value = 0;
-      activeTabs.value[String(selectedTripId.value)] = null;
+      activeTabs.value[ String(selectedTripId.value) ] = null;
     }
 
-    (activeTabs.value as Record<number, number | null>)[tripId] = 2;
+    (activeTabs.value as Record<number, number | null>)[ tripId ] = 2;
     selectedTripId.value = tripId;
 
     console.log("API response cho tab 2:");
@@ -189,13 +191,13 @@ const handleClick = async (tripId: number, tab: any) => {
   } else if (tab.props.name === 4) {
     console.log("API response cho tab 4:");
   } else {
-    activeTabs.value[tripId] =
-      activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
+    activeTabs.value[ tripId ] =
+      activeTabs.value[ tripId ] === tab.props.name ? null : tab.props.name;
     selectedTripId.value = tripId;
   }
 };
 const closeTrip = (tripId: number) => {
-  activeTabs.value[tripId] = null;
+  activeTabs.value[ tripId ] = null;
   selectedTripId.value = null;
   tripDetail.value = null;
   activeStep.value = 0;
@@ -328,7 +330,7 @@ const isSeatSelected = (floor: number, row: number, col: number) => {
   );
   return seat && selectedTicket.value.some((s) => s.id === seat.id);
 };
-const activeStep = ref(0);
+
 
 watch(
   () => selectedTicket.value.length,
@@ -392,7 +394,7 @@ watch(
   optionsPointUp,
   (newVal) => {
     if (newVal.length > 0) {
-      valuePointUp.value = newVal[0];
+      valuePointUp.value = newVal[ 0 ];
     }
   },
   { immediate: true }
@@ -402,13 +404,13 @@ watch(
   optionsPointDown,
   (newVal) => {
     if (newVal.length > 0) {
-      valuePointDown.value = newVal[0];
+      valuePointDown.value = newVal[ 0 ];
     }
   },
   { immediate: true }
 );
 
-const pendingTicketStore = usePendingTicketStore();
+
 const nextStep = async () => {
   // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
   // selectedStep = 2 là bước chọn điểm đón/trả
@@ -435,8 +437,12 @@ const nextStep = async () => {
       selectedTripId: selectedTripId.value ?? 0,
       tripData: selectedTrip ?? ({} as DTO_RP_TripInfo),
     };
-    pendingTicketStore.setPendingTicket(bookingData);
 
+    if (!userStore.isLoggedIn) {
+      ElMessage.warning("Bạn cần đăng nhập để tiếp tục!");
+      return;
+    }
+    pendingTicketStore.setPendingTicket(bookingData);
     try {
       await changeTicketBookedAPI(selectedTicket.value);
       router.push("/payment-method-2");
@@ -471,7 +477,9 @@ const nextStep = async () => {
             <div class="flex justify-between items-center mb-5">
               <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
               <el-button type="danger" text>
-                Bỏ lọc <el-icon class="el-icon--right"><Delete /></el-icon>
+                Bỏ lọc <el-icon class="el-icon--right">
+                  <Delete />
+                </el-icon>
               </el-button>
             </div>
 
@@ -481,26 +489,10 @@ const nextStep = async () => {
                   <span class="font-semibold text-lg"> Giờ đi </span>
                 </template>
                 <div class="flex flex-col px-4">
-                  <el-checkbox
-                    v-model="checked1"
-                    label="00:00 - 06:00"
-                    size="large"
-                  />
-                  <el-checkbox
-                    v-model="checked2"
-                    label="06:00 - 12:00"
-                    size="large"
-                  />
-                  <el-checkbox
-                    v-model="checked2"
-                    label="12:00 - 18:00"
-                    size="large"
-                  />
-                  <el-checkbox
-                    v-model="checked2"
-                    label="18:00 - 24:00"
-                    size="large"
-                  />
+                  <el-checkbox v-model="checked1" label="00:00 - 06:00" size="large" />
+                  <el-checkbox v-model="checked2" label="06:00 - 12:00" size="large" />
+                  <el-checkbox v-model="checked2" label="12:00 - 18:00" size="large" />
+                  <el-checkbox v-model="checked2" label="18:00 - 24:00" size="large" />
                 </div>
                 <div></div>
               </el-collapse-item>
@@ -534,27 +526,16 @@ const nextStep = async () => {
             <el-skeleton :rows="5" animated />
           </div>
           <div v-else class="flex flex-col gap-4">
-            <div
-              v-for="trip in tripData"
-              :key="trip.id"
-              :class="[
-                'trip-card rounded-2xl bg-white pt-4',
-                selectedTripId === trip.id
-                  ? 'border-[#03ACFF] border-[3px]'
-                  : '',
-              ]"
-              :loading="loading"
-            >
+            <div v-for="trip in tripData" :key="trip.id" :class="[
+              'trip-card rounded-2xl bg-white pt-4',
+              selectedTripId === trip.id
+                ? 'border-[#03ACFF] border-[3px]'
+                : '',
+            ]" :loading="loading">
               <div class="flex justify-between mx-4">
                 <!-- Ảnh -->
-                <div
-                  class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]"
-                >
-                  <img
-                    :src="trip.company.url_vehicle_online"
-                    class="w-full object-cover"
-                    loading="eager"
-                  />
+                <div class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]">
+                  <img :src="trip.company.url_vehicle_online" class="w-full object-cover" loading="eager" />
                 </div>
                 <!-- Thông tin chuyến đi -->
                 <div class="w-full ml-4">
@@ -563,20 +544,15 @@ const nextStep = async () => {
                       <div class="flex items-center gap-4">
                         <span class="text-[20px] font-semibold">{{
                           trip.company.name
-                        }}</span>
+                          }}</span>
                         <div class="px-2">
-                          <el-rate
-                            v-model="valuePoint"
-                            disabled
-                            show-score
-                            text-color="#ff9900"
-                            score-template="{value}"
-                          />
+                          <el-rate v-model="valuePoint" disabled show-score text-color="#ff9900"
+                            score-template="{value}" />
                         </div>
                       </div>
                       <span class="text-[#909295] mt-2">{{
                         trip.seat_map.name
-                      }}</span>
+                        }}</span>
                     </div>
                     <div class="ml-auto flex flex-col text-right">
                       <span class="text-xl font-bold text-red-500">
@@ -593,9 +569,7 @@ const nextStep = async () => {
                           }}đ
                         </span>
                         <div class="bg-red-500 px-[2px] rounded">
-                          <span class="text-sm text-white items-center"
-                            >-10%</span
-                          >
+                          <span class="text-sm text-white items-center">-10%</span>
                         </div>
                       </div>
                     </div>
@@ -604,9 +578,9 @@ const nextStep = async () => {
                   <div class="flex text-base font-medium my-1">
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
-                        <el-icon :style="{ color: 'red', fontSize: '1.5rem' }"
-                          ><Place
-                        /></el-icon>
+                        <el-icon :style="{ color: 'red', fontSize: '1.5rem' }">
+                          <Place />
+                        </el-icon>
                         <span class="text-black text-xl w-16 text-center">
                           {{
                             calculateTotalTime(
@@ -615,20 +589,21 @@ const nextStep = async () => {
                             )
                           }}
                         </span>
-                        <el-icon style="color: #99a9bf"><CaretRight /></el-icon>
+                        <el-icon style="color: #99a9bf">
+                          <CaretRight />
+                        </el-icon>
                         <span class="text-black text-md">{{
                           trip.departureInfo.pointName
-                        }}</span>
+                          }}</span>
                       </div>
                       <div class="py-[1px] flex items-center gap-2">
-                        <el-icon
-                          :style="{
-                            fontSize: '1.5rem',
-                            transform: 'rotate(90deg)',
-                            color: '#909295',
-                          }"
-                          ><Minus
-                        /></el-icon>
+                        <el-icon :style="{
+                          fontSize: '1.5rem',
+                          transform: 'rotate(90deg)',
+                          color: '#909295',
+                        }">
+                          <Minus />
+                        </el-icon>
                         <span class="text-sm text-gray-500 mx-2">
                           {{
                             calculateDuration(
@@ -645,10 +620,9 @@ const nextStep = async () => {
                         </span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <el-icon
-                          :style="{ color: '#3B82F6', fontSize: '1.5rem' }"
-                          ><LocationFilled
-                        /></el-icon>
+                        <el-icon :style="{ color: '#3B82F6', fontSize: '1.5rem' }">
+                          <LocationFilled />
+                        </el-icon>
                         <span class="text-black text-xl w-16 text-center">
                           {{
                             calculateTotalTime(
@@ -657,18 +631,15 @@ const nextStep = async () => {
                             )
                           }}
                         </span>
-                        <el-icon style="color: #99a9bf"><CaretRight /></el-icon>
+                        <el-icon style="color: #99a9bf">
+                          <CaretRight />
+                        </el-icon>
                         <span class="text-black text-md">
-                          {{ trip.destinationInfo.pointName }}</span
-                        >
+                          {{ trip.destinationInfo.pointName }}</span>
                       </div>
                     </div>
-                    <div
-                      class="text-white px-3 py-1 rounded ml-auto flex items-end"
-                    >
-                      <span class="text-amber-600 text-md"
-                        >Còn {{ trip.tickets_available }} chỗ trống</span
-                      >
+                    <div class="text-white px-3 py-1 rounded ml-auto flex items-end">
+                      <span class="text-amber-600 text-md">Còn {{ trip.tickets_available }} chỗ trống</span>
                     </div>
                   </div>
                 </div>
@@ -678,42 +649,24 @@ const nextStep = async () => {
               <div class="relative">
                 <div class="border-t border-gray-300"></div>
 
-                <el-button
-                  v-if="!activeTabs[trip.id]"
-                  type="primary"
-                  round
-                  class="absolute bottom-[-35px] right-4 z-10 mt-[3px]"
-                  @click="openTrip(trip.id)"
-                >
+                <el-button v-if="!activeTabs[ trip.id ]" type="primary" round
+                  class="absolute bottom-[-35px] right-4 z-10 mt-[3px]" @click="openTrip(trip.id)">
                   <span class="mx-2">Chọn chuyến</span>
                 </el-button>
-                <el-button
-                  v-else
-                  type="danger"
-                  round
-                  class="absolute bottom-[-35px] right-4 z-10 mt-[3px]"
-                  @click="closeTrip(trip.id)"
-                >
+                <el-button v-else type="danger" round class="absolute bottom-[-35px] right-4 z-10 mt-[3px]"
+                  @click="closeTrip(trip.id)">
                   <span class="mx-2">Đóng</span>
                 </el-button>
               </div>
 
-              <el-tabs
-                v-model="activeTabs[trip.id]"
-                class="demo-tabs relative z-0"
-                @tab-click="
-                  (tab: any): void => {
-                    handleClick(trip.id, tab);
-                  }
-                "
-              >
+              <el-tabs v-model="activeTabs[ trip.id ]" class="demo-tabs relative z-0" @tab-click="
+                (tab: any): void => {
+                  handleClickTab(trip.id, tab);
+                }
+              ">
                 <el-tab-pane label="Chọn ghế" :name="1" class="">
                   <div class="mt-5 items-center">
-                    <el-steps
-                      :active="activeStep"
-                      align-center
-                      finish-status="success"
-                    >
+                    <el-steps :active="activeStep" align-center finish-status="success">
                       <el-step title="Chỗ mong muốn" />
                       <el-step title="Điểm đón/trả" />
                     </el-steps>
@@ -721,79 +674,43 @@ const nextStep = async () => {
                   <div v-if="selectedStep === 1">
                     <el-row>
                       <el-col :span="8">
-                        <div
-                          class="flex flex-col mt-5 mx-4 bg-[#f5f5f5] rounded-xl p-2"
-                        >
+                        <div class="flex flex-col mt-5 mx-4 bg-[#f5f5f5] rounded-xl p-2">
                           <span class="text-base font-semibold">Chú thích</span>
                           <div class="mt-3">
                             <el-button circle class="mx-2"></el-button>
                             Còn trống
                           </div>
                           <div class="mt-3">
-                            <el-button
-                              circle
-                              class="mx-2"
-                              type="info"
-                            ></el-button>
+                            <el-button circle class="mx-2" type="info"></el-button>
                             Đã đặt
                           </div>
                         </div>
                       </el-col>
                       <el-col :span="16" class="flex justify-center">
-                        <div
-                          v-if="tripDetail"
-                          class="flex flex-wrap justify-center gap-8 mb-5 mt-5"
-                        >
-                          <div
-                            v-for="floor in getFloors"
-                            :key="floor"
-                            class="flex flex-col items-center"
-                          >
+                        <div v-if="tripDetail" class="flex flex-wrap justify-center gap-8 mb-5 mt-5">
+                          <div v-for="floor in getFloors" :key="floor" class="flex flex-col items-center">
                             <h3 class="text-base">Tầng {{ floor }}</h3>
-                            <div
-                              class="flex flex-col bg-[#f5f5f5] rounded-xl p-2"
-                            >
-                              <div
-                                v-for="row in getRows(floor)"
-                                :key="row"
-                                style="display: flex"
-                              >
-                                <div
-                                  v-for="col in getColumns"
-                                  :key="col"
-                                  style="margin: 5px"
-                                  class=""
-                                >
-                                  <el-tooltip
-                                    :content="
-                                      'Số ghế: ' +
-                                      getSeatName(floor, row, col) +
-                                      ' -  Giá:' +
-                                      ' ' +
-                                      getBasePrice(floor, row, col)
-                                    "
-                                    placement="top"
-                                  >
-                                    <el-button
-                                      circle
-                                      size="large"
-                                      class="mx-2"
+                            <div class="flex flex-col bg-[#f5f5f5] rounded-xl p-2">
+                              <div v-for="row in getRows(floor)" :key="row" style="display: flex">
+                                <div v-for="col in getColumns" :key="col" style="margin: 5px" class="">
+                                  <el-tooltip :content="'Số ghế: ' +
+                                    getSeatName(floor, row, col) +
+                                    ' -  Giá:' +
+                                    ' ' +
+                                    getBasePrice(floor, row, col)
+                                    " placement="top">
+                                    <el-button circle size="large" class="mx-2"
                                       :disabled="getSeatStatus(floor, row, col)"
-                                      :class="getButtonClass(floor, row, col)"
-                                      :type="
-                                        getSeatStatus(floor, row, col)
+                                      :class="getButtonClass(floor, row, col)" :type="getSeatStatus(floor, row, col)
                                           ? 'info'
                                           : isSeatSelected(floor, row, col)
-                                          ? 'danger'
-                                          : ''
-                                      "
-                                      @click="
+                                            ? 'danger'
+                                            : ''
+                                        " @click="
                                         toggleSeatSelection(floor, row, col)
-                                      "
-                                      >{{
+                                        ">{{
                                         getSeatName(floor, row, col)
-                                      }}</el-button
-                                    >
+                                      }}</el-button>
                                   </el-tooltip>
                                 </div>
                               </div>
@@ -813,20 +730,10 @@ const nextStep = async () => {
                       <el-col :span="12">
                         <div class="rounded-xl bg-gray-100 p-4 m-2 mt-5">
                           <span>Thông tin điểm đón</span>
-                          <el-select
-                            v-model="valuePointUp"
-                            filterable
-                            allow-create
-                            default-first-option
-                            class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          >
-                            <el-option
-                              v-for="item in optionsPointUp"
-                              :key="item.id"
-                              :label="item.name"
-                              :value="item.name"
-                              class="mb-[2px]"
-                            >
+                          <el-select v-model="valuePointUp" filterable allow-create default-first-option
+                            class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name"
+                              :value="item.name" class="mb-[2px]">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-sm">
                                   •
@@ -836,11 +743,10 @@ const nextStep = async () => {
                                       item.time_point
                                     )
                                   }}
-                                  - {{ item.name }}</span
-                                >
+                                  - {{ item.name }}</span>
                                 <span class="text-xs text-gray-600">{{
                                   item.address
-                                }}</span>
+                                  }}</span>
                               </div>
                             </el-option>
                           </el-select>
@@ -849,20 +755,10 @@ const nextStep = async () => {
                       <el-col :span="12">
                         <div class="bg-gray-100 rounded-xl p-4 m-2 mt-5">
                           <span>Thông tin điểm trả</span>
-                          <el-select
-                            v-model="valuePointDown"
-                            filterable
-                            allow-create
-                            default-first-option
-                            class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          >
-                            <el-option
-                              v-for="item in optionsPointDown"
-                              :key="item.id"
-                              :label="item.name"
-                              :value="item.name"
-                              class="mb-[2px]"
-                            >
+                          <el-select v-model="valuePointDown" filterable allow-create default-first-option
+                            class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            <el-option v-for="item in optionsPointDown" :key="item.id" :label="item.name"
+                              :value="item.name" class="mb-[2px]">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-sm">
                                   •
@@ -872,11 +768,10 @@ const nextStep = async () => {
                                       item.time_point
                                     )
                                   }}
-                                  - {{ item.name }}</span
-                                >
+                                  - {{ item.name }}</span>
                                 <span class="text-xs text-gray-600">{{
                                   item.address
-                                }}</span>
+                                  }}</span>
                               </div>
                             </el-option>
                           </el-select>
@@ -892,12 +787,7 @@ const nextStep = async () => {
                   <div class="w-full bg-[#4D5054] rounded-b-[14px] px-5">
                     <div class="flex justify-between items-center py-2">
                       <div class="text-white flex justify-center items-center">
-                        <el-button
-                          color="#fff"
-                          @click="preStep"
-                          v-if="selectedStep === 2"
-                          class="mr-5"
-                        >
+                        <el-button color="#fff" @click="preStep" v-if="selectedStep === 2" class="mr-5">
                           Quay lại
                         </el-button>
                         <span>
@@ -908,15 +798,8 @@ const nextStep = async () => {
                         </span>
                       </div>
                       <div>
-                        <span class="text-white text-sm mr-5"
-                          >Tổng cộng: {{ totalPrice }}</span
-                        >
-                        <el-button
-                          color="#fff"
-                          @click="nextStep"
-                          v-if="selectedTicket.length >= 1"
-                          >Tiếp tục</el-button
-                        >
+                        <span class="text-white text-sm mr-5">Tổng cộng: {{ totalPrice }}</span>
+                        <el-button color="#fff" @click="nextStep" v-if="selectedTicket.length >= 1">Tiếp tục</el-button>
                       </div>
                     </div>
                   </div>
@@ -928,18 +811,14 @@ const nextStep = async () => {
                         <h3 class="text-lg font-semibold mb-2">Điểm đón</h3>
                         <ul class="list-disc pl-5">
                           <el-scrollbar height="400px">
-                            <li
-                              v-for="point in optionsPointUp"
-                              :key="point.id"
-                              class="mb-2"
-                            >
+                            <li v-for="point in optionsPointUp" :key="point.id" class="mb-2">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-base">{{
                                   point.name
-                                }}</span>
+                                  }}</span>
                                 <span class="text-sm text-gray-500">{{
                                   point.address
-                                }}</span>
+                                  }}</span>
                                 <span class="text-sm text-gray-400">
                                   Thời gian:
                                   {{
@@ -958,18 +837,14 @@ const nextStep = async () => {
                         <h3 class="text-lg font-semibold mb-2">Điểm trả</h3>
                         <ul class="list-disc pl-5">
                           <el-scrollbar height="400px">
-                            <li
-                              v-for="point in optionsPointDown"
-                              :key="point.id"
-                              class="mb-2"
-                            >
+                            <li v-for="point in optionsPointDown" :key="point.id" class="mb-2">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-base">{{
                                   point.name
-                                }}</span>
+                                  }}</span>
                                 <span class="text-sm text-gray-500">{{
                                   point.address
-                                }}</span>
+                                  }}</span>
                                 <span class="text-sm text-gray-400">
                                   Thời gian:
                                   {{
@@ -1013,8 +888,8 @@ const nextStep = async () => {
                     thể. - Hành lý : Hành lý nhỏ gọn dưới 20 kg, không vận
                     chuyển kèm động vật , thú cưng, không mang đồ có mùi, đồ
                     chảy nước trên xe.nn
-                  </div></el-tab-pane
-                >
+                  </div>
+                </el-tab-pane>
               </el-tabs>
             </div>
           </div>
@@ -1028,26 +903,33 @@ const nextStep = async () => {
 .el-tabs__nav {
   float: left !important;
 }
+
 .el-tabs__nav-wrap:after {
   background-color: #fff !important;
 }
+
 .el-tabs__header {
   padding: 0 !important;
   margin: 0 !important;
 }
+
 .el-collapse-item__content {
   padding-bottom: 10px !important;
 }
+
 .el-checkbox.el-checkbox--large .el-checkbox__label {
   font-size: 15px !important;
 }
+
 .el-tabs__nav-scroll {
   margin-left: 10px !important;
   margin-right: 10px !important;
 }
+
 .el-tabs__nav-wrap:after {
   height: 0 !important;
 }
+
 /* .el-divider--horizontal {
   margin: 0 !important;
   margin-top: 10px !important;
