@@ -3,7 +3,7 @@
 import { Search } from "@element-plus/icons-vue";
 import SelectTrip_v2 from "~/components/select/SelectTrip_v2.vue";
 
-const radio1 = ref('New York')
+const radio1 = ref('Vé xe khách')
 </script>
 
 <template>
@@ -28,7 +28,7 @@ const radio1 = ref('New York')
           <img src="/static/xe-khach/Ellipse152.png"
             class="fixed left-[70%] top-[40%] -translate-y-1/2 w-[600px] opacity-70 z-0" />
           <img src="/static/xe-khach/Container.png"
-            class="absolute left-[1%] top-[40%] transform-translate-y-1/2 w-full" />
+            class="absolute left-[1%] sm:top-[40%] top-[10%] transform-translate-y-1/2 w-full" />
           <img src="/static/xe-khach/bus.png" class="relative w-full drop-shadow-lg z-10" />
         </div>
       </div>
@@ -36,76 +36,146 @@ const radio1 = ref('New York')
   </section>
 
   <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-5">
-    <el-radio-group v-model="radio1" size="large" class="flex gap-x-4" id="homepage-group">
-      <el-radio-button value="New York">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M288 0C422.4 0 512 35.2 512 80l0 16 0 32c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32l0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-192 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32c0 0 0 0 0 0l0-32s0 0 0 0l0-16C64 35.2 153.6 0 288 0zM128 160l0 96c0 17.7 14.3 32 32 32l112 0 0-160-112 0c-17.7 0-32 14.3-32 32zM304 288l112 0c17.7 0 32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-112 0 0 160zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16L208 64c-8.8 0-16 7.2-16 16s7.2 16 16 16l160 0c8.8 0 16-7.2 16-16z" />
-            </svg>
-            <span>Vé xe khách</span>
-          </div>
-        </template>
-      </el-radio-button>
+    <div class="sm:flex gap-x-4 hidden">
+      <el-radio-group v-model="radio1" size="large" id="homepage-group">
+        <el-radio-button value="Vé xe khách">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M288 0C422.4 0 512 35.2 512 80l0 16 0 32c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32l0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-192 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32c0 0 0 0 0 0l0-32s0 0 0 0l0-16C64 35.2 153.6 0 288 0zM128 160l0 96c0 17.7 14.3 32 32 32l112 0 0-160-112 0c-17.7 0-32 14.3-32 32zM304 288l112 0c17.7 0 32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-112 0 0 160zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16L208 64c-8.8 0-16 7.2-16 16s7.2 16 16 16l160 0c8.8 0 16-7.2 16-16z" />
+              </svg>
+              <span>Vé xe khách</span>
+            </div>
+          </template>
+        </el-radio-button>
 
 
-      <el-radio-button value="3">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M0 32C0 14.3 14.3 0 32 0L480 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 384c17.7 0 32 14.3 32 32s-14.3 32-32 32l-176 0 0-48c0-26.5-21.5-48-48-48s-48 21.5-48 48l0 48L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32L32 64C14.3 64 0 49.7 0 32zm96 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM240 96c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM112 192c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM328 384c13.3 0 24.3-10.9 21-23.8c-10.6-41.5-48.2-72.2-93-72.2s-82.5 30.7-93 72.2c-3.3 12.8 7.8 23.8 21 23.8l144 0z" />
-            </svg>
-            <span>Khách sạn</span>
-          </div>
+        <el-radio-button value="3">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M0 32C0 14.3 14.3 0 32 0L480 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 384c17.7 0 32 14.3 32 32s-14.3 32-32 32l-176 0 0-48c0-26.5-21.5-48-48-48s-48 21.5-48 48l0 48L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32L32 64C14.3 64 0 49.7 0 32zm96 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM240 96c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM112 192c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM328 384c13.3 0 24.3-10.9 21-23.8c-10.6-41.5-48.2-72.2-93-72.2s-82.5 30.7-93 72.2c-3.3 12.8 7.8 23.8 21 23.8l144 0z" />
+              </svg>
+              <span>Khách sạn</span>
+            </div>
+          </template>
+        </el-radio-button>
+        <el-radio-button value="4">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M200 0c-30.6 0-56 54.7-56 86.1l0 106.5L7.8 274.3C2.9 277.2 0 282.4 0 288l0 64c0 5.1 2.4 9.8 6.4 12.8s9.3 3.9 14.1 2.5l123.4-37 0 81.2-50 40c-3.8 3-6 7.6-6 12.5l0 32c0 5.1 2.5 10 6.6 13s9.5 3.8 14.4 2.2L200 480.9 290.4 511c-1.6-4.7-2.4-9.8-2.4-15l0-32.6c-18.2-10.5-30.7-29.7-31.9-51.8l-.1-.1 0-3.5 0-82.5L256 184l0-1.1s0 0 0 0l0-96.9C256 54.7 231.5 0 200 0zm88 176l0 224c0 20.9 13.4 38.7 32 45.3l0 42.7c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-40 160 0 0 40c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-42.7c18.6-6.6 32-24.4 32-45.3l0-224c0-26.5-21.5-48-48-48l-256 0c-26.5 0-48 21.5-48 48zm79.8 78.7c3.3-8.7 11.2-14.7 20.5-14.7l151.4 0c9.2 0 17.2 6 20.5 14.7L576 304l-224 0 15.8-49.3zM568 352a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM336 376a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
+              </svg>
+              <span>Đưa đón sân bay</span>
+            </div>
+          </template>
+        </el-radio-button>
+        <el-radio-button value="5">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M192 0c-17.7 0-32 14.3-32 32l0 32 0 .2c-38.6 2.2-72.3 27.3-85.2 64.1L39.6 228.8C16.4 238.4 0 261.3 0 288L0 432l0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 320 0 0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 0-144c0-26.7-16.4-49.6-39.6-59.2L437.2 128.3c-12.9-36.8-46.6-62-85.2-64.1l0-.2 0-32c0-17.7-14.3-32-32-32L192 0zM165.4 128l181.2 0c13.6 0 25.7 8.6 30.2 21.4L402.9 224l-293.8 0 26.1-74.6c4.5-12.8 16.6-21.4 30.2-21.4zM96 288a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm288 32a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+              </svg>
+              <span>Cho thuê xe</span>
+            </div>
+          </template>
+        </el-radio-button>
+        <el-radio-button value="6">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M383.5 192c.3-5.3 .5-10.6 .5-16c0-51-15.9-96-40.2-127.6C319.5 16.9 288.2 0 256 0s-63.5 16.9-87.8 48.4C143.9 80 128 125 128 176c0 5.4 .2 10.7 .5 16L240 192l0 128-32 0c-7 0-13.7 1.5-19.7 4.2L68.2 192l28.3 0c-.3-5.3-.5-10.6-.5-16c0-64 22.2-121.2 57.1-159.3C62 49.3 18.6 122.6 4.2 173.6C1.5 183.1 9 192 18.9 192l6 0L165.2 346.3c-3.3 6.5-5.2 13.9-5.2 21.7l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-7.8-1.9-15.2-5.2-21.7L487.1 192l6 0c9.9 0 17.4-8.9 14.7-18.4C493.4 122.6 450 49.3 358.9 16.7C393.8 54.8 416 112.1 416 176c0 5.4-.2 10.7-.5 16l28.3 0L323.7 324.2c-6-2.7-12.7-4.2-19.7-4.2l-32 0 0-128 111.5 0z" />
+              </svg>
+              <span>Hoạt động & Vui chơi</span>
+            </div>
+          </template>
+        </el-radio-button>
+        <el-radio-button value="7">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                <path
+                  d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
+              </svg>
+              <span>Xem thêm</span>
+            </div>
+          </template>
+        </el-radio-button>
+      </el-radio-group>
+    </div>
+
+    <!-- Menu dropdown cho màn hình nhỏ -->
+    <div class="sm:hidden">
+      <el-dropdown trigger="click" @command="radio1 = $event">
+        <el-button type="primary">
+          {{ radio1 || 'Vé xe khách' }}
+          <i class="el-icon-arrow-down el-icon--right"></i>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item v-if="radio1 !== 'Vé xe khách'" command="Vé xe khách">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M288 0C422.4 0 512 35.2 512 80l0 16 0 32c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32l0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-192 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32c0 0 0 0 0 0l0-32s0 0 0 0l0-16C64 35.2 153.6 0 288 0zM128 160l0 96c0 17.7 14.3 32 32 32l112 0 0-160-112 0c-17.7 0-32 14.3-32 32zM304 288l112 0c17.7 0 32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-112 0 0 160zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16L208 64c-8.8 0-16 7.2-16 16s7.2 16 16 16l160 0c8.8 0 16-7.2 16-16z" />
+                </svg>
+                <span>Vé xe khách</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item v-if="radio1 !== 'Khách sạn'" command="Khách sạn">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M0 32C0 14.3 14.3 0 32 0L480 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 384c17.7 0 32 14.3 32 32s-14.3 32-32 32l-176 0 0-48c0-26.5-21.5-48-48-48s-48 21.5-48 48l0 48L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32L32 64C14.3 64 0 49.7 0 32zm96 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM240 96c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zM112 192c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM328 384c13.3 0 24.3-10.9 21-23.8c-10.6-41.5-48.2-72.2-93-72.2s-82.5 30.7-93 72.2c-3.3 12.8 7.8 23.8 21 23.8l144 0z" />
+                </svg>
+                <span>Khách sạn</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item v-if="radio1 !== 'Đưa đón sân bay'" command="Đưa đón sân bay">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M200 0c-30.6 0-56 54.7-56 86.1l0 106.5L7.8 274.3C2.9 277.2 0 282.4 0 288l0 64c0 5.1 2.4 9.8 6.4 12.8s9.3 3.9 14.1 2.5l123.4-37 0 81.2-50 40c-3.8 3-6 7.6-6 12.5l0 32c0 5.1 2.5 10 6.6 13s9.5 3.8 14.4 2.2L200 480.9 290.4 511c-1.6-4.7-2.4-9.8-2.4-15l0-32.6c-18.2-10.5-30.7-29.7-31.9-51.8l-.1-.1 0-3.5 0-82.5L256 184l0-1.1s0 0 0 0l0-96.9C256 54.7 231.5 0 200 0zM88 160l0 224c0 20.9 13.4 38.7 32 45.3l0 42.7c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-40 160 0 0 40c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-42.7c18.6-6.6 32-24.4 32-45.3l0-224c0-26.5-21.5-48-48-48l-256 0c-26.5 0-48 21.5-48 48zm79.8 78.7c3.3-8.7 11.2-14.7 20.5-14.7l151.4 0c9.2 0 17.2 6 20.5 14.7L576 304l-224 0 15.8-49.3zM568 352a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM336 376a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
+                </svg>
+                <span>Đưa đón sân bay</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item v-if="radio1 !== 'Cho thuê xe'" command="Cho thuê xe">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M192 0c-17.7 0-32 14.3-32 32l0 32 0 .2c-38.6 2.2-72.3 27.3-85.2 64.1l-25.5 69.3C46.1 242.2 32 278.3 32 316.6l0 32c0 20.4 16.6 36.9 36.8 36.9l153.3 0 0 32c0 11 9 20 20 20l48 0c11 0 20-9 20-20l0-32 156.1 0c19.8 0 36.8-16.5 36.8-36.9l0-32c0-38.2-14.1-74.4-49.3-101.2l-25.4-69.3c-12.9-36.8-46.6-61.9-85.2-64.1l0-.2 0-32c0-17.7-14.3-32-32-32zM93.2 159.7c7.6-20.8 27.1-34.7 50.8-37.4c0 0 5.3 0 8.2 0c14.5 0 28.6 6.5 38.5 17.8l11.8 14.5L209.6 192H98.4L93.2 159.7zM96 288c0-13.3 10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 32c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-32zM392 288c0-13.3 10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 32c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-32z" />
+                </svg>
+                <span>Cho thuê xe</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item v-if="radio1 !== 'Hoạt động & Vui chơi'" command="Hoạt động & Vui chơi">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M383.5 192c.3-5.3 .5-10.6 .5-16c0-51-15.9-96-40.2-127.6C319.5 16.9 288.2 0 256 0s-63.5 16.9-87.8 48.4C143.9 80 128 125 128 176c0 5.4 .2 10.7 .5 16L240 192l0 128-32 0c-7 0-13.7 1.5-19.7 4.2L68.2 192l28.3 0c-.3-5.3-.5-10.6-.5-16c0-64 22.2-121.2 57.1-159.3C62 49.3 18.6 122.6 4.2 173.6C1.5 183.1 9 192 18.9 192l6 0L165.2 346.3c-3.3 6.5-5.2 13.9-5.2 21.7l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-7.8-1.9-15.2-5.2-21.7L487.1 192l6 0c9.9 0 17.4-8.9 14.7-18.4C493.4 122.6 450 49.3 358.9 16.7C393.8 54.8 416 112.1 416 176c0 5.4-.2 10.7-.5 16l28.3 0L323.7 324.2c-6-2.7-12.7-4.2-19.7-4.2l-32 0 0-128 111.5 0z" />
+                </svg>
+                <span>Hoạt động & Vui chơi</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item v-if="radio1 !== 'Xem thêm'" command="Xem thêm">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                  <path
+                    d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
+                </svg>
+                <span>Xem thêm</span>
+              </div>
+            </el-dropdown-item>
+          </el-dropdown-menu>
         </template>
-      </el-radio-button>
-      <el-radio-button value="4">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M200 0c-30.6 0-56 54.7-56 86.1l0 106.5L7.8 274.3C2.9 277.2 0 282.4 0 288l0 64c0 5.1 2.4 9.8 6.4 12.8s9.3 3.9 14.1 2.5l123.4-37 0 81.2-50 40c-3.8 3-6 7.6-6 12.5l0 32c0 5.1 2.5 10 6.6 13s9.5 3.8 14.4 2.2L200 480.9 290.4 511c-1.6-4.7-2.4-9.8-2.4-15l0-32.6c-18.2-10.5-30.7-29.7-31.9-51.8l-.1-.1 0-3.5 0-82.5L256 184l0-1.1s0 0 0 0l0-96.9C256 54.7 231.5 0 200 0zm88 176l0 224c0 20.9 13.4 38.7 32 45.3l0 42.7c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-40 160 0 0 40c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-42.7c18.6-6.6 32-24.4 32-45.3l0-224c0-26.5-21.5-48-48-48l-256 0c-26.5 0-48 21.5-48 48zm79.8 78.7c3.3-8.7 11.2-14.7 20.5-14.7l151.4 0c9.2 0 17.2 6 20.5 14.7L576 304l-224 0 15.8-49.3zM568 352a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM336 376a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
-            </svg>
-            <span>Đưa đón sân bay</span>
-          </div>
-        </template>
-      </el-radio-button>
-      <el-radio-button value="5">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M192 0c-17.7 0-32 14.3-32 32l0 32 0 .2c-38.6 2.2-72.3 27.3-85.2 64.1L39.6 228.8C16.4 238.4 0 261.3 0 288L0 432l0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 320 0 0 48c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32l0-48 0-144c0-26.7-16.4-49.6-39.6-59.2L437.2 128.3c-12.9-36.8-46.6-62-85.2-64.1l0-.2 0-32c0-17.7-14.3-32-32-32L192 0zM165.4 128l181.2 0c13.6 0 25.7 8.6 30.2 21.4L402.9 224l-293.8 0 26.1-74.6c4.5-12.8 16.6-21.4 30.2-21.4zM96 288a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm288 32a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
-            </svg>
-            <span>Cho thuê xe</span>
-          </div>
-        </template>
-      </el-radio-button>
-      <el-radio-button value="6">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M383.5 192c.3-5.3 .5-10.6 .5-16c0-51-15.9-96-40.2-127.6C319.5 16.9 288.2 0 256 0s-63.5 16.9-87.8 48.4C143.9 80 128 125 128 176c0 5.4 .2 10.7 .5 16L240 192l0 128-32 0c-7 0-13.7 1.5-19.7 4.2L68.2 192l28.3 0c-.3-5.3-.5-10.6-.5-16c0-64 22.2-121.2 57.1-159.3C62 49.3 18.6 122.6 4.2 173.6C1.5 183.1 9 192 18.9 192l6 0L165.2 346.3c-3.3 6.5-5.2 13.9-5.2 21.7l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-7.8-1.9-15.2-5.2-21.7L487.1 192l6 0c9.9 0 17.4-8.9 14.7-18.4C493.4 122.6 450 49.3 358.9 16.7C393.8 54.8 416 112.1 416 176c0 5.4-.2 10.7-.5 16l28.3 0L323.7 324.2c-6-2.7-12.7-4.2-19.7-4.2l-32 0 0-128 111.5 0z" />
-            </svg>
-            <span>Hoạt động & Vui chơi</span>
-          </div>
-        </template>
-      </el-radio-button>
-      <el-radio-button value="7">
-        <template #default>
-          <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
-              <path
-                d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
-            </svg>
-            <span>Xem thêm</span>
-          </div>
-        </template>
-      </el-radio-button>
-    </el-radio-group>
+      </el-dropdown>
+    </div>
 
     <el-divider class="" />
     <div class="flex justify-center items-center ">
@@ -114,13 +184,17 @@ const radio1 = ref('New York')
 
     <div class="mt-[200px] [@media(max-width:450px)]:mt-[100px]">
       <div class="mx-auto max-w-2xl lg:text-center">
-        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
+        <p
+          class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
           Đồng hành cùng VinaHome</p>
-        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Chúng tôi giúp bạn kết nối đến mọi nơi, mang đến lựa chọn di chuyển tiện
+        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Chúng tôi giúp bạn kết nối đến mọi
+          nơi,
+          mang đến lựa chọn di chuyển tiện
           lợi và tiết kiệm chi phí.</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10 p-4 [@media(max-width:450px)]:gap-y-4">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10 p-4 [@media(max-width:450px)]:gap-y-4">
         <div>
           <div
             class="min-h-[110px] bg-[#FEF6F3] p-4 rounded-lg border border-[#FCDED6] flex flex-col relative pl-10 pr-2">
@@ -213,9 +287,12 @@ const radio1 = ref('New York')
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
+          <p
+            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Tuyến đường phổ biến</p>
-          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Những tuyến đường được yêu thích nhất, mang đến trải nghiệm di chuyển
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Những tuyến đường được yêu thích
+            nhất,
+            mang đến trải nghiệm di chuyển
             thoải mái, tiết kiệm và thuận tiện cho mọi hành trình!</p>
         </div>
 
@@ -230,13 +307,17 @@ const radio1 = ref('New York')
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
+          <p
+            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Các bước đơn giản để tận hưởng chuyến đi</p>
-          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Hãy tận hưởng hành trình của bạn, trân trọng từng khoảnh khắc và khám
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Hãy tận hưởng hành trình của bạn,
+            trân
+            trọng từng khoảnh khắc và khám
             phá vẻ đẹp từ những điều giản đơn.
           </p>
         </div>
-        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 [@media(max-width:450px)]:gap-y-4 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        <div
+          class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 [@media(max-width:450px)]:gap-y-4 pt-10 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <article
             class="relative flex max-w-xl flex-col items-start justify-between bg-white rounded-md p-4 border border-transparent hover:border-[#0382F7] transition">
             <div class="absolute top-2 right-2 h-20 w-20 flex items-center justify-center">
@@ -346,9 +427,12 @@ const radio1 = ref('New York')
 
       <div class="mt-[100px]">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
+          <p
+            class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
             Những địa điểm được ghé thăm nhiều</p>
-          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Khám phá những cảnh quan ngoạn mục, di tích lịch sử và những thành phố
+          <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Khám phá những cảnh quan ngoạn
+            mục, di
+            tích lịch sử và những thành phố
             sôi động trên khắp Việt Nam.</p>
         </div>
 
@@ -371,7 +455,8 @@ const radio1 = ref('New York')
             </div>
 
             <div class="relative lg:row-span-2">
-              <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
+              <div
+                class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
                 <img class="w-full h-full object-cover object-top rounded-lg" src="/ha-long.jpg" alt="" />
               </div>
             </div>
@@ -382,9 +467,12 @@ const radio1 = ref('New York')
 
     <div class="mt-[100px] mb-10">
       <div class="mx-auto max-w-2xl lg:text-center">
-        <p class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
+        <p
+          class="mt-2 text-[20px] font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl lg:text-balance [@media(max-width:450px)]:text-center">
           Thanh toán đa dạng</p>
-        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Thanh toán dễ dàng, nhanh chóng và bảo mật với nhiều phương thức tiện
+        <p class="mt-6 text-lg text-gray-600 [@media(max-width:450px)]:text-center">Thanh toán dễ dàng, nhanh chóng và
+          bảo
+          mật với nhiều phương thức tiện
           lợi.</p>
       </div>
 
@@ -415,7 +503,8 @@ const radio1 = ref('New York')
       </div>
     </div>
 
-    <div class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px] min-h-[350px] [@media(max-width:450px)]:mt-[100px]">
+    <div
+      class="relative isolate bg-[#03ACFF] rounded-lg mb-10 mt-[200px] min-h-[350px] [@media(max-width:450px)]:mt-[100px]">
       <div class="mx-auto max-w-7xl px-6 lg:px-8 py-10 sm:py-10 lg:py-14 relative z-10">
         <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
           <div class="max-w-xl lg:max-w-lg">
@@ -433,7 +522,7 @@ const radio1 = ref('New York')
       </div>
       <div class="absolute bottom-0 z-0 md:z-10 right-0 md:right-[-50px]">
         <img src="/static/a1.png" class="w-full max-w-[620px]" />
-      </div>      
+      </div>
     </div>
   </section>
 </template>
@@ -461,6 +550,7 @@ const radio1 = ref('New York')
 }
 
 @media (max-width: 768px) {
+
   .el-carousel__indicators,
   .el-carousel__indicator,
   .el-carousel__indicator--horizontal,
@@ -468,5 +558,4 @@ const radio1 = ref('New York')
     display: none !important;
   }
 }
-
 </style>
