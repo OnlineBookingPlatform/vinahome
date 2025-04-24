@@ -119,6 +119,7 @@ const isMobile = ref(false)
 
 const handleLogout = async () => {
   await userStore.clearUserData();
+  localStorage.clear();
   router.push("/");
 };
 

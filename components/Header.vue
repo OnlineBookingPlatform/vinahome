@@ -46,6 +46,7 @@ const avatarUrl = computed(() => {
 });
 const handleLogout = async () => {
   await userStore.clearUserData();
+  localStorage.clear();
   router.push("/");
 };
 
