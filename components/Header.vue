@@ -8,7 +8,7 @@ import {
 } from "vue3-google-signin";
 import { useUserStore } from "~/stores/userStore";
 import { loginWithGoogle } from "~/api/authAPI";
-
+const router = useRouter();
 const visible = ref(false)
 
 const handleOnSuccess = async (response: AuthCodeFlowSuccessResponse) => {
@@ -44,10 +44,12 @@ const userStore = useUserStore();
 const avatarUrl = computed(() => {
   return userStore.userData?.url_avatar || "";
 });
-const handleLogout = () => {
-  userStore.clearUserData();
+const handleLogout = async () => {
+  await userStore.clearUserData();
+  localStorage.clear();
+  router.push("/");
+};
 
-}
 // watch(avatarUrl, (newValue) => {
 //   console.log("Avatar URL:", newValue);
 // });
