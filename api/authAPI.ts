@@ -16,3 +16,19 @@ export const loginWithGoogle = async (accessToken: string): Promise<ApiResponse<
         throw error;
     }
 };
+
+export const loginWithFacebook = async (accessToken: string): Promise<ApiResponse<UserType>> => {
+    if (!accessToken) {
+        throw new Error("Access token is required");
+    }
+
+    try {
+        return await $fetch<ApiResponse<UserType>>(`${API_BASE_URL}/v1/auth/facebook-login`, {
+            method: "POST",
+            body: { accessToken },
+        });
+    } catch (error) {
+        console.error("Login failed: ", error);
+        throw error;
+    }
+};
