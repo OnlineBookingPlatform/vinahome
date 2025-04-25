@@ -14,7 +14,7 @@ import {
   type SearchTripParams,
   type TripPointType,
 } from "~/types/TripType";
-import { ElMessage } from "element-plus";
+import { dayjs, ElMessage } from "element-plus";
 import {
   getPointDownByTrip,
   getPointUpByTrip,
@@ -47,7 +47,7 @@ const pendingTicketStore = usePendingTicketStore();
 const activeStep = ref(0);
 
 
-// Bộ lọc theo tên côgn ty
+// Bộ lọc theo tên công ty
 const filterCompanies = ref<number[]>([])
 const uniqueCompanies = computed(() => {
   const map = new Map<number, DTO_RP_TripInfo>()
@@ -61,7 +61,7 @@ const uniqueCompanies = computed(() => {
 
 // Bộ lọc theo thời gian khởi hành
 const filterTime = ref<string[]>([])
-
+const allTrips = ref<DTO_RP_TripInfo[]>([])
 
 
 
@@ -92,8 +92,10 @@ const fetchTrips = async () => {
 
     if (response?.result) {
       tripData.value = response.result;
+      allTrips.value = response.result;
     } else {
       tripData.value = [];
+      allTrips.value = [];
       ElMessage.warning("Không tìm thấy chuyến đi phù hợp");
     }
   } catch (err) {
@@ -115,6 +117,22 @@ watch(
   },
   { deep: true }
 );
+
+// Lọc data theo thời gian khởi hành
+watchEffect(() => {
+  if (filterTime.value.length === 0) {
+    tripData.value = allTrips.value;
+  } else {
+    tripData.value = allTrips.value.filter(trip => {
+      const hour = dayjs(trip.time_departure, 'HH:mm:ss').hour();
+      return filterTime.value.some(range => {
+        const [ start, end ] = range.split('-').map(Number);
+        return hour >= start && hour < end;
+      });
+    });
+  }
+});
+
 // Danh sách chuyến được gọi khi component được mount
 // onMounted(async () => {
 //   // Lấy params từ URL 
@@ -549,7 +567,7 @@ const nextStep = async () => {
                   <span class="font-semibold text-lg"> Giá vé </span>
                 </template>
                 <div class="px-4">
-                  <el-slider  />
+                  <el-slider />
                 </div>
               </el-collapse-item>
               <el-collapse-item name="4">
@@ -572,7 +590,7 @@ const nextStep = async () => {
                   <span class="font-semibold text-lg"> Đánh giá </span>
                 </template>
                 <div class="flex flex-col px-4">
-                  <el-rate  size="large" />
+                  <el-rate size="large" />
                 </div>
               </el-collapse-item>
             </el-collapse>
