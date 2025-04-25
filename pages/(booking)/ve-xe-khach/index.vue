@@ -47,6 +47,25 @@ const pendingTicketStore = usePendingTicketStore();
 const activeStep = ref(0);
 
 
+// Bộ lọc theo tên côgn ty
+const filterCompanies = ref<number[]>([])
+const uniqueCompanies = computed(() => {
+  const map = new Map<number, DTO_RP_TripInfo>()
+  for (const trip of tripData.value) {
+    if (!map.has(trip.company.id)) {
+      map.set(trip.company.id, trip)
+    }
+  }
+  return Array.from(map.values())
+})
+
+// Bộ lọc theo thời gian khởi hành
+const filterTime = ref<string[]>([])
+
+
+
+
+
 const fetchTrips = async () => {
   const { departureId, destinationId, departureDate, numberOfTickets } = route.query;
 
@@ -504,34 +523,57 @@ const nextStep = async () => {
                 <template #title>
                   <span class="font-semibold text-lg"> Giờ đi </span>
                 </template>
-                <div class="flex flex-col px-4">
-                  <el-checkbox v-model="checked1" label="00:00 - 06:00" size="large" />
-                  <el-checkbox v-model="checked2" label="06:00 - 12:00" size="large" />
-                  <el-checkbox v-model="checked2" label="12:00 - 18:00" size="large" />
-                  <el-checkbox v-model="checked2" label="18:00 - 24:00" size="large" />
+                <div>
+                  <el-checkbox-group v-model="filterTime" class="flex flex-col px-4">
+                    <el-checkbox label="00:00 - 06:00" :value="'0-6'" size="large" />
+                    <el-checkbox label="06:00 - 12:00" :value="'6-12'" size="large" />
+                    <el-checkbox label="12:00 - 18:00" :value="'12-18'" size="large" />
+                    <el-checkbox label="18:00 - 24:00" :value="'18-24'" size="large" />
+                  </el-checkbox-group>
+
                 </div>
-                <div></div>
               </el-collapse-item>
               <el-collapse-item name="2">
                 <template #title>
                   <span class="font-semibold text-lg"> Nhà xe </span>
                 </template>
-                <div></div>
+                <div>
+                  <el-checkbox-group class="flex flex-col px-4" v-model="filterCompanies">
+                    <el-checkbox v-for="company in uniqueCompanies" :key="company.id" :label="company.company.name"
+                      :value="company.id" size="large" />
+                  </el-checkbox-group>
+                </div>
               </el-collapse-item>
               <el-collapse-item name="3">
                 <template #title>
                   <span class="font-semibold text-lg"> Giá vé </span>
                 </template>
+                <div class="px-4">
+                  <el-slider  />
+                </div>
               </el-collapse-item>
               <el-collapse-item name="4">
                 <template #title>
                   <span class="font-semibold text-lg"> Loại xe </span>
                 </template>
+                <div>
+                  <el-checkbox-group class="flex flex-col px-4">
+                    <el-checkbox label="Ghế ngồi" :value="'0-6'" size="large" />
+                    <el-checkbox label="Ghế ngồi limousine" :value="'6-12'" size="large" />
+                    <el-checkbox label="Giường nằm" :value="'12-18'" size="large" />
+                    <el-checkbox label="Giường nằm limousine" :value="'18-24'" size="large" />
+                    <el-checkbox label="Phòng VIP (Cabin)" :value="'18-24'" size="large" />
+                  </el-checkbox-group>
+
+                </div>
               </el-collapse-item>
               <el-collapse-item name="5">
                 <template #title>
                   <span class="font-semibold text-lg"> Đánh giá </span>
                 </template>
+                <div class="flex flex-col px-4">
+                  <el-rate  size="large" />
+                </div>
               </el-collapse-item>
             </el-collapse>
           </div>
@@ -718,15 +760,15 @@ const nextStep = async () => {
                                     <el-button circle size="large" class="mx-2"
                                       :disabled="getSeatStatus(floor, row, col)"
                                       :class="getButtonClass(floor, row, col)" :type="getSeatStatus(floor, row, col)
-                                          ? 'info'
-                                          : isSeatSelected(floor, row, col)
-                                            ? 'danger'
-                                            : ''
+                                        ? 'info'
+                                        : isSeatSelected(floor, row, col)
+                                          ? 'danger'
+                                          : ''
                                         " @click="
-                                        toggleSeatSelection(floor, row, col)
-                                        ">{{
-                                        getSeatName(floor, row, col)
-                                      }}</el-button>
+                                          toggleSeatSelection(floor, row, col)
+                                          ">{{
+                                            getSeatName(floor, row, col)
+                                          }}</el-button>
                                   </el-tooltip>
                                 </div>
                               </div>
