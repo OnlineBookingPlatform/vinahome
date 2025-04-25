@@ -397,13 +397,19 @@ const handleSearchTrip = async () => {
       numberOfTickets: selectNumberTicket.value || 1,
     };
 
-    const query = Object.fromEntries(
-      Object.entries(params).filter(
-        ([_, value]) => value !== undefined && value !== null
-      )
-    );
+    // const query = Object.fromEntries(
+    //   Object.entries(params).filter(
+    //     ([_, value]) => value !== undefined && value !== null
+    //   )
+    // );
+    // console.log("Data select", query)
 
-    await router.push({ path: "/ve-xe-khach", query });
+    await router.replace({
+    path: '/ve-xe-khach',
+    query: Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    ),
+  });
   } catch (err) {
     console.error("Lỗi chuyển trang:", err);
     alert("Có lỗi xảy ra khi tìm kiếm");

@@ -46,11 +46,9 @@ const checked2 = ref(false);
 const pendingTicketStore = usePendingTicketStore();
 const activeStep = ref(0);
 
-// Danh sách chuyến được gọi khi component được mount
-onMounted(async () => {
-  // Lấy params từ URL 
-  const { departureId, destinationId, departureDate, numberOfTickets } =
-    route.query;
+
+const fetchTrips = async () => {
+  const { departureId, destinationId, departureDate, numberOfTickets } = route.query;
 
   console.log("Search params:", {
     departureId,
@@ -59,14 +57,15 @@ onMounted(async () => {
     numberOfTickets,
   });
 
-  // params để gọi API
   const searchParams = {
     departureId: departureId ? Number(departureId) : null,
     destinationId: destinationId ? Number(destinationId) : null,
     departureDate: departureDate as string,
     numberOfTickets: numberOfTickets ? Number(numberOfTickets) : 1,
   };
+
   console.log("Formatted search params:", searchParams);
+
   loading.value = true;
   try {
     const response = await getTripOnPlatform(searchParams);
@@ -85,44 +84,61 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+};
+onMounted(fetchTrips);
+watch(
+  () => route.query,
+  (newQuery, oldQuery) => {
+    // Chỉ fetch lại nếu query thực sự thay đổi (tránh gọi API liên tục)
+    if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+      fetchTrips();
+    }
+  },
+  { deep: true }
+);
+// Danh sách chuyến được gọi khi component được mount
+// onMounted(async () => {
+//   // Lấy params từ URL 
+//   const { departureId, destinationId, departureDate, numberOfTickets } =
+//     route.query;
+
+//   console.log("Search params:", {
+//     departureId,
+//     destinationId,
+//     departureDate,
+//     numberOfTickets,
+//   });
+
+//   // params để gọi API
+//   const searchParams = {
+//     departureId: departureId ? Number(departureId) : null,
+//     destinationId: destinationId ? Number(destinationId) : null,
+//     departureDate: departureDate as string,
+//     numberOfTickets: numberOfTickets ? Number(numberOfTickets) : 1,
+//   };
+//   console.log("Formatted search params:", searchParams);
+//   loading.value = true;
+//   try {
+//     const response = await getTripOnPlatform(searchParams);
+//     console.log("API response:", response);
+
+//     if (response?.result) {
+//       tripData.value = response.result;
+//     } else {
+//       tripData.value = [];
+//       ElMessage.warning("Không tìm thấy chuyến đi phù hợp");
+//     }
+//   } catch (err) {
+//     console.error("Search error:", err);
+//     ElMessage.error("Có lỗi xảy ra khi tìm kiếm chuyến đi");
+//     tripData.value = [];
+//   } finally {
+//     loading.value = false;
+//   }
+// });
 
 
 
-// const timeToSeconds = (timeStr: string): number => {
-//   if (!timeStr) return 0;
-//   const parts = timeStr.split(":").map((part) => parseInt(part) || 0);
-//   return parts[ 0 ] * 3600 + parts[ 1 ] * 60 + (parts[ 2 ] || 0);
-// };
-
-// // Chuyển đổi số giây thành chuỗi HH:MM
-// const secondsToTime = (totalSeconds: number): string => {
-//   const hours = Math.floor(totalSeconds / 3600) % 24;
-//   const minutes = Math.floor((totalSeconds % 3600) / 60);
-//   return [
-//     hours.toString().padStart(2, "0"),
-//     minutes.toString().padStart(2, "0"),
-//   ].join(":");
-// };
-
-// // Tính tổng 2 mốc thời gian
-// const calculateTotalTime = (time1: string, time2: string): string => {
-//   const totalSeconds = timeToSeconds(time1) + timeToSeconds(time2);
-//   return secondsToTime(totalSeconds);
-// };
-
-// const calculateDuration = (startTime: string, endTime: string): string => {
-//   const startSec = timeToSeconds(startTime);
-//   const endSec = timeToSeconds(endTime);
-
-//   const durationSec =
-//     endSec >= startSec ? endSec - startSec : 86400 - startSec + endSec;
-
-//   const hours = Math.floor(durationSec / 3600);
-//   const minutes = Math.floor((durationSec % 3600) / 60);
-
-//   return `${hours}h${minutes.toString().padStart(2, "0")}`;
-// };
 
 
 
@@ -521,7 +537,7 @@ const nextStep = async () => {
           </div>
         </el-col>
         <el-col :span="17">
-          <h2 class="text-lg font-semibold mb-4">Danh sách chuyến đi</h2>
+          <h2 class="text-lg font-semibold mb-4">Danh sách chuyến đi ({{ tripData.length }})</h2>
           <div v-if="loading" class="loading-container">
             <el-skeleton :rows="5" animated />
           </div>
