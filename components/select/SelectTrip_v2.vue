@@ -397,13 +397,6 @@ const handleSearchTrip = async () => {
       numberOfTickets: selectNumberTicket.value || 1,
     };
 
-    // const query = Object.fromEntries(
-    //   Object.entries(params).filter(
-    //     ([_, value]) => value !== undefined && value !== null
-    //   )
-    // );
-    // console.log("Data select", query)
-
     await router.replace({
     path: '/ve-xe-khach',
     query: Object.fromEntries(
@@ -415,6 +408,48 @@ const handleSearchTrip = async () => {
     alert("Có lỗi xảy ra khi tìm kiếm");
   }
 };
+
+// Lưu giá trị được chọn vào localStorage khi có thay đổi
+const saveSelectionToLocalStorage = () => {
+  localStorage.setItem('tripSearch', JSON.stringify({
+    departure: selectedDeparture.value,
+    destination: selectedDestination.value,
+    date: formattedDate.value,
+    tickets: selectNumberTicket.value,
+  }));
+};
+
+// Khôi phục giá trị từ localStorage khi component được tạo
+onMounted(async () => {
+  await fetchProvinces();
+
+  const savedData = localStorage.getItem('tripSearch');
+  if (savedData) {
+    const { departure, destination, date, tickets } = JSON.parse(savedData);
+
+    selectedDeparture.value = departure ?? null;
+    selectedDestination.value = destination ?? null;
+    departureQuery.value = departure?.name ?? '';
+    destinationQuery.value = destination?.name ?? '';
+
+    formattedDate.value = date;
+    selectNumberTicket.value = tickets ?? 1;
+  }
+});
+
+
+
+
+
+// Theo dõi thay đổi và tự động lưu vào localStorage
+watch(
+  [selectedDeparture, selectedDestination, formattedDate, selectNumberTicket],
+  () => {
+    saveSelectionToLocalStorage();
+  },
+  { deep: true }
+);
+
 onMounted(() => {
   fetchProvinces();
 });
