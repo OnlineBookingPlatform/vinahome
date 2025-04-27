@@ -1,4 +1,4 @@
-import type { DTO_RP_TripInfo, TripPointType } from "./TripType";
+import type { DTO_RP_TripInfo } from "./TripType";
 
 export interface Ticket {
   id: number;
@@ -10,8 +10,6 @@ export interface Ticket {
 
 export interface BookingData {
   selectedTicket: Ticket[];
-  pointUp: TripPointType;
-  pointDown: TripPointType;
   selectedTripId: number;
   tripData: DTO_RP_TripInfo;
 }

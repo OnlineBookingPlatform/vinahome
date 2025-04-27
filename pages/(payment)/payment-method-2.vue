@@ -17,6 +17,7 @@ const showPriceDetail = ref(true);
 const router = useRouter();
 const pendingTicketStore = usePendingTicketStore();
 const userStore = useUserStore();
+const pointStore = usePointStore();
 const isLoading = ref(true);
 
 const localUserData = ref({
@@ -43,6 +44,7 @@ onMounted(async () => {
 
     await Promise.all([
       userStore.loadUserData(),
+      pointStore.loadPoints(),
       pendingTicketStore.loadPendingTicket()
     ]);
 
@@ -231,12 +233,12 @@ const fetchBookingDataTicketAPI = async () => {
       id: ticket.id ?? 0,
       passenger_name: localUserData.value.name,
       passenger_phone: localUserData.value.phone,
-      point_up: typeof pendingData.value?.pointUp === 'string'
-        ? pendingData.value.pointUp
-        : (pendingData.value?.pointUp?.name || ""),
-      point_down: typeof pendingData.value?.pointDown === 'string'
-        ? pendingData.value.pointDown
-        : (pendingData.value?.pointDown?.name || ""),
+      point_up: typeof pointStore.pointUp?.name === 'string'
+        ? pointStore.pointUp.name
+        : "",
+      point_down: typeof pointStore.pointDown?.name === 'string'
+        ? pointStore.pointDown.name
+        : "",
       ticket_note: localUserData.value.note,
 
       email: localUserData.value.email,
@@ -299,7 +301,7 @@ onMounted(() => {
         </div>
         <ResultSuccess v-if="paymentSuccess" />
 
-        <PaymentTripInfo v-if="!paymentSuccess && !showPaymentMethods" :pending-data="pendingData" />
+        <PaymentTripInfo v-if="!paymentSuccess && !showPaymentMethods" :pending-data="pendingData"  :point-up="pointStore.pointUp" :point-down="pointStore.pointDown"/>
         <PaymentMethodRadio v-else-if="!paymentSuccess && showPaymentMethods" v-model="paymentMethod"
           :pending-data="pendingData" />
       </div>
@@ -435,14 +437,15 @@ onMounted(() => {
                 <div class="flex gap-2 items-center font-semibold">
                   <span>{{
                     calculateTotalTime(
-                      pendingData?.pointUp.start_time || "",
-                      pendingData?.pointUp.time_point || ""
+                      pointStore?.pointUp?.start_time || "",
+                      pointStore?.pointUp?.time_point || ""
                     )
                   }}</span>
-                  <span>{{ pendingData?.pointUp.name }}</span>
+                  
+                  <span>{{ pointStore?.pointUp?.name }}</span>
                 </div>
                 <p class="text-muted text-xs">
-                  {{ pendingData?.pointUp.address }}
+                  {{ pointStore?.pointUp?.address }}
                 </p>
                 <button class="text-primary text-sm underline">Thay đổi</button>
               </div>
@@ -457,14 +460,14 @@ onMounted(() => {
                 <div class="flex gap-2 items-center font-semibold">
                   <span>{{
                     calculateTotalTime(
-                      pendingData?.pointDown.start_time || "",
-                      pendingData?.pointDown.time_point || ""
+                      pointStore?.pointDown?.start_time || "",
+                      pointStore?.pointDown?.time_point || ""
                     )
                   }}</span>
-                  <span>{{ pendingData?.pointDown.name }}</span>
+                  <span>{{ pointStore?.pointDown?.name }}</span>
                 </div>
                 <p class="text-muted text-xs">
-                  {{ pendingData?.pointDown.address }}
+                  {{ pointStore?.pointDown?.address }}
                 </p>
                 <button class="text-primary text-sm underline">Thay đổi</button>
               </div>

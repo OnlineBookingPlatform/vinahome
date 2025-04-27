@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { TripPointType } from '~/types/TripType';
+import type { TripPointType } from '~/types/PointType';
 export const usePointStore = defineStore('point', {
     state: () => ({
         pointUp: null as TripPointType | null,

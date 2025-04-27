@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { calculateTotalTime } from "~/lib/libTime";
 import type { BookingData } from "~/types/PendingType";
+import type { TripPointType } from "~/types/PointType";
 
 defineProps<{
   pendingData: BookingData;
+  pointUp: TripPointType | null;
+  pointDown: TripPointType | null;
 }>();
 </script>
 <template>
@@ -36,14 +39,14 @@ defineProps<{
           <h6>
             {{
               calculateTotalTime(
-                pendingData.pointUp.start_time,
-                pendingData.pointUp.time_point
+                pointUp?.start_time || "",
+                pointUp?.time_point || ""
               )
             }}
           </h6>
-          <p>{{ pendingData.pointUp.name }}</p>
+          <p>{{ pointUp?.name }}</p>
         </div>
-        <p class="text-muted text-sm">{{ pendingData.pointUp.address }}</p>
+        <p class="text-muted text-sm">{{ pointUp?.address }}</p>
         <button class="text-sm text-primary underline">Thay đổi</button>
       </div>
       <div class="order-last">
@@ -52,14 +55,14 @@ defineProps<{
           <h6>
             {{
               calculateTotalTime(
-                pendingData.pointDown.start_time,
-                pendingData.pointDown.time_point
+                pointDown?.start_time || "",
+                pointDown?.time_point || ""
               )
             }}
           </h6>
-          <p>{{ pendingData.pointDown.name }}</p>
+          <p>{{ pointDown?.name }}</p>
         </div>
-        <p class="text-muted text-sm">{{ pendingData.pointDown.address }}</p>
+        <p class="text-muted text-sm">{{ pointDown?.address }}</p>
         <button class="text-sm text-primary underline">Thay đổi</button>
       </div>
     </div>

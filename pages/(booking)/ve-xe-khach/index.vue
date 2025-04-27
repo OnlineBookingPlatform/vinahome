@@ -12,7 +12,6 @@ import {
   type DetailTripType,
   type DTO_RP_TripInfo,
   type SearchTripParams,
-  type TripPointType,
 } from "~/types/TripType";
 import { dayjs, ElMessage } from "element-plus";
 import {
@@ -26,6 +25,7 @@ import type { SelectedTicket } from "~/types/TicketType";
 import type { BookingData } from "~/types/PendingType";
 import { changeTicketBookedAPI } from "~/api/ticketAPI";
 import { timeToSeconds, calculateTotalTime, calculateDuration } from "~/lib/libTime"
+import type { TripPointType } from "~/types/PointType";
 const route = useRoute();
 const router = useRouter();
 const tripData = ref<DTO_RP_TripInfo[]>([]);
@@ -476,20 +476,6 @@ const nextStep = async () => {
     );
     const bookingData: BookingData = {
       selectedTicket: selectedTicket.value,
-      pointUp: valuePointUp.value ?? {
-        id: 0,
-        name: "",
-        address: "",
-        time_point: "",
-        start_time: "",
-      },
-      pointDown: valuePointDown.value ?? {
-        id: 0,
-        name: "",
-        address: "",
-        time_point: "",
-        start_time: "",
-      },
       selectedTripId: selectedTripId.value ?? 0,
       tripData: selectedTrip ?? ({} as DTO_RP_TripInfo),
     };
