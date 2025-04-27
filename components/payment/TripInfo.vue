@@ -136,15 +136,27 @@ onMounted(() => {
   </div>
   <!-- Form thay đổi thông điểm đi/điểm đến -->
   <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500" :before-close="handleClose">
-    <div v-if="isEditingPointUp">
-      <el-select v-model="tempPointUp" placeholder="Chọn điểm đón" style="width: 100%">
-        <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name" :value="item" />
-      </el-select>
+    <div v-if="isEditingPointUp" class="px-2">
+      <el-radio-group v-model="tempPointUp" class="flex flex-col items-start gap-4">
+        <el-radio v-for="item in optionsPointUp" :key="item.id" :label="item">
+          <div class="flex flex-col">
+            <span class="text-[15px]">{{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}</span>
+            <span class="text-sm font-normal">Địa chỉ: {{ item.address }}</span>
+          </div>
+        </el-radio>
+      </el-radio-group>
     </div>
-    <div v-else>
-      <el-select v-model="tempPointDown" placeholder="Chọn điểm trả" style="width: 100%">
-        <el-option v-for="item in optionsPointDown" :key="item.id" :label="item.name" :value="item" />
-      </el-select>
+
+
+    <div v-else class="px-2">
+      <el-radio-group v-model="tempPointDown" class="flex flex-col items-start gap-4">
+        <el-radio v-for="item in optionsPointDown" :key="item.id" :label="item">
+          <div class="flex flex-col">
+            <span class="text-[15px]">{{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}</span>
+            <span class="text-sm font-normal">Địa chỉ: {{ item.address }}</span>
+          </div>
+        </el-radio>
+      </el-radio-group>
     </div>
 
     <template #footer>
@@ -163,7 +175,9 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 240px;
 }
-
+.el-radio-group{
+  align-items: flex-start;
+}
 @container (max-width: 600px) {
   .trip-info {
     display: flex;
