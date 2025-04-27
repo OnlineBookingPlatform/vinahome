@@ -2,34 +2,31 @@
 import { ArrowLeft, Ticket } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { createZaloPayPayment } from "~/api/paymentAPI";
-import { changeTicketAvailableAPI } from "~/api/ticketAPI";
+import { checkZaloPayPayment, createZaloPayPayment } from "~/api/paymentAPI";
+import { changeTicketAvailableAPI, updateTicketOnPlatformAPI } from "~/api/ticketAPI";
 import ResultSuccess from "~/components/payment/ResultSuccess.vue";
 import { calculateTotalTime } from "~/lib/libTime"
 import type { UserType } from "~/types/AccountType";
 import type { BookingData } from "~/types/PendingType";
-import type { DTO_RQ_ZaloPay } from "~/types/ZaloPayType";
+import type { DTO_RQ_UpdateTicketOnPlatform } from "~/types/TicketType";
+import type { DTO_RP_StatusZaloPay, DTO_RQ_ZaloPay } from "~/types/ZaloPayType";
 const showPaymentMethods = ref(false);
 const showTripInfo = ref(false);
 const showFormTripInfo = ref(false);
+const showPriceDetail = ref(true);
+const router = useRouter();
+const pendingTicketStore = usePendingTicketStore();
+const userStore = useUserStore();
+const isLoading = ref(true);
 
-const contactInfoForm = ref({
-  gender: "male",
-  firstName: "",
-  lastName: "",
+const localUserData = ref({
+  name: "",
   email: "",
-  phoneNumber: "",
+  phone: "",
+  gender: 1,
   note: "",
 });
 
-const showPriceDetail = ref(true);
-
-const router = useRouter();
-
-const pendingTicketStore = usePendingTicketStore();
-const userStore = useUserStore();
-
-const isLoading = ref(true);
 
 const pendingData = computed(() => {
   if (!pendingTicketStore.pendingTicket) {
@@ -38,32 +35,54 @@ const pendingData = computed(() => {
   }
   return pendingTicketStore.pendingTicket as BookingData;
 });
-const localUserData = ref({
-  name: "",
-  email: "",
-  phone: "",
-  gender: 1,
-  note: "",
-});
+
+
 onMounted(async () => {
-  isLoading.value = true;
+  try {
+    isLoading.value = true;
 
-  userStore.loadUserData();
-  pendingTicketStore.loadPendingTicket();
+    await Promise.all([
+      userStore.loadUserData(),
+      pendingTicketStore.loadPendingTicket()
+    ]);
 
-  const user = userStore.userData;
-  if (user) {
-    localUserData.value.name = user.name || "";
-    localUserData.value.email = user.email || "";
-    localUserData.value.phone = user.phone || "";
-    localUserData.value.gender = user.gender || 1;
+    console.log("localUserData ticket:", localUserData.value);
+
+
+    const user = userStore.userData;
+    if (user) {
+      localUserData.value = {
+        ...localUserData.value,
+        name: user.name ?? "",
+        email: user.email ?? "",
+        phone: user.phone ?? "",
+        gender: user.gender ?? 1,
+        note: user.note ?? "",
+      };
+    }
+  } catch (error) {
+    console.error("Error in onMounted:", error);
+  } finally {
+    isLoading.value = false;
   }
-
-  isLoading.value = false;
 });
+
+
+
 const paymentMethod = ref("vnpay");
 const submitForm = async () => {
   showPaymentMethods.value = true;
+  const fieldsToUpdate: Partial<typeof localUserData.value> = {
+      name: localUserData.value.name,
+      phone: localUserData.value.phone,
+      note: localUserData.value.note,
+      gender: localUserData.value.gender,
+      email: localUserData.value.email,
+    };
+  userStore.setUserData({
+    ...userStore.userData,
+    ...fieldsToUpdate,
+  } as UserType);
   if ((showPaymentMethods.value = true)) {
     if (paymentMethod.value == "vnpay") {
       console.log("VNPAY selected");
@@ -167,9 +186,11 @@ const formattedTime = computed(() => {
 const background = computed(() =>
   currentTimeleft.value < 600 ? "bg-warning" : "bg-primary"
 );
+
 watch(resetTrigger, () => {
   resetCountdown();
 });
+
 onMounted(() => {
   startCountdown();
   if (currentTimeleft.value <= 12) {
@@ -197,11 +218,55 @@ const handleBack = async () => {
 
 // Xử lý params khi thanh toán thành công
 const paymentSuccess = ref(false);
+const hasCalledAPI = ref(false);
+
+const fetchBookingDataTicketAPI = async () => {
+  try {
+    await userStore.loadUserData();
+    await pendingTicketStore.loadPendingTicket();
+
+    const selectedTickets = pendingData.value?.selectedTicket ?? [];
+
+    const ticketData: DTO_RQ_UpdateTicketOnPlatform[] = selectedTickets.map(ticket => ({
+      id: ticket.id ?? 0,
+      passenger_name: localUserData.value.name,
+      passenger_phone: localUserData.value.phone,
+      point_up: typeof pendingData.value?.pointUp === 'string'
+        ? pendingData.value.pointUp
+        : (pendingData.value?.pointUp?.name || ""),
+      point_down: typeof pendingData.value?.pointDown === 'string'
+        ? pendingData.value.pointDown
+        : (pendingData.value?.pointDown?.name || ""),
+      ticket_note: localUserData.value.note,
+
+      email: localUserData.value.email,
+      gender: localUserData.value.gender,
+    }));
+    console.log("Ticket data to update:", ticketData);
+    const response = await updateTicketOnPlatformAPI(ticketData);
+    if (response.status === 200) {
+      console.log('Cập nhật vé thành công!');
+      ElMessage.success('Đặt vé thành công!');
+    } else {
+      console.error('Cập nhật vé thất bại');
+      ElMessage.error('Đặt vé thất bại!');
+    }
+  } catch (error) {
+    console.error("Error calling API:", error);
+  }
+};
+
+
 const checkPaymentStatus = () => {
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has('status') && urlParams.get('status') === '1') {
+  const status = urlParams.get('status');
+
+  if (status && status === '1' && !hasCalledAPI.value) {
+    hasCalledAPI.value = true;
     paymentSuccess.value = true;
-  } else {
+    console.log("Payment success detected!");
+    fetchBookingDataTicketAPI()
+  } else if (status !== '1') {
     paymentSuccess.value = false;
   }
 };
@@ -209,7 +274,7 @@ onMounted(() => {
   checkPaymentStatus();
   const interval = setInterval(() => {
     checkPaymentStatus();
-  }, 1000); // Kiểm tra mỗi giây
+  }, 10000); // Kiểm tra mỗi giây
   onBeforeUnmount(() => {
     clearInterval(interval);
   });
@@ -250,7 +315,7 @@ onMounted(() => {
             </span>
           </p>
         </div>
-        <el-form v-model="contactInfoForm" require-asterisk-position="right" :disabled="showPaymentMethods">
+        <el-form v-model="localUserData" require-asterisk-position="right" :disabled="showPaymentMethods">
           <div class="flex gap-6 *:flex-1">
             <el-form-item label="Họ và tên" required>
               <el-input v-model="localUserData.name" placeholder="Nhập họ tên" />
@@ -283,8 +348,8 @@ onMounted(() => {
           </el-form-item>
         </el-form>
       </div>
-      <button class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75" v-if="!paymentSuccess"
-        @click="submitForm">
+      <button class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"
+        v-if="!paymentSuccess" @click="submitForm">
         {{ showPaymentMethods ? "Xác nhận thanh toán" : "Tiếp tục thanh toán" }}
       </button>
     </div>

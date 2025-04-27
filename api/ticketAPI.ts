@@ -1,7 +1,7 @@
 import type { DTO_RQ_UpdateTicketOnPlatform } from "~/types/TicketType";
 import type { ApiResponse } from "./APIResponse";
 // const API_GATEWAY_URL = "http://localhost:3002";
-const API_GATEWAY_URL = "https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app";
+const API_GATEWAY_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
 
 export const changeTicketBookedAPI = async (
   data: any
@@ -53,3 +53,5 @@ export const updateTicketOnPlatformAPI = async (
     throw error;
   }
 }
+
+

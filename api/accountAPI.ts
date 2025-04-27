@@ -2,7 +2,7 @@ import type { AccountByCompanyBusType, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
 // const API_BASE_URL = "http://localhost:3002";
-const API_BASE_URL = "https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app";
+const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 

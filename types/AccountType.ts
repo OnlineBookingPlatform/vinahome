@@ -8,6 +8,7 @@ export interface UserType {
     gender: number;
     date_birth: string;
     token: string;
+    note: string;
 }
 
 export interface AccountByCompanyBusType {

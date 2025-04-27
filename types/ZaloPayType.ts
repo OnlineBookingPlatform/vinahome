@@ -9,3 +9,6 @@ export interface DTO_RQ_Ticket {
     seat_name: string;
     price: number;
 }
+export interface DTO_RP_StatusZaloPay {
+    app_trans_id: string;
+}

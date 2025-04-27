@@ -36,9 +36,9 @@ const radio1 = ref('Vé xe khách')
   </section>
 
   <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-5">
-    <div class="sm:flex gap-x-4 hidden">
-      <el-radio-group v-model="radio1" size="large" id="homepage-group">
-        <el-radio-button value="Vé xe khách">
+    <div class="flex gap-4">
+      <el-radio-group v-model="radio1" size="large" id="homepage-group" >
+        <el-radio-button value="Vé xe khách" class="mr-2">
           <template #default>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="w-4 h-4" fill="currentColor">
@@ -51,7 +51,7 @@ const radio1 = ref('Vé xe khách')
         </el-radio-button>
 
 
-        <el-radio-button value="3">
+        <el-radio-button value="3" class="mr-2">
           <template #default>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
@@ -62,7 +62,7 @@ const radio1 = ref('Vé xe khách')
             </div>
           </template>
         </el-radio-button>
-        <el-radio-button value="4">
+        <el-radio-button value="4" class="mr-2">
           <template #default>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
@@ -73,7 +73,7 @@ const radio1 = ref('Vé xe khách')
             </div>
           </template>
         </el-radio-button>
-        <el-radio-button value="5">
+        <el-radio-button value="5" class="mr-2">
           <template #default>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
@@ -84,7 +84,7 @@ const radio1 = ref('Vé xe khách')
             </div>
           </template>
         </el-radio-button>
-        <el-radio-button value="6">
+        <el-radio-button value="6" class="mr-2">
           <template #default>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
