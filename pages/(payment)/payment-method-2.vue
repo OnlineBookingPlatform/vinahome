@@ -210,6 +210,7 @@ const handleBack = async () => {
     try {
       await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
       localStorage.removeItem("paymentStartTime");
+      pointStore.clearPoints();
       router.back();
       pendingTicketStore.clearPendingTicket();
     } catch (error) {
@@ -484,6 +485,9 @@ onMounted(() => {
       </div>
     </aside>
   </section>
+
+
+  
 </template>
 
 <style scoped>
