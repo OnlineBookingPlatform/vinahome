@@ -40,11 +40,14 @@ const valuePointUp = ref<TripPointType | null>(null);
 const valuePointDown = ref<TripPointType | null>(null);
 const optionsPointDown = ref<TripPointType[]>([]);
 const optionsPointUp = ref<TripPointType[]>([]);
+const selectedPointUpId = ref<number | null>(null);
+const selectedPointDownId = ref<number | null>(null);
 const valuePoint = ref(1);
 const checked1 = ref(true);
 const checked2 = ref(false);
 const pendingTicketStore = usePendingTicketStore();
 const activeStep = ref(0);
+const pointStore = usePointStore();
 
 
 // Bộ lọc theo tên công ty
@@ -126,7 +129,7 @@ watchEffect(() => {
     tripData.value = allTrips.value.filter(trip => {
       const hour = dayjs(trip.time_departure, 'HH:mm:ss').hour();
       return filterTime.value.some(range => {
-        const [ start, end ] = range.split('-').map(Number);
+        const [start, end] = range.split('-').map(Number);
         return hour >= start && hour < end;
       });
     });
@@ -183,10 +186,10 @@ const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
     selectedTicket.value = [];
     activeStep.value = 0;
-    activeTabs.value[ String(selectedTripId.value) ] = null;
+    activeTabs.value[String(selectedTripId.value)] = null;
   }
 
-  (activeTabs.value as Record<number, number | null>)[ tripId ] = 1;
+  (activeTabs.value as Record<number, number | null>)[tripId] = 1;
   selectedTripId.value = tripId;
 
   // Reset point chọn
@@ -205,7 +208,7 @@ const handleClickTab = async (tripId: number, tab: any) => {
   console.log("Tab được chọn:", tab.props.name);
   console.log(
     "activeTabs trước khi cập nhật:",
-    activeTabs.value[ String(tripId) ]
+    activeTabs.value[String(tripId)]
   );
   if (tab.props.name === 1) {
     if (selectedTripId.value !== tripId) {
@@ -220,10 +223,10 @@ const handleClickTab = async (tripId: number, tab: any) => {
     if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
       selectedTicket.value = [];
       activeStep.value = 0;
-      activeTabs.value[ String(selectedTripId.value) ] = null;
+      activeTabs.value[String(selectedTripId.value)] = null;
     }
 
-    (activeTabs.value as Record<number, number | null>)[ tripId ] = 2;
+    (activeTabs.value as Record<number, number | null>)[tripId] = 2;
     selectedTripId.value = tripId;
 
     console.log("API response cho tab 2:");
@@ -244,17 +247,17 @@ const handleClickTab = async (tripId: number, tab: any) => {
   } else if (tab.props.name === 4) {
     console.log("API response cho tab 4:");
   } else {
-    activeTabs.value[ tripId ] =
-      activeTabs.value[ tripId ] === tab.props.name ? null : tab.props.name;
+    activeTabs.value[tripId] =
+      activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
     selectedTripId.value = tripId;
   }
 };
 const closeTrip = (tripId: number) => {
-  activeTabs.value[ tripId ] = null;
+  activeTabs.value[tripId] = null;
   selectedTripId.value = null;
   tripDetail.value = null;
   activeStep.value = 0;
-
+  pointStore.clearPoints();
   selectedTicket.value = [];
 };
 
@@ -430,12 +433,14 @@ const fetchPointDownOptions = async () => {
 };
 watch(
   selectedTripId,
-  (newVal) => {
+  async (newVal) => {
     if (newVal !== null) {
-      fetchPointUpOptions();
-      fetchPointDownOptions();
-      valuePointDown.value = null;
-      valuePointUp.value = null;
+      await fetchPointUpOptions();
+      await fetchPointDownOptions();
+      
+      selectedPointUpId.value =  null;
+      selectedPointDownId.value =  null;
+
       activeStep.value = 0;
       selectedStep.value = 1;
     }
@@ -443,25 +448,24 @@ watch(
   { immediate: true }
 );
 
-watch(
-  optionsPointUp,
-  (newVal) => {
-    if (newVal.length > 0) {
-      valuePointUp.value = newVal[ 0 ];
-    }
-  },
-  { immediate: true }
-);
+watch(selectedPointUpId, (newId) => {
+  if (newId !== null) {
+    const selectedPoint = optionsPointUp.value.find(p => p.id === newId) || null;
+    pointStore.setPointUp(selectedPoint);
+  }
+});
 
-watch(
-  optionsPointDown,
-  (newVal) => {
-    if (newVal.length > 0) {
-      valuePointDown.value = newVal[ 0 ];
-    }
-  },
-  { immediate: true }
-);
+
+watch(selectedPointDownId, (newId) => {
+  if (newId !== null) {
+    const selectedPoint = optionsPointDown.value.find(p => p.id === newId) || null;
+    pointStore.setPointDown(selectedPoint);
+  }
+});
+
+
+
+
 
 
 const nextStep = async () => {
@@ -620,7 +624,7 @@ const nextStep = async () => {
                       <div class="flex items-center gap-4">
                         <span class="text-[20px] font-semibold">{{
                           trip.company.name
-                          }}</span>
+                        }}</span>
                         <div class="px-2">
                           <el-rate v-model="valuePoint" disabled show-score text-color="#ff9900"
                             score-template="{value}" />
@@ -628,7 +632,7 @@ const nextStep = async () => {
                       </div>
                       <span class="text-[#909295] mt-2">{{
                         trip.seat_map.name
-                        }}</span>
+                      }}</span>
                     </div>
                     <div class="ml-auto flex flex-col text-right">
                       <span class="text-xl font-bold text-red-500">
@@ -670,7 +674,7 @@ const nextStep = async () => {
                         </el-icon>
                         <span class="text-black text-md">{{
                           trip.departureInfo.pointName
-                          }}</span>
+                        }}</span>
                       </div>
                       <div class="py-[1px] flex items-center gap-2">
                         <el-icon :style="{
@@ -725,7 +729,7 @@ const nextStep = async () => {
               <div class="relative">
                 <div class="border-t border-gray-300"></div>
 
-                <el-button v-if="!activeTabs[ trip.id ]" type="primary" round
+                <el-button v-if="!activeTabs[trip.id]" type="primary" round
                   class="absolute bottom-[-35px] right-4 z-10 mt-[3px]" @click="openTrip(trip.id)">
                   <span class="mx-2">Chọn chuyến</span>
                 </el-button>
@@ -735,7 +739,7 @@ const nextStep = async () => {
                 </el-button>
               </div>
 
-              <el-tabs v-model="activeTabs[ trip.id ]" class="demo-tabs relative z-0" @tab-click="
+              <el-tabs v-model="activeTabs[trip.id]" class="demo-tabs relative z-0" @tab-click="
                 (tab: any): void => {
                   handleClickTab(trip.id, tab);
                 }
@@ -806,10 +810,10 @@ const nextStep = async () => {
                       <el-col :span="12">
                         <div class="rounded-xl bg-gray-100 p-4 m-2 mt-5">
                           <span>Thông tin điểm đón</span>
-                          <el-select v-model="valuePointUp" filterable allow-create default-first-option
+                          <el-select v-model="selectedPointUpId" filterable allow-create default-first-option
                             class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name"
-                              :value="item.name" class="mb-[2px]">
+                            <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name" :value="item.id"
+                              class="mb-[2px]">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-sm">
                                   •
@@ -822,7 +826,7 @@ const nextStep = async () => {
                                   - {{ item.name }}</span>
                                 <span class="text-xs text-gray-600">{{
                                   item.address
-                                  }}</span>
+                                }}</span>
                               </div>
                             </el-option>
                           </el-select>
@@ -831,10 +835,10 @@ const nextStep = async () => {
                       <el-col :span="12">
                         <div class="bg-gray-100 rounded-xl p-4 m-2 mt-5">
                           <span>Thông tin điểm trả</span>
-                          <el-select v-model="valuePointDown" filterable allow-create default-first-option
+                          <el-select v-model="selectedPointDownId" filterable allow-create default-first-option
                             class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                             <el-option v-for="item in optionsPointDown" :key="item.id" :label="item.name"
-                              :value="item.name" class="mb-[2px]">
+                              :value="item.id" class="mb-[2px]">
                               <div class="flex flex-col">
                                 <span class="font-semibold text-sm">
                                   •
@@ -847,7 +851,7 @@ const nextStep = async () => {
                                   - {{ item.name }}</span>
                                 <span class="text-xs text-gray-600">{{
                                   item.address
-                                  }}</span>
+                                }}</span>
                               </div>
                             </el-option>
                           </el-select>
@@ -891,10 +895,10 @@ const nextStep = async () => {
                               <div class="flex flex-col">
                                 <span class="font-semibold text-base">{{
                                   point.name
-                                  }}</span>
+                                }}</span>
                                 <span class="text-sm text-gray-500">{{
                                   point.address
-                                  }}</span>
+                                }}</span>
                                 <span class="text-sm text-gray-400">
                                   Thời gian:
                                   {{
@@ -917,10 +921,10 @@ const nextStep = async () => {
                               <div class="flex flex-col">
                                 <span class="font-semibold text-base">{{
                                   point.name
-                                  }}</span>
+                                }}</span>
                                 <span class="text-sm text-gray-500">{{
                                   point.address
-                                  }}</span>
+                                }}</span>
                                 <span class="text-sm text-gray-400">
                                   Thời gian:
                                   {{
