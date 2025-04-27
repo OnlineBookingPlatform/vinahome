@@ -44,10 +44,10 @@ export default defineNuxtConfig({
           "http-equiv": "Content-Security-Policy", 
           content: `
             default-src 'self';
-            img-src 'self' https://4084-2001-ee0-4f00-57d0-409-89b9-d937-f25a.ngrok-free.app https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:;
+            img-src 'self' https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:;
             style-src 'self' 'unsafe-inline';
             script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://connect.facebook.net;
-            connect-src 'self' http://localhost:3002 https://4084-2001-ee0-4f00-57d0-409-89b9-d937-f25a.ngrok-free.app https://api.cloudinary.com;
+            connect-src 'self' http://localhost:3002 https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app https://api.cloudinary.com;
           `.replace(/\n/g, ''),
         },
         {

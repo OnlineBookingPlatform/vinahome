@@ -1,11 +1,12 @@
 import type {BusCompanyType} from "~/types/CompanyType";
 import type { ApiResponse } from "./APIResponse";
 // const API_BASE_URL = "https://vinahome-server.onrender.com";
-const API_BASE_URL = "http://localhost:3002";
+// const API_BASE_URL = "http://localhost:3002";
+const API_GATEWAY_URL = "https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app";
 
 export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/create-company`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_GATEWAY_URL}/v2/company/create-company`, {
             method: "POST",
             body: companyInfo,
         });
@@ -16,7 +17,7 @@ export const createCompanyAPI = async (companyInfo: BusCompanyType): Promise<Api
 }
 export const updateCompanyAPI = async (companyId: number, companyInfo: BusCompanyType): Promise<ApiResponse<BusCompanyType>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType>>(`${API_BASE_URL}/v2/company/update-company/${companyId}`, {
+        return await $fetch<ApiResponse<BusCompanyType>>(`${API_GATEWAY_URL}/v2/company/update-company/${companyId}`, {
             method: "PUT",
             body: companyInfo,
         });
@@ -27,7 +28,7 @@ export const updateCompanyAPI = async (companyId: number, companyInfo: BusCompan
 }
 export const getCompanyAPI = async (): Promise<ApiResponse<BusCompanyType[]>> => {
     try {
-        return await $fetch<ApiResponse<BusCompanyType[]>>(`${API_BASE_URL}/v2/company/get-all`, {
+        return await $fetch<ApiResponse<BusCompanyType[]>>(`${API_GATEWAY_URL}/v2/company/get-all`, {
             method: "GET",
         });
     } catch (error) {
@@ -37,7 +38,7 @@ export const getCompanyAPI = async (): Promise<ApiResponse<BusCompanyType[]>> =>
 }
 export const deleteCompanyAPI = async (companyId: number): Promise<ApiResponse<void>> => {
     try {
-        return await $fetch<ApiResponse<void>>(`${API_BASE_URL}/v2/company/delete-company/${companyId}`, {
+        return await $fetch<ApiResponse<void>>(`${API_GATEWAY_URL}/v2/company/delete-company/${companyId}`, {
             method: "DELETE",
         });
     } catch (error) {
@@ -48,7 +49,7 @@ export const deleteCompanyAPI = async (companyId: number): Promise<ApiResponse<v
 
 export const createPolicyAPI = async (companyId: number, policyInfo: any): Promise<ApiResponse<any>> => {
     try {
-        return await $fetch<ApiResponse<any>>(`${API_BASE_URL}/v2/company/create-policy/${companyId}`, {
+        return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/company/create-policy/${companyId}`, {
             method: "POST",
             body: policyInfo,
         });
@@ -60,7 +61,7 @@ export const createPolicyAPI = async (companyId: number, policyInfo: any): Promi
 
 export const getPolicyAPI = async (companyId: number): Promise<ApiResponse<any>> => {
     try {
-        return await $fetch<ApiResponse<any>>(`${API_BASE_URL}/v2/company/get-policy/${companyId}`, {
+        return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/company/get-policy/${companyId}`, {
             method: "GET",
         });
     } catch (error) {

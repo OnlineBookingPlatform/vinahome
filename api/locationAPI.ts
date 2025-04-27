@@ -1,8 +1,8 @@
 import type { Province } from "~/types/LocationType";
 import type { ApiResponse } from "./APIResponse";
 
-const API_GATEWAY_URL = "http://localhost:3002";
-// const API_GATEWAY_URL = "https://4084-2001-ee0-4f00-57d0-409-89b9-d937-f25a.ngrok-free.app";
+// const API_GATEWAY_URL = "http://localhost:3002";
+const API_GATEWAY_URL = "https://8172-2001-ee0-4f00-57d0-a516-9578-1651-ef25.ngrok-free.app";
 
 export const getProvinces = async (): Promise<ApiResponse<Province[]>> => {
   try {
