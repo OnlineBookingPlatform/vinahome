@@ -1,8 +1,8 @@
 import type { AccountByCompanyBusType, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
-// const API_BASE_URL = "https://vinahome-server.onrender.com";
 const API_BASE_URL = "http://localhost:3002";
+// const API_BASE_URL = "https://4084-2001-ee0-4f00-57d0-409-89b9-d937-f25a.ngrok-free.app";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 
