@@ -195,6 +195,9 @@ const openTrip = async (tripId: number) => {
   // Reset point chọn
   valuePointUp.value = null;
   valuePointDown.value = null;
+  selectedPointUpId.value = null;
+  selectedPointDownId.value = null;
+  pointStore.clearPoints();
   activeStep.value = 0;
 
   const response = await getTripDeatil(tripId);
@@ -437,10 +440,6 @@ watch(
     if (newVal !== null) {
       await fetchPointUpOptions();
       await fetchPointDownOptions();
-      
-      selectedPointUpId.value =  null;
-      selectedPointDownId.value =  null;
-
       activeStep.value = 0;
       selectedStep.value = 1;
     }
