@@ -304,7 +304,7 @@ onMounted(() => {
 <template>
   <section class="container mx-auto flex justify-center my-10 gap-6">
     <div v-if="isLoading" class="text-center py-10">
-      <el-spinner size="large" />
+      <!-- <el-spinner size="large" /> -->
       <p>Đang tải thông tin vé...</p>
     </div>
     <div class="flex-1 max-w-3xl space-y-6" v-else-if="pendingData">
