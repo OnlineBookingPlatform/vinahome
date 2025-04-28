@@ -1,12 +1,58 @@
 <script setup lang="ts">
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
+import { registerSaleTicketOnPlatformAPI } from '~/api/companyAPI';
+import type { DTO_RQ_RegisterSaleTicketOnPlatform } from '~/types/CompanyType';
+
 definePageMeta({
   layout: "default",
 });
+
+const ruleFormRef = ref<FormInstance>()
+const ruleForm = reactive<DTO_RQ_RegisterSaleTicketOnPlatform>({
+  name: null,
+  phone: null,
+  email: null,
+  address: null,
+  note: null,
+  bus_company_name: null,
+})
+const rules = reactive<FormRules<DTO_RQ_RegisterSaleTicketOnPlatform>>({
+  name: [
+    { required: true, message: 'Vui lòng nhập họ và tên', trigger: 'blur' },
+  ],
+  phone: [
+    { required: true, message: 'Vui lòng nhập số điện thoại', trigger: 'blur' },
+  ],
+  bus_company_name: [
+    { required: true, message: 'Vui lòng nhập tên nhà xe', trigger: 'blur' },
+  ],
+})
+const successMessage = ref('')
+const submitForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate(async (valid, fields) => {
+    if (valid) {
+      console.log('submit!', ruleForm)
+      await registerSaleTicketOnPlatformAPI(ruleForm)
+      ElMessage.success('Đăng ký thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.');
+      successMessage.value = 'Đăng ký thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.'
+    } else {
+      console.log('error submit!', fields)
+      ElMessage.error('Vui lòng kiểm tra lại thông tin đã nhập.');
+    }
+  })
+}
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' 
+  });
+}
 </script>
 
 <template>
   <!-- Phần 1: Header (Màu xanh) -->
-  <section class="bg-blue-600 text-white py-20 [@media(max-width:450px)]:py-10">
+  <section class="bg-blue-500 text-white py-20 [@media(max-width:450px)]:py-10">
     <el-row class="container mx-auto [@media(max-width:450px)]:px-2">
       <el-col :xs="24" :md="14" class="flex items-center">
         <div class="px-10 [@media(max-width:450px)]:px-2">
@@ -21,50 +67,52 @@ definePageMeta({
 
       <el-col :xs="24" :md="10">
         <div class="flex justify-center [@media(min-width:1200px)]:justify-start mt-[20px]">
-          <el-card class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300 [@media(max-width:450px)]:max-w-[300px] [@media(max-width:450px)]:p-2">
+          <div
+            class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300 [@media(max-width:450px)]:max-w-[300px] [@media(max-width:450px)]:p-2">
             <h2 class="text-base md:text-lg font-bold leading-tight text-center mb-5 [@media(max-width:450px)]:text-lg">
-              Bắt đầu lấp đầy chỗ trống trên xe của bạn với hơn 10 triệu lượt khách đi thành công trên Vinahome
+              Bắt đầu lấp đầy chỗ trống trên xe của bạn cùng với nền tảng bán vé xe khách trực tuyến VinaHome
             </h2>
-            <el-form>
+            <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules">
               <el-row :gutter="20">
                 <el-col :xs="24" :md="12">
-                  <el-form-item label="Họ và tên" label-position="top" required>
-                    <el-input placeholder="Nhập họ và tên" size="large" />
+                  <el-form-item label="Họ và tên" label-position="top" prop="name">
+                    <el-input placeholder="Nhập họ và tên" size="large" v-model="ruleForm.name" />
                   </el-form-item>
                 </el-col>
                 <el-col :xs="24" :md="12">
-                  <el-form-item label="Số điện thoại liên hệ" label-position="top" required>
-                    <el-input placeholder="Nhập số điện thoại" size="large" />
+                  <el-form-item label="Số điện thoại liên hệ" label-position="top" prop="phone">
+                    <el-input placeholder="Nhập số điện thoại" size="large" v-model="ruleForm.phone" />
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
                 <el-col :xs="24" :md="12">
-                  <el-form-item label="Email" label-position="top">
-                    <el-input placeholder="Nhập email" size="large" />
+                  <el-form-item label="Email" label-position="top" prop="email">
+                    <el-input placeholder="Nhập email" size="large" v-model="ruleForm.email" />
                   </el-form-item>
                 </el-col>
                 <el-col :xs="24" :md="12">
-                  <el-form-item label="Tên nhà xe" label-position="top">
-                    <el-input placeholder="Nhập tên nhà xe" size="large" />
+                  <el-form-item label="Tên nhà xe" label-position="top" prop="bus_company_name">
+                    <el-input placeholder="Nhập tên nhà xe" size="large" v-model="ruleForm.bus_company_name" />
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-form-item label="Tỉnh (Thành phố) / Tuyến đường" label-position="top" required>
-                <el-input placeholder="Nhập thông tin" size="large" />
+              <el-form-item label="Địa chỉ" label-position="top" prop="address">
+                <el-input placeholder="Nhập thông tin" size="large" v-model="ruleForm.address" />
               </el-form-item>
-              <el-form-item label="Nội dung tư vấn" label-position="top">
-                <el-input type="textarea" placeholder="Nhập nội dung tư vấn" size="large" />
+              <el-form-item label="Nội dung tư vấn" label-position="top" prop="note">
+                <el-input type="textarea" placeholder="Nhập nội dung tư vấn" size="large" v-model="ruleForm.note"
+                  :autosize="{ minRows: 2, maxRows: 4 }" />
               </el-form-item>
-              <el-button type="primary" size="large" class="w-full">
+              <el-button type="primary" size="large" class="w-full" @click="submitForm(ruleFormRef)">
                 Đăng ký mở bán
               </el-button>
             </el-form>
-            <div class="text-center mt-4 text-sm text-gray-500">
-              <span class="text-orange-500 font-bold">Create your own free forms</span> to generate leads from your
-              website.
-            </div>
-          </el-card>
+            <p class="text-center text-gray-500 mt-4">
+              {{ successMessage }}
+            </p>
+
+          </div>
         </div>
       </el-col>
     </el-row>
@@ -73,63 +121,80 @@ definePageMeta({
   <!-- Phần 2: Nội dung (Màu trắng) -->
   <section class="bg-white text-gray-800 py-16">
     <div class="container mx-auto text-center [@media(max-width:450px)]:px-1">
-      <h2 class="text-4xl font-bold text-center mb-4 [@media(max-width:450px)]:text-2xl">Sự an tâm của Chủ nhà xe là ưu tiên hàng đầu của Vinahome</h2>
+      <h2 class="text-4xl font-bold text-center mb-4 [@media(max-width:450px)]:text-2xl">
+        Sự an tâm của Chủ nhà xe luôn là ưu tiên hàng đầu tại Vinahome
+      </h2>
 
       <div class="grid md:grid-cols-3 gap-12 mt-16 [@media(max-width:450px)]:mt-12 [@media(max-width:450px)]:gap-10">
         <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
-            <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
+            <img src="/icon/chart.png" alt="" class="w-14 h-14" />
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-center">Tỷ lệ khách đặt vé mà không đi qua sàn Vinahome rất thấp
-            chỉ
-            0.2%</h3>
-          <p class="text-lg leading-relaxed flex-1">99.8% khách hàng đặt vé trên sàn Vinahome là khách thật, giúp nhà xe
-            cắt giảm tình trạng đặt ảo giữ ghế mà không đi, không bán được cho khách khác gây thất thoát doanh thu của
-            nhà xe.</p>
+          <h3 class="text-xl font-semibold mb-3 text-center">
+            Tỷ lệ khách đặt vé nhưng không sử dụng dịch vụ tại Vinahome chỉ chiếm tỉ lệ rất nhỏ
+          </h3>
+          <p class="text-lg leading-relaxed flex-1">
+            Lượng khách hàng đặt vé thông qua Vinahome đều là khách thực tế, giúp nhà xe hạn chế tối đa tình trạng giữ
+            chỗ ảo làm thất thoát doanh thu.
+          </p>
         </div>
         <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
-            <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
+            <img src="/icon/money-bag.png" alt="" class="w-14 h-14" />
           </div>
-          <h3 class="text-xl font-semibold mb-2 text-center">Quy trình đối soát, thanh toán công nợ đúng hạn</h3>
-          <p class="text-lg leading-relaxed flex-1">Vinahome đảm bảo thanh toán đúng hạn, giúp nhà xe yên tâm về dòng
-            tiền
-            và dễ dàng kiểm soát công nợ với các phương thức thanh toán linh hoạt.</p>
+          <h3 class="text-xl font-semibold mb-2 text-center">
+            Đối soát và thanh toán công nợ minh bạch, đúng lịch
+          </h3>
+          <p class="text-lg leading-relaxed flex-1">
+            Vinahome cam kết quy trình thanh toán rõ ràng và đúng hạn, hỗ trợ nhà xe chủ động dòng tiền với nhiều lựa
+            chọn phương thức thanh toán linh hoạt.
+          </p>
         </div>
         <div class="px-8 flex flex-col text-left items-center [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
-            <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
+            <img src="/icon/support.png" alt="" class="w-14 h-14" />
           </div>
-          <h3 class="text-xl font-semibold mb-2 text-center">Được hỗ trợ tận tình từ đội ngũ chuyên viên Vinahome</h3>
-          <p class="text-lg leading-relaxed flex-1">Sau khi đăng ký mở bán, nhà xe được đội ngũ Vinahome hỗ trợ hướng
-            dẫn
-            quy trình từ thiết lập dịch vụ đến thanh toán trong suốt quá trình hoạt động.</p>
+          <h3 class="text-xl font-semibold mb-2 text-center">
+            Hỗ trợ tận tâm từ đội ngũ chuyên viên Vinahome
+          </h3>
+          <p class="text-lg leading-relaxed flex-1">
+            Ngay từ khi đăng ký bán vé, nhà xe sẽ nhận được sự đồng hành, hướng dẫn chi tiết từ đội ngũ Vinahome xuyên
+            suốt quá trình hoạt động.
+          </p>
         </div>
       </div>
 
       <div class="grid md:grid-cols-2 gap-12 mt-12 place-items-center">
-        <div class="px-32 flex flex-col text-left items-center [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
+        <div
+          class="px-32 flex flex-col text-left items-center [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
-            <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
+            <img src="/icon/movies.png" alt="" class="w-14 h-14" />
           </div>
-          <h3 class="text-xl font-semibold mb-2 text-center">Nhà xe có thể đăng bán một số lượng tuyến/chuyến ghế trống
-            nhất định</h3>
-          <p class="text-lg leading-relaxed flex-1">Vinahome không bắt buộc nhà xe bán tất cả các tuyến/chuyến/ghế
-            trống,
-            linh hoạt theo nhu cầu của nhà xe mà vẫn đảm bảo doanh thu tối ưu.</p>
+          <h3 class="text-xl font-semibold mb-2 text-center">
+            Linh hoạt đăng bán số lượng vé theo tuyến/chuyến phù hợp
+          </h3>
+          <p class="text-lg leading-relaxed flex-1">
+            Vinahome không yêu cầu nhà xe phải mở bán toàn bộ tuyến/chuyến hoặc ghế trống, cho phép nhà xe tự do điều
+            chỉnh theo nhu cầu thực tế nhằm tối ưu hiệu quả kinh doanh.
+          </p>
         </div>
-        <div class="px-32 flex flex-col text-left items-center  [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
+        <div
+          class="px-32 flex flex-col text-left items-center  [@media(max-width:450px)]:px-8 [@media(max-width:450px)]:text-center">
           <div class="flex justify-center mb-4">
-            <el-avatar size="50" src="https://cdn-icons-png.flaticon.com/512/190/190411.png" />
+            <img src="/icon/software.png" alt="" class="w-14 h-14" />
           </div>
-          <h3 class="text-xl font-semibold mb-2 text-center">Sàn bán vé xe khách trực tuyến uy tín, đáng tin cậy</h3>
-          <p class="text-lg leading-relaxed flex-1">Vinahome là nền tảng đặt vé xe khách hoạt động từ năm 2013, giúp nhà
-            xe tăng độ phủ thương hiệu và tiếp cận lượng khách hàng tiềm năng lớn.</p>
+          <h3 class="text-xl font-semibold mb-2 text-center">
+            Sàn giao dịch vé xe khách uy tín và chuyên nghiệp
+          </h3>
+          <p class="text-lg leading-relaxed flex-1">
+            Thành lập từ năm 2024, Vinahome đã trở thành cầu nối tin cậy giữa nhà xe và hành khách, hỗ trợ tăng trưởng
+            thương hiệu và tiếp cận lượng khách hàng rộng lớn.
+          </p>
         </div>
       </div>
       <div class="mt-12">
         <button
-          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300" @click="scrollToTop">
           Đăng ký mở bán
         </button>
       </div>
@@ -139,10 +204,9 @@ definePageMeta({
   <!-- Phần 3: Lắng nghe khách hàng (Màu trắng) -->
   <section class="bg-gray-100 text-gray-800 py-16">
     <div class="container mx-auto px-4 [@media(max-width:450px)]:px-1">
-      <h2 class="text-4xl font-bold text-center mb-4 [@media(max-width:450px)]:text-2xl">Lắng nghe khách hàng nói về Vina Home</h2>
-      <p class="text-center text-gray-600 mb-10">
-        Hơn 2000 nhà xe đang mở bán trên sàn Vinahome - Sàn bán vé số 1 Việt Nam
-      </p>
+      <h2 class="text-4xl font-bold text-center  [@media(max-width:450px)]:text-2xl mb-10">Lắng nghe khách hàng nói về
+        Vina Home</h2>
+     
 
       <div class="space-y-10 [@media(max-width:450px)]:px-5">
         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row items-center md:items-start">
@@ -206,7 +270,8 @@ definePageMeta({
   <!-- Phần 4: Đăng ký (Màu xám) -->
   <section class="bg-gray-800 text-white py-16">
     <div class="container mx-auto px-4 [@media(max-width:450px)]:px-1">
-      <h2 class="text-4xl font-bold text-center mb-10 [@media(max-width:450px)]:text-2xl"> Đăng ký mở bán theo 4 bước đơn giản</h2>
+      <h2 class="text-4xl font-bold text-center mb-10 [@media(max-width:450px)]:text-2xl"> Đăng ký mở bán theo 4 bước
+        đơn giản</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 [@media(max-width:450px)]:px-5">
         <div class="bg-white text-gray-900 p-6 rounded-2xl shadow-lg text-center">
           <div
@@ -252,7 +317,7 @@ definePageMeta({
       </div>
       <div class="flex justify-center mt-8">
         <button
-          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300" @click="scrollToTop">
           Đăng ký mở bán
         </button>
       </div>
