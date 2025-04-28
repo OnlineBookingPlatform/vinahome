@@ -4,7 +4,7 @@ import { getPointDownByTrip, getPointUpByTrip } from "~/api/tripAPI";
 import { calculateTotalTime } from "~/lib/libTime";
 import type { BookingData } from "~/types/PendingType";
 import type { TripPointType } from "~/types/PointType";
-
+const pointStore = usePointStore();
 const props = defineProps<{
   pendingData: BookingData;
   pointUp: TripPointType | null;
@@ -25,26 +25,19 @@ const isEditingPointUp = ref(true);
 const tempPointUp = ref<TripPointType | null>(null);
 const tempPointDown = ref<TripPointType | null>(null);
 
-const openEditPointDialog = (isPointUp: boolean) => {
-  isEditingPointUp.value = isPointUp;
-  dialogTitle.value = isPointUp ? 'Thay đổi điểm đón' : 'Thay đổi điểm trả';
 
-  // Copy giá trị hiện tại vào biến tạm từ props
-  // tempPointUp.value = pointUp ? { ...pointUp } : null;
-  // tempPointDown.value = pointDown ? { ...pointDown } : null;
 
-  dialogVisible.value = true;
-};
 
-const confirmChanges = () => {
-  if (isEditingPointUp.value && tempPointUp.value) {
-    valuePointUp.value = tempPointUp.value;
-  } else if (!isEditingPointUp.value && tempPointDown.value) {
-    valuePointDown.value = tempPointDown.value;
-  }
 
-  dialogVisible.value = false;
-};
+// const confirmChanges = () => {
+//   if (isEditingPointUp.value && tempPointUp.value) {
+//     valuePointUp.value = tempPointUp.value;
+//   } else if (!isEditingPointUp.value && tempPointDown.value) {
+//     valuePointDown.value = tempPointDown.value;
+//   }
+
+//   dialogVisible.value = false;
+// };
 
 const handleClose = () => {
   dialogVisible.value = false;
@@ -69,10 +62,43 @@ const fetchPointDownOptions = async () => {
     ElMessage.error("Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau.");
   }
 };
+// Sử dụng store để quản lý điểm đón/trả
+const confirmChanges = () => {
+  if (isEditingPointUp.value && tempPointUp.value) {
+    valuePointUp.value = tempPointUp.value;
+    pointStore.setPointUp(tempPointUp.value);
+  } else if (!isEditingPointUp.value && tempPointDown.value) {
+    valuePointDown.value = tempPointDown.value;
+    pointStore.setPointDown(tempPointDown.value);
+  }
 
-onMounted(() => {
-  fetchPointUpOptions();
-  fetchPointDownOptions();
+  dialogVisible.value = false;  // Đóng modal
+};
+
+const openEditPointDialog = (isPointUp: boolean) => {
+  isEditingPointUp.value = isPointUp;
+  dialogTitle.value = isPointUp ? 'Thay đổi điểm đón' : 'Thay đổi điểm trả';
+
+  if (isPointUp) {
+    // Tìm điểm đón hiện tại trong danh sách options
+    tempPointUp.value = optionsPointUp.value.find(
+      point => point.id === pointStore.pointUp?.id
+    ) || null;
+  } else {
+    // Tìm điểm trả hiện tại trong danh sách options
+    tempPointDown.value = optionsPointDown.value.find(
+      point => point.id === pointStore.pointDown?.id
+    ) || null;
+  }
+
+  dialogVisible.value = true;
+};
+onMounted(async () => {
+  await fetchPointUpOptions();
+  await fetchPointDownOptions();
+  
+  valuePointUp.value = props.pointUp || pointStore.pointUp;
+  valuePointDown.value = props.pointDown || pointStore.pointDown;
 });
 
 
@@ -140,19 +166,23 @@ onMounted(() => {
       <el-radio-group v-model="tempPointUp" class="flex flex-col items-start gap-4">
         <el-radio v-for="item in optionsPointUp" :key="item.id" :label="item">
           <div class="flex flex-col">
-            <span class="text-[15px]">{{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}</span>
+            <span class="text-[15px]">
+              {{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}
+            </span>
             <span class="text-sm font-normal">Địa chỉ: {{ item.address }}</span>
           </div>
         </el-radio>
       </el-radio-group>
-    </div>
 
+    </div>
 
     <div v-else class="px-2">
       <el-radio-group v-model="tempPointDown" class="flex flex-col items-start gap-4">
         <el-radio v-for="item in optionsPointDown" :key="item.id" :label="item">
           <div class="flex flex-col">
-            <span class="text-[15px]">{{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}</span>
+            <span class="text-[15px]">
+              {{ calculateTotalTime(item.start_time, item.time_point) }} - {{ item.name }}
+            </span>
             <span class="text-sm font-normal">Địa chỉ: {{ item.address }}</span>
           </div>
         </el-radio>
@@ -168,6 +198,7 @@ onMounted(() => {
       </div>
     </template>
   </el-dialog>
+
 </template>
 
 <style scoped>
@@ -175,9 +206,11 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 240px;
 }
-.el-radio-group{
+
+.el-radio-group {
   align-items: flex-start;
 }
+
 @container (max-width: 600px) {
   .trip-info {
     display: flex;
