@@ -37,7 +37,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       console.log('error submit!', fields)
     }
   })
-}
+};
+
 </script>
 
 <template>

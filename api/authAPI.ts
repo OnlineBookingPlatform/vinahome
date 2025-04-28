@@ -1,4 +1,4 @@
-import type { UserType } from "~/types/AccountType";
+import type { DTO_RQ_SuperAdminLogin, SuperAdminType, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 // const API_BASE_URL = "https://vinahome-server.onrender.com";
 // const API_GATEWAY_URL = "http://localhost:3002";
@@ -38,3 +38,17 @@ export const loginWithFacebook = async (accessToken: string): Promise<ApiRespons
         throw error;
     }
 };
+
+export const loginSuperAdminAPI = async (data: DTO_RQ_SuperAdminLogin): Promise<ApiResponse<SuperAdminType>> => {
+    const config = useRuntimeConfig();
+    const API_GATEWAY_URL = config.public.apiGatewayUrl;
+    try {
+        return await $fetch<ApiResponse<SuperAdminType>>(`${API_GATEWAY_URL}/v1/auth/super-admin-login`, {
+            method: "POST",
+            body: data,
+        });
+    } catch (error) {
+        console.error("Login failed: ", error);
+        throw error;
+    }
+}

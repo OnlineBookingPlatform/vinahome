@@ -10,6 +10,12 @@ export interface UserType {
     token: string;
     note: string;
 }
+export interface SuperAdminType {
+    id: string;
+    name: string;
+    account_type: string;
+    token: string;
+}
 
 export interface AccountByCompanyBusType {
     id: string;
@@ -21,4 +27,9 @@ export interface AccountByCompanyBusType {
     role: number;
     email: string;
     company_id:number;
+}
+
+export interface DTO_RQ_SuperAdminLogin {
+    username: string | null;
+    password: string | null;
 }

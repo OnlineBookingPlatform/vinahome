@@ -1,4 +1,7 @@
 <script lang="ts">
+import { SuperAdminHeaderSuperAdmin } from '#components';
+
+
 
 </script>
 <template>
@@ -8,7 +11,9 @@
         <SuperAdminMenu/>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
+        <el-header class="bg-[#0072bc]">
+          <SuperAdminHeaderSuperAdmin/>
+        </el-header>
         <el-main>
             <slot />
         </el-main>
