@@ -36,7 +36,7 @@ const radio1 = ref('Vé xe khách')
   </section>
 
   <section class="container mx-auto px-24 sm:px-4 xs:px-2 [@media(max-width:450px)]:px-5">
-    <div class="flex gap-4">
+    <div class="flex gap-4 [@media(max-width:450px)]:hidden">
       <el-radio-group v-model="radio1" size="large" id="homepage-group" >
         <el-radio-button value="Vé xe khách" class="mr-2">
           <template #default>

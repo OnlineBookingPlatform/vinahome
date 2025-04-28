@@ -466,7 +466,7 @@ onMounted(() => {
     </div>
 
     <!-- Hàng dưới: Các ô nhập thông tin -->
-    <div class="flex flex-wrap gap-4 items-center mb-[40px] md:flex-row flex-col">
+    <div class="flex flex-wrap gap-4 items-center mb-[40px] [@media(max-width:450px)]:mb-[20px] md:flex-row flex-col">
       <!-- Điểm đi -->
       <div class="flex flex-col h-[70px] w-full md:flex-1">
         <span class="text-[13px] mb-1 text-black mx-2">Điểm đi</span>
@@ -499,7 +499,7 @@ onMounted(() => {
       </div>
 
       <!-- Nút đổi chỗ -->
-      <div class="flex items-center justify-center md:mt-[28px] mt-0 z-0 md:mx-[-23px] mx-auto md:z-10">
+      <div class="flex items-center justify-center md:mt-[28px] mt-0 z-0 md:mx-[-23px] mx-auto md:z-10 [@media(max-width:450px)]:hidden">
         <el-button circle class="shadow-md" size="default" @click="swapLocations">
           <el-icon class="transition-transform duration-300 hover:rotate-180" color="#0072bc">
             <Switch />
@@ -639,7 +639,7 @@ onMounted(() => {
     </div>
 
     <div
-      class="w-full flex justify-center mt-6 md:absolute md:bottom-[-25px] md:left-1/2 md:transform md:-translate-x-1/2">
+      class="w-full flex justify-center mt-6 md:absolute md:bottom-[-25px] md:left-1/2 md:transform md:-translate-x-1/2 [@media(max-width:450px)]:mt-0">
       <button class="shadow-lg btn-search" @click="handleSearchTrip">
         Tìm chuyến xe
       </button>
