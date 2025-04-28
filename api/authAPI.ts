@@ -1,10 +1,12 @@
-import type {UserType} from "~/types/AccountType";
-import type {ApiResponse} from "~/api/APIResponse";
+import type { UserType } from "~/types/AccountType";
+import type { ApiResponse } from "~/api/APIResponse";
 // const API_BASE_URL = "https://vinahome-server.onrender.com";
-// const API_BASE_URL = "http://localhost:3002";
-const config = useRuntimeConfig();
-const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
+// const API_GATEWAY_URL = "http://localhost:3002";
+// const config = useRuntimeConfig();
+// const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
 export const loginWithGoogle = async (accessToken: string): Promise<ApiResponse<UserType>> => {
+    const config = useRuntimeConfig();
+    const API_GATEWAY_URL = config.public.apiGatewayUrl;
     if (!accessToken) {
         throw new Error("Access token is required");
     }
@@ -20,6 +22,8 @@ export const loginWithGoogle = async (accessToken: string): Promise<ApiResponse<
 };
 
 export const loginWithFacebook = async (accessToken: string): Promise<ApiResponse<UserType>> => {
+    const config = useRuntimeConfig();
+    const API_GATEWAY_URL = config.public.apiGatewayUrl;
     if (!accessToken) {
         throw new Error("Access token is required");
     }

@@ -3,14 +3,17 @@ import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
 // const API_BASE_URL = "http://localhost:3002";
 // const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
-const config = useRuntimeConfig();
-const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
+// const config = useRuntimeConfig();
+// const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
+// const API_GATEWAY_URL = "http://localhost:3002";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 
 export const getAccountInfo = async (
   userId: string
 ): Promise<ApiResponse<UserType>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   if (!userId) {
     ElMessage.error("Thông tin người dùng không hợp lệ");
   }
@@ -32,6 +35,8 @@ export const updateAccountInfo = async (
   userId: number,
   userData: Partial<UserType>
 ): Promise<ApiResponse<UserType>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   if (!userId) {
     throw new Error("userId is required");
   }
@@ -53,6 +58,8 @@ export const updateAvatarOnServer = async (
   userId: number,
   url_avatar: string
 ) => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<UserType>>(
       `${API_GATEWAY_URL}/v1/account/update-avatar-account/${userId}`,
@@ -91,6 +98,8 @@ export const uploadAvatarToCloudinary = async (
 export const getListsAccountByCompanyAPI = async (
   companyId: number
 ): Promise<ApiResponse<AccountByCompanyBusType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<AccountByCompanyBusType[]>>(
       `${API_GATEWAY_URL}/account/get-list-account-by-company/${companyId}`,

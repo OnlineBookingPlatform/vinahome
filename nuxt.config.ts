@@ -24,7 +24,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiGateway: process.env.API_GATEWAY_URL,
+      // apiGatewayUrl: "http://localhost:3002",
+      apiGatewayUrl: process.env.API_GATEWAY_URL,
       cloudinaryBaseUrl: "https://res.cloudinary.com",
     },
   },

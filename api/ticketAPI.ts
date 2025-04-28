@@ -2,12 +2,15 @@ import type { DTO_RQ_UpdateTicketOnPlatform } from "~/types/TicketType";
 import type { ApiResponse } from "./APIResponse";
 // const API_GATEWAY_URL = "http://localhost:3002";
 // const API_GATEWAY_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
-const config = useRuntimeConfig();
-const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
+// const config = useRuntimeConfig();
+// const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
+// const API_GATEWAY_URL = "http://localhost:3002";
 
 export const changeTicketBookedAPI = async (
   data: any
 ): Promise<ApiResponse<void>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<void>>(
       `${API_GATEWAY_URL}/v2/ticket/change-ticket-booked`,
@@ -25,6 +28,8 @@ export const changeTicketBookedAPI = async (
 export const changeTicketAvailableAPI = async (
   data: any
 ): Promise<ApiResponse<void>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<void>>(
       `${API_GATEWAY_URL}/v2/ticket/change-ticket-available`,
@@ -42,6 +47,8 @@ export const changeTicketAvailableAPI = async (
 export const updateTicketOnPlatformAPI = async (
   data: DTO_RQ_UpdateTicketOnPlatform[]
 ): Promise<ApiResponse<void>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<void>>(
       `${API_GATEWAY_URL}/v2/ticket/update-ticket-on-platform`,

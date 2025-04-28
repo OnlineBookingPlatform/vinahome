@@ -7,15 +7,18 @@ import type {
 import type { ApiResponse } from "./APIResponse";
 import type { TripPointType } from "~/types/PointType";
 
-const config = useRuntimeConfig();
+// const config = useRuntimeConfig();
+// const API_GATEWAY_URL = "http://localhost:3002";
 
 
 export const getTripOnPlatform = async (
   params: SearchTripParams
 ): Promise<ApiResponse<DTO_RP_TripInfo[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<DTO_RP_TripInfo[]>>(
-      `${config.public.apiGateway}/v2/trip/search`,
+      `${API_GATEWAY_URL}/v2/trip/search`,
       {
         method: "POST",
         body: params,
@@ -30,9 +33,11 @@ export const getTripOnPlatform = async (
 export const getTripDeatil = async (
   tripId: number
 ): Promise<ApiResponse<DetailTripType>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<DetailTripType>>(
-      `${config.public.apiGateway}/v2/trip/get-trip-detail-on-platform/${tripId}`,
+      `${API_GATEWAY_URL}/v2/trip/get-trip-detail-on-platform/${tripId}`,
       {
         method: "GET",
       }
@@ -46,9 +51,11 @@ export const getTripDeatil = async (
 export const getPointUpByTrip = async (
   tripId: number
 ): Promise<ApiResponse<TripPointType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<TripPointType[]>>(
-      `${config.public.apiGateway}/v2/trip/get-point-up-by-trip/${tripId}`,
+      `${API_GATEWAY_URL}/v2/trip/get-point-up-by-trip/${tripId}`,
       {
         method: "GET",
       }
@@ -62,9 +69,11 @@ export const getPointUpByTrip = async (
 export const getPointDownByTrip = async (
   tripId: number
 ): Promise<ApiResponse<TripPointType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<TripPointType[]>>(
-      `${config.public.apiGateway}/v2/trip/get-point-down-by-trip/${tripId}`,
+      `${API_GATEWAY_URL}/v2/trip/get-point-down-by-trip/${tripId}`,
       {
         method: "GET",
       }

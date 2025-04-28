@@ -1,12 +1,12 @@
 import type { Province } from "~/types/LocationType";
 import type { ApiResponse } from "./APIResponse";
+// const config = useRuntimeConfig();
+// const API_GATEWAY_URL = config.public.apiGateway;
 
-// const API_GATEWAY_URL = "http://localhost:3002";
-// const API_GATEWAY_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
-const config = useRuntimeConfig();
-const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
 
 export const getProvinces = async (): Promise<ApiResponse<Province[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<Province[]>>(
       `${API_GATEWAY_URL}/v2/location/provinces`,
