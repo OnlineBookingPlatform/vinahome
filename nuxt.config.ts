@@ -45,7 +45,7 @@ export default defineNuxtConfig({
           "http-equiv": "Content-Security-Policy", 
           content: `
             default-src 'self';
-            img-src 'self' https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:;
+            img-src 'self' https://upload.wikimedia.org https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app https://img.vietqr.io https://lh3.googleusercontent.com https://res.cloudinary.com https://placehold.co data:;
             style-src 'self' 'unsafe-inline';
             script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://connect.facebook.net;
             connect-src 'self' http://localhost:3002 https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app https://api.cloudinary.com;

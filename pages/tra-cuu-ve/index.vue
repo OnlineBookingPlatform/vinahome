@@ -1,48 +1,16 @@
 <script setup lang="ts">
-import type { FormInstance, FormRules } from "element-plus";
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { searchTicketOnPlatformAPI } from "~/api/ticketAPI";
 import { lookUpTicketsList } from "~/mocks/tra-cuu";
-
-// const phoneRegex = new RegExp(
-//   /^(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{1,4}\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
-// );
-
-// const lookUpModel = reactive({
-//   orderCode: "",
-//   phoneNumber: "",
-// });
-
-// const resultTicket = ref("");
-
-// const onSubmit = () => {
-//   const { phoneNumber, orderCode } = lookUpModel;
-//   if (!!phoneNumber && !phoneRegex.test(phoneNumber)) {
-//     alert("Sai format số điện thoại");
-//     return;
-//   }
-
-//   let ticket;
-
-//   if (
-//     (ticket = lookUpTicketsList.find(
-//       (ticket) =>
-//         ticket.orderCode === orderCode || ticket.passenger.phone === phoneNumber
-//     ))
-//   ) {
-//     resultTicket.value = JSON.stringify(ticket);
-//   } else {
-//     alert("Không tìm được vé");
-//   }
-// };
-interface RuleForm {
-  phone: string;
-  code: string;
-}
+import type { DTO_RP_TicketSearch, DTO_RQ_TicketSearch } from "~/types/TicketType";
+const ticketData = ref<DTO_RP_TicketSearch | null>(null);
+const isLoading = ref(false);
 const ruleFormRef = ref<FormInstance>()
-const ruleForm = reactive<RuleForm>({
-  phone: '',
-  code: '',
+const ruleForm = reactive<DTO_RQ_TicketSearch>({
+  phone: null,
+  code: null,
 })
-const rules = reactive<FormRules<RuleForm>>({
+const rules = reactive<FormRules<DTO_RQ_TicketSearch>>({
   phone: [
     { required: true, message: 'Vui lòng nhập số điện thoại', trigger: 'blur' },
   ],
@@ -50,11 +18,21 @@ const rules = reactive<FormRules<RuleForm>>({
     { required: true, message: 'Vui lòng nhập mã vé', trigger: 'blur' },
   ],
 })
+
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      console.log('submit!', ruleForm)
+      isLoading.value = true;
+      try {
+        const response = await searchTicketOnPlatformAPI(ruleForm)
+        ticketData.value = response.result
+      } catch (error) {
+        ElMessage.error('Lỗi hệ thông, vui lòng thử lại sau.');
+      } finally {
+        isLoading.value = false;
+      }
     } else {
       console.log('error submit!', fields)
     }
@@ -63,9 +41,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
-  <div class="container space-y-6 justify-center text-center mt-10 mb-20">
+  <div class="container space-y-6 justify-center text-center mt-10 mb-10">
     <h1 class="text-xl font-bold">TRA CỨU THÔNG TIN ĐẶT VÉ</h1>
-
     <el-form ref="ruleFormRef" style="max-width: 500px" class="mx-auto" :model="ruleForm" :rules="rules">
       <el-form-item prop="phone">
         <span>Số điện thoại</span>
@@ -77,13 +54,88 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       </el-form-item>
       <el-form-item class="mt-10">
         <div class="w-full flex justify-center items-center gap-4">
-          <el-button type="primary" round @click="submitForm(ruleFormRef)" class="w-[200px]">
-          Tra cứu
-        </el-button>
+          <el-button type="primary" round @click="submitForm(ruleFormRef)" class="w-[200px]" :loading="isLoading">
+            Tra cứu
+          </el-button>
         </div>
       </el-form-item>
 
     </el-form>
+  </div>
+  <div class="container w-[80%] mb-10 p-4 mt-4 mx-auto" v-if="ticketData">
+    <div class="w-full bg-slate-50 rounded-lg px-4 py-4 mx-auto shadow">
+      <div class="flex">
+        <div class="flex-1">
+          <div class="flex mx-2">
+            <div class="font-semibold text-gray-700 mb-2 w-28">Họ tên:</div>
+            <span class="text-gray-900">{{ ticketData.passenger_name }}</span>
+          </div>
+          <div class="flex mx-2">
+            <div class="font-semibold text-gray-700 mb-2 w-28">Số điện thoại:</div>
+            <span class="text-gray-900">{{ ticketData.passenger_phone }}</span>
+          </div>
+          <div class="flex mx-2">
+            <div class="font-semibold text-gray-700 mb-2 w-28">Email:</div>
+            <span class="text-gray-900">{{ ticketData.email }}</span>
+          </div>
+
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Giá vé:</span>
+            <span class="text-gray-900">
+              {{ ticketData.base_price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) }}
+            </span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Trạng thái:</span>
+            <span class="text-gray-900">{{ ticketData.payment_method }}</span>
+          </div>
+        </div>
+        <div class="flex-1">
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Mã vé:</span>
+            <span class="text-gray-900">{{ ticketData.id }}</span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Số ghế:</span>
+            <span class="text-gray-900">{{ ticketData.seat_name }}</span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Tuyến xe:</span>
+            <span class="text-gray-900">{{ ticketData.route_name }}</span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Biển số xe:</span>
+            <span class="text-gray-900">{{ ticketData.license_plate }}</span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Khởi hành:</span>
+            <span class="text-gray-900">
+              {{ ticketData.start_time?.split(':').slice(0, 2).join(':') }} -
+              {{ new Date(ticketData.start_date).toLocaleDateString('vi-VN') }}
+            </span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Điểm lên:</span>
+            <span class="text-gray-900">{{ ticketData.point_up }}</span>
+          </div>
+          <div class="flex mx-2">
+            <span class="font-semibold text-gray-700 mb-2 w-28">Điểm xuống:</span>
+            <span class="text-gray-900">{{ ticketData.point_down }}</span>
+          </div>
+
+        </div>
+        <div class="flex-1 w-full flex justify-center items-center">
+          <div class="mx-2" style="width: 150px; height: 150px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Superqr.svg" alt="QR code"
+              class="w-full h-full object-cover" />
+          </div>
+        </div>
+
+
+
+      </div>
+    </div>
+
   </div>
 
 
