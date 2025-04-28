@@ -63,7 +63,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     </el-form>
   </div>
   <div class="container w-[80%] mb-10 p-4 mt-4 mx-auto" v-if="ticketData">
-    <div class="w-full bg-slate-50 rounded-lg px-4 py-4 mx-auto shadow">
+    <div class="w-full bg-slate-50 rounded-lg px-4 py-4 mx-auto shadow border-l-4 border-[#0072bc]">
       <div class="flex">
         <div class="flex-1">
           <div class="flex mx-2">
