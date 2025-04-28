@@ -143,29 +143,45 @@ const initCountdown = () => {
   return TOTAL_TIME;
 };
 
-const startCountdown = () => {
-  currentTimeleft.value = initCountdown();
+const startCountdown = async () => {
+  try {
+    currentTimeleft.value = initCountdown();
+    
+    if (currentTimeleft.value <= 0) {
+      console.log("Thời gian đã hết ngay từ đầu!");
+      await handleTimeoutActions();
+      return;
+    }
 
-  if (currentTimeleft.value > 0) {
     timer.value = setInterval(async () => {
       currentTimeleft.value -= 1;
 
       if (currentTimeleft.value <= 0) {
         clearInterval(timer.value as NodeJS.Timeout);
-        try {
-          await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
-          localStorage.removeItem("paymentStartTime");
-          pointStore.clearPoints();
-          router.push("/")
-          pendingTicketStore.clearPendingTicket();
-          ElMessage.warning("Thời gian thanh toán đã hết!");
-        } catch (error) {
-          ElMessage.error("Lỗi hệ thống! Vui lòng thử lại sau.");
-        }
+        await handleTimeoutActions();
       }
     }, 1000);
-  } else {
-    console.log("Thời gian đã hết ngay từ đầu!");
+  } catch (error) {
+    console.error("Lỗi trong quá trình đếm ngược:", error);
+    ElMessage.error("Có lỗi xảy ra trong quá trình đếm ngược");
+  }
+};
+
+const handleTimeoutActions = async () => {
+  try {
+    await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
+    localStorage.removeItem("paymentStartTime");
+    pointStore.clearPoints();
+    pendingTicketStore.clearPendingTicket();
+    ElMessage.warning("Thời gian thanh toán đã hết!");
+    
+    // Thêm delay nhỏ để đảm bảo các action hoàn thành trước khi chuyển trang
+    setTimeout(() => {
+      router.push("/");
+    }, 100);
+  } catch (error) {
+    console.error("Lỗi khi xử lý hết thời gian:", error);
+    ElMessage.error("Lỗi hệ thống! Vui lòng thử lại sau.");
   }
 };
 const resetCountdown = () => {
@@ -196,8 +212,8 @@ watch(resetTrigger, () => {
 
 onMounted(() => {
   startCountdown();
-  if (currentTimeleft.value <= 12) {
-    currentTimeleft.value = 12;
+  if (currentTimeleft.value <= 1) {
+    currentTimeleft.value = 1;
   }
 });
 onUnmounted(clearTimer);
