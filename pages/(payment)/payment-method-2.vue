@@ -156,7 +156,7 @@ const startCountdown = () => {
           await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
           localStorage.removeItem("paymentStartTime");
           pointStore.clearPoints();
-          router.back();
+          router.push("/")
           pendingTicketStore.clearPendingTicket();
           ElMessage.warning("Thời gian thanh toán đã hết!");
         } catch (error) {
