@@ -20,7 +20,9 @@
   <script setup>
   import { ref } from 'vue';
   import { ElMessage } from 'element-plus';
-  
+  definePageMeta({
+  layout: 'none'
+});
   const loginForm = ref({
     username: '',
     password: ''
