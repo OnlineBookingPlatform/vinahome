@@ -2,20 +2,20 @@ import type {
   DetailTripType,
   DTO_RP_TripInfo,
   SearchTripParams,
-  TripPointType,
   TripType,
 } from "~/types/TripType";
 import type { ApiResponse } from "./APIResponse";
+import type { TripPointType } from "~/types/PointType";
 
-// const API_GATEWAY_URL = "http://localhost:3002";
-const API_GATEWAY_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
+const config = useRuntimeConfig();
+
 
 export const getTripOnPlatform = async (
   params: SearchTripParams
 ): Promise<ApiResponse<DTO_RP_TripInfo[]>> => {
   try {
     return await $fetch<ApiResponse<DTO_RP_TripInfo[]>>(
-      `${API_GATEWAY_URL}/v2/trip/search`,
+      `${config.public.apiGateway}/v2/trip/search`,
       {
         method: "POST",
         body: params,
@@ -32,7 +32,7 @@ export const getTripDeatil = async (
 ): Promise<ApiResponse<DetailTripType>> => {
   try {
     return await $fetch<ApiResponse<DetailTripType>>(
-      `${API_GATEWAY_URL}/v2/trip/get-trip-detail-on-platform/${tripId}`,
+      `${config.public.apiGateway}/v2/trip/get-trip-detail-on-platform/${tripId}`,
       {
         method: "GET",
       }
@@ -48,7 +48,7 @@ export const getPointUpByTrip = async (
 ): Promise<ApiResponse<TripPointType[]>> => {
   try {
     return await $fetch<ApiResponse<TripPointType[]>>(
-      `${API_GATEWAY_URL}/v2/trip/get-point-up-by-trip/${tripId}`,
+      `${config.public.apiGateway}/v2/trip/get-point-up-by-trip/${tripId}`,
       {
         method: "GET",
       }
@@ -64,7 +64,7 @@ export const getPointDownByTrip = async (
 ): Promise<ApiResponse<TripPointType[]>> => {
   try {
     return await $fetch<ApiResponse<TripPointType[]>>(
-      `${API_GATEWAY_URL}/v2/trip/get-point-down-by-trip/${tripId}`,
+      `${config.public.apiGateway}/v2/trip/get-point-down-by-trip/${tripId}`,
       {
         method: "GET",
       }

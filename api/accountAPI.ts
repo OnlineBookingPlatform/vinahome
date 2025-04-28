@@ -2,7 +2,9 @@ import type { AccountByCompanyBusType, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
 // const API_BASE_URL = "http://localhost:3002";
-const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
+// const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
+const config = useRuntimeConfig();
+const API_GATEWAY_URL = config.public.API_GATEWAY_URL;
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsw7kuodi/image/upload";
 const UPLOAD_PRESET = "account";
 
@@ -14,7 +16,7 @@ export const getAccountInfo = async (
   }
   try {
     return await $fetch<ApiResponse<UserType>>(
-      `${API_BASE_URL}/v1/account/get-account-info/${userId}`,
+      `${API_GATEWAY_URL}/v1/account/get-account-info/${userId}`,
       {
         method: "GET",
       }
@@ -35,7 +37,7 @@ export const updateAccountInfo = async (
   }
   try {
     return await $fetch<ApiResponse<UserType>>(
-      `${API_BASE_URL}/v1/account/update-account-info/${userId}`,
+      `${API_GATEWAY_URL}/v1/account/update-account-info/${userId}`,
       {
         method: "PUT",
         body: userData,
@@ -53,7 +55,7 @@ export const updateAvatarOnServer = async (
 ) => {
   try {
     return await $fetch<ApiResponse<UserType>>(
-      `${API_BASE_URL}/v1/account/update-avatar-account/${userId}`,
+      `${API_GATEWAY_URL}/v1/account/update-avatar-account/${userId}`,
       {
         method: "PUT",
         body: { url_avatar },
@@ -91,7 +93,7 @@ export const getListsAccountByCompanyAPI = async (
 ): Promise<ApiResponse<AccountByCompanyBusType[]>> => {
   try {
     return await $fetch<ApiResponse<AccountByCompanyBusType[]>>(
-      `${API_BASE_URL}/account/get-list-account-by-company/${companyId}`,
+      `${API_GATEWAY_URL}/account/get-list-account-by-company/${companyId}`,
       {
         method: "GET",
       }

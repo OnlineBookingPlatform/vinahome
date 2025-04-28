@@ -10,10 +10,21 @@ export const usePendingTicketStore = defineStore("pendingTicketStore", {
         if (process.client) {
           const pendingTicketStore = localStorage.getItem("pendingTicketStore");
           if (pendingTicketStore) {
-            this.pendingTicket = JSON.parse(pendingTicketStore) as BookingData;
+            try {
+              const parsed = JSON.parse(pendingTicketStore);
+              if (parsed && typeof parsed === 'object') {
+                this.pendingTicket = parsed;
+              } else {
+                this.pendingTicket = null;
+              }
+            } catch (error) {
+              console.error('Failed to parse pendingTicketStore:', error);
+              this.pendingTicket = null;
+            }
           }
         }
       },
+      
       setPendingTicket(pendingTicket: BookingData) {
         this.pendingTicket = pendingTicket;
         if (process.client) {
