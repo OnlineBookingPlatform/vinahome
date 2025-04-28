@@ -21,7 +21,7 @@ definePageMeta({
 
       <el-col :xs="24" :md="10">
         <div class="flex justify-center [@media(min-width:1200px)]:justify-start mt-[20px]">
-          <el-card class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300">
+          <el-card class="max-w-[500px] p-8 bg-white text-black rounded-lg shadow-lg border border-gray-300 [@media(max-width:450px)]:max-w-[300px] [@media(max-width:450px)]:p-2">
             <h2 class="text-base md:text-lg font-bold leading-tight text-center mb-5 [@media(max-width:450px)]:text-lg">
               Bắt đầu lấp đầy chỗ trống trên xe của bạn với hơn 10 triệu lượt khách đi thành công trên Vinahome
             </h2>
