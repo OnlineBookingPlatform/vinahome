@@ -127,7 +127,7 @@ const submitForm = async () => {
 const resetTrigger = ref(false);
 const timer = ref<NodeJS.Timeout | null>(null);
 const currentTimeleft = ref(0);
-const TOTAL_TIME = 12000; // 20 phút
+const TOTAL_TIME = 1200; // 20 phút
 
 const initCountdown = () => {
   const savedStartTime = localStorage.getItem("paymentStartTime");
@@ -155,6 +155,7 @@ const startCountdown = () => {
         try {
           await changeTicketAvailableAPI(pendingData.value?.selectedTicket);
           localStorage.removeItem("paymentStartTime");
+          pointStore.clearPoints();
           router.back();
           pendingTicketStore.clearPendingTicket();
           ElMessage.warning("Thời gian thanh toán đã hết!");
