@@ -29,8 +29,13 @@ const routes = ref([
   }
 ]);
 
-// Lưu chỉ số của item đã chọn
-const selectedIndex = ref<number | null>(null);
+// Dữ liệu chỉ số carousel hiện tại
+const currentIndex = ref(0);
+
+const handleCarouselChange = (newIndex: number) => {
+  currentIndex.value = newIndex;
+};
+
 </script>
 
 <template>
@@ -324,21 +329,25 @@ const selectedIndex = ref<number | null>(null);
         </div>
 
         <div class="mt-10 mb-10">
-          <el-carousel :interval="4000" type="card" height="280px">
+          <el-carousel :interval="4000" type="card" height="280px" :current-index="currentIndex"
+            @change="handleCarouselChange">
+
             <el-carousel-item v-for="(route, index) in routes" :key="index" :style="{ background: 'none' }">
               <div class="relative w-full h-full flex justify-center items-center">
                 <div
-                  class="relative w-[340px] h-[200px] flex-shrink-0 rounded-2xl overflow-visible transition-all duration-300 cursor-pointer hover:scale-105 "
-                  :class="selectedIndex === index ? 'ring-2 ring-[#03acff] scale-105' : ''"
-                  @click="selectedIndex = index">
+                  class="relative w-[340px] h-[200px] flex-shrink-0 rounded-2xl overflow-visible transition-all duration-300 cursor-pointer"
+                  :class="[
+                    currentIndex === index ? 'scale-105 ring-2 ring-[#03acff]' : '',
+                    'hover:scale-105'
+                  ]">
                   <img :src="route.image" class="w-full h-full object-cover rounded-2xl" />
                   <div
                     class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow px-4 h-12 w-[280px] flex items-center z-20 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600"
-                    :class="selectedIndex === index ? 'justify-start pr-4 ring-2 ring-[#03acff] scale-105' : 'justify-center'">
+                    :class="currentIndex === index ? 'justify-start pr-4 ring-2 ring-[#03acff] scale-105' : 'justify-center'">
                     <span class="text-sm font-semibold text-gray-900 whitespace-nowrap">
                       {{ route.name }}
                     </span>
-                    <div v-if="selectedIndex === index"
+                    <div v-if="currentIndex === index"
                       class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-0 h-[48px] w-[48px] bg-[#03acff] ring-2 ring-[#03acff] rounded-full flex items-center justify-center text-white shadow-md">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
