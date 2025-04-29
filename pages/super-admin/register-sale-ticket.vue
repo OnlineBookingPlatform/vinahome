@@ -16,6 +16,7 @@ const fetchRegisterSaleTicket = async () => {
         const response = await getSaleTicketOnPlatformAPI();
         if (response.result) {
             tableData.value = response.result;
+            console.log('Register Sale Ticket Data:', tableData.value);
         } else {
             ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.');
         }
@@ -40,8 +41,20 @@ onMounted(() => {
             <el-table-column prop="address" label="Địa chỉ" />
             <el-table-column prop="bus_company_name" label="Tên nhà xe" />
             <el-table-column prop="note" label="Nội dung tư vấn" />
-            <el-table-column prop="status" label="Trạng thái" />
-            <el-table-column prop="created_at" label="Ngày nhận tin" />
+            <el-table-column prop="status" label="Trạng thái">
+                <template #default="{ row }">
+                    <span>
+                        {{ row.status === 1 ? 'Chưa xử lý' : 'Đã xử lý' }}
+                    </span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="created_at" label="Ngày nhận tin">
+                <template #default="{ row }">
+                    {{ new Date(row.created_at).toLocaleDateString('vi-VN') }}
+                </template>
+            </el-table-column>
+
         </el-table>
     </section>
 </template>
