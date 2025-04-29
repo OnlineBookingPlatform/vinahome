@@ -172,7 +172,7 @@ onMounted(() => {
         :before-close="handleClose">
         <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="auto"
             class="demo-ruleForm">
-            <el-form-item label="Họ tên" prop="name" label-position="top">
+            <el-form-item label="Tên tuyến" prop="name" label-position="top">
                 <el-input v-model="ruleForm.name" type="text" autocomplete="off" />
             </el-form-item>
             <el-form-item label="Tài khoản" prop="username" label-position="top">

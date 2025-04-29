@@ -1,216 +1,189 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
-import { ElMessageBox, ElMessage } from "element-plus";
+import { ElMessageBox, ElMessage, type FormInstance, type UploadProps, type UploadUserFile } from "element-plus";
+import type { RoutePopularType } from "~/types/RouteType";
+import { createRoutePopularAPI, updateRoutePopularAPI, getListRoutePopularAPI } from "~/api/routeAPI";
 
 definePageMeta({
     layout: "superadmin",
 });
-
-interface Route {
-    id: number;
-    image: string;
-    name: string;
-    price: number;
-    status: boolean;
-}
-
-const routes = ref<Route[]>([
-    { id: 4, image: "https://res.cloudinary.com/dsw7kuodi/image/upload/v1742804367/account/v1/hn0gvv67zf0kua468qge.jpg", name: "Hà Nội - Sài Gòn", price: 500000, status: true },
-    { id: 7, image: "https://res.cloudinary.com/dsw7kuodi/image/upload/v1742804367/account/v1/hn0gvv67zf0kua468qge.jpg", name: "Đà Nẵng - Hà Nội", price: 350000, status: false },
-    { id: 9, image: "https://res.cloudinary.com/dsw7kuodi/image/upload/v1742804367/account/v1/hn0gvv67zf0kua468qge.jpg", name: "Hải Phòng - Quảng Ninh", price: 20000, status: true }
-]);
-
-// Modal
-const isModalOpen = ref(false);
-const isEditMode = ref(false);
-const selectedRouteId = ref<number | null>(null);
-const routeForm = ref<any>(null);
-
-const newRoute = ref<Route>({
-    id: 0,
-    image: "",
-    name: "",
-    price: 0,
-    status: true,
+const isLoading = ref(false);
+const dialogVisible = ref(false);
+const tableData = ref<RoutePopularType[]>([]);
+const ruleFormRef = ref<FormInstance>()
+const isEditMode = ref(false)
+const ruleForm = reactive<RoutePopularType>({
+    id: null,
+    name: null,
+    url_avatar: null,
+    base_price: null,
+    status: false,
 });
 
-// Rules
-const rules = {
-    name: [{ required: true, message: "Tên tuyến không được để trống", trigger: "blur" }],
-    price: [
-        { required: true, message: "Giá vé không được để trống", trigger: "blur" },
-        {
-            validator: (_rule: any, value: number, callback: Function) => {
-                if (value <= 0) callback(new Error("Giá vé phải lớn hơn 0"));
-                else callback();
-            }, trigger: "blur"
-        }
+
+
+const rules = reactive({
+    name: [
+        { required: true, message: 'Vui lòng nhập tên tuyến', trigger: 'blur' },
     ],
-};
-
-// Mở modal add
-const openAddModal = () => {
-    isEditMode.value = false;
-    selectedRouteId.value = null;
-    Object.assign(newRoute.value, { id: 0, image: "", name: "", price: 0, status: true });
-    isModalOpen.value = true;
-};
-
-// Mở modal edit
-const openEditModal = (route: Route) => {
-    isEditMode.value = true;
-    selectedRouteId.value = route.id;
-    Object.assign(newRoute.value, route);
-    isModalOpen.value = true;
-};
-
-// Button Lưu
-const saveRoute = () => {
-    routeForm.value?.validate((valid: boolean) => {
-        if (!valid) return;
-
-        if (isEditMode.value && selectedRouteId.value !== null) {
-            const index = routes.value.findIndex((r) => r.id === selectedRouteId.value);
-            if (index !== -1) routes.value[index] = { ...newRoute.value };
-            ElMessage.success("Cập nhật tuyến xe thành công!");
-        } else {
-            const maxId = routes.value.length > 0 ? Math.max(...routes.value.map((r) => r.id)) : 0;
-            newRoute.value.id = maxId + 1;
-            routes.value.push({ ...newRoute.value });
-            ElMessage.success("Thêm tuyến xe thành công!");
-        }
-
-        isModalOpen.value = false;
-    });
-};
-
-// Button Xóa
-const deleteRoute = (routeId: number) => {
-    ElMessageBox.confirm("Bạn có chắc chắn muốn xóa tuyến xe này?", "Xác nhận", {
-        confirmButtonText: "Xóa",
-        cancelButtonText: "Hủy",
-        type: "warning",
-    })
+    base_price: [
+        { required: true, message: 'Vui lòng nhập giá vé', trigger: 'blur' },
+    ],
+    url_avatar: [
+        { required: true, message: 'Vui lòng nhập URL hình ảnh', trigger: 'blur' },
+    ],
+});
+const resetForm = () => {
+    ruleForm.id = null
+    ruleForm.name = null
+    ruleForm.url_avatar = null
+    ruleForm.base_price = null
+    ruleForm.status = false
+    ruleFormRef.value?.clearValidate()
+}
+const handleClose = (done: () => void) => {
+    ElMessageBox.confirm('Bạn chắc chắn muốn đóng không?')
         .then(() => {
-            routes.value = routes.value.filter((route) => route.id !== routeId);
-            ElMessage.success("Xóa tuyến xe thành công!");
+            done()
+            resetForm()
         })
         .catch(() => {
-            console.log("Hủy xóa");
-        });
-};
-
-// Xác nhận trước khi đóng modal
-const handleBeforeClose = (done?: () => void) => {
-    ElMessageBox.confirm("Bạn có chắc chắn muốn thoát không?", "Xác nhận", {
-        confirmButtonText: "OK",
-        cancelButtonText: "Hủy",
-        type: "warning",
-    })
-        .then(() => {
-            isModalOpen.value = false;
-            if (done) done();
+            // catch error
         })
-        .catch(() => { });
-};
+}
+const handleCloseDialog = () => {
+    dialogVisible.value = false
+    resetForm()
+}
 
-// Tải ảnh
-const beforeAvatarUpload = async (file: File) => {
-    console.log("Đã vào hàm beforeAvatarUpload");
-    const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
-    if (!validImageTypes.includes(file.type)) {
-        ElMessage.error("Vui lòng tải lên file hình ảnh hợp lệ (PNG, JPEG, GIF).");
-        return false;
+const submitForm = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return
+    await formEl.validate(async (valid, fields) => {
+        if (valid) {
+            try {
+                isLoading.value = true
+
+                if (isEditMode.value) {
+                    const res = await updateRoutePopularAPI(ruleForm)
+                    ElMessage.success('Cập nhật tuyến thành công')
+
+                    const index = tableData.value.findIndex(item => item.id === res.result.id)
+                    if (index !== -1) {
+                        tableData.value[ index ] = { ...res.result }
+                    }
+                } else {
+                    const res = await createRoutePopularAPI(ruleForm)
+                    if (res.status === 200) {
+                        ElMessage.success('Thêm tuyến thành công')
+                        tableData.value.push(res.result)
+                    } else {
+                        ElMessage.error(res.message || 'Thêm không thành công')
+                    }
+                }
+                dialogVisible.value = false
+            } catch (error) {
+                ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
+            } finally {
+                isLoading.value = false
+                resetForm()
+            }
+        } else {
+            console.log('error submit!', fields)
+        }
+    })
+}
+
+const fetchRoutePopular = async () => {
+    try {
+        const res = await getListRoutePopularAPI()
+        if (res.status === 200) {
+            tableData.value = res.result
+        } else {
+            ElMessage.error(res.message || 'Lấy danh sách tuyến không thành công')
+        }
+    } catch (error) {
+        ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
     }
+}
 
-    const imageUrl = URL.createObjectURL(file);
-    console.log("Image URL: ", imageUrl);
-    newRoute.value.image = imageUrl;
-    ElMessage.success("Tải ảnh lên thành công!");
 
-    return false;
-};
-
+const handleEdit = (row: RoutePopularType) => {
+    console.log("Edit row: ", row);
+}
+const handleDelete = (row: RoutePopularType) => {
+    console.log("Delete row: ", row);
+}
+onMounted(() => {
+    fetchRoutePopular()
+})
 </script>
 
 
 <template>
-    <el-card class="box-card">
-        <div class="header">
-            <h2 class="text-lg font-semibold">Danh Sách Tuyến Xe</h2>
-            <el-button type="primary" :icon="Plus" @click="openAddModal">Thêm tuyến</el-button>
-        </div>
-
-        <!-- Table -->
-        <el-table :data="routes" style="width: 100%">
-            <el-table-column type="index" label="STT" width="60"></el-table-column>
-            <el-table-column label="Hình ảnh">
+    <section class="p-2">
+        <el-button type="primary" @click="dialogVisible = true">Thêm tuyến</el-button>
+    </section>
+    <section class="p-2">
+        <el-table :data="tableData" stripe style="width: 100%">
+            <el-table-column type="index" label="STT" width="50" />
+            <el-table-column prop="name" label="Tên tuyến" />
+            <el-table-column prop="url_avatar" label="URL Hình ảnh" />
+            <el-table-column prop="base_price" label="Giá cơ bản">
                 <template #default="{ row }">
-                    <el-image :src="row.image" fit="cover" style="width: 150px; height: 90px; border-radius: 5px" />
+                    {{
+                        new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                    minimumFractionDigits: 0
+                    }).format(row.base_price)
+                    }}
                 </template>
             </el-table-column>
 
-            <el-table-column prop="name" label="Tên tuyến"></el-table-column>
-            <el-table-column label="Giá vé">
+            <el-table-column prop="status" label="Trạng thái">
                 <template #default="{ row }">
-                    {{ new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(row.price) }}
-                </template>
-            </el-table-column>
-
-            <el-table-column label="Trạng thái">
-                <template #default="{ row }">
-                    <el-tag :type="row.status ? 'success' : 'info'">
-                        {{ row.status ? "Hiện" : "Ẩn" }}
+                    <el-tag :type="row.status ? 'success' : 'danger'">
+                        {{ row.status ? 'Đang hoạt động' : 'Ngưng hoạt động' }}
                     </el-tag>
                 </template>
             </el-table-column>
-
-            <el-table-column label="Tùy chọn" width="150">
+            <el-table-column fixed="right">
                 <template #default="{ row }">
-                    <el-button type="primary" :icon="Edit" circle @click="openEditModal(row)"></el-button>
-                    <el-button type="danger" :icon="Delete" circle @click="deleteRoute(row.id)"></el-button>
+                    <el-button type="primary" :icon="Edit" circle @click="handleEdit(row)" />
+                    <el-button type="danger" :icon="Delete" circle @click="handleDelete(row)" />
                 </template>
             </el-table-column>
         </el-table>
-    </el-card>
+    </section>
 
-    <!-- Modal -->
-    <el-dialog v-model="isModalOpen" :title="isEditMode ? 'Chỉnh Sửa Tuyến Xe' : 'Thêm Tuyến Xe'" width="500px"
-        :close-on-click-modal="false" :before-close="handleBeforeClose">
-
-        <el-form ref="routeForm" :model="newRoute" :rules="rules" label-width="120px" @submit.prevent="saveRoute">
-            <el-form-item label="Tên tuyến" prop="name">
-                <el-input v-model="newRoute.name" placeholder="Nhập tên tuyến"></el-input>
+    <el-dialog v-model="dialogVisible" :title="isEditMode ? 'Chỉnh sửa tuyến' : 'Thêm tuyến'" width="500"
+        :before-close="handleClose">
+        <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="auto"
+            class="demo-ruleForm">
+            <el-form-item label="Tên tuyến" prop="name" label-position="top">
+                <el-input v-model="ruleForm.name" type="text" autocomplete="off" />
             </el-form-item>
-
-            <el-form-item label="Giá vé" prop="price">
-                <el-input v-model="newRoute.price" placeholder="Nhập giá vé" type="number"
-                    @input="newRoute.price = Number(newRoute.price) || 0">
-                </el-input>
+            <el-form-item label="URL Hình ảnh" prop="url_avatar" label-position="top">
+                <el-input v-model="ruleForm.url_avatar" type="textarea" autocomplete="off"
+                    :autosize="{ minRows: 2, maxRows: 4 }" />
             </el-form-item>
-
-            <el-form-item label="Hình ảnh" prop="image">
-                <el-upload class="upload-demo mx-3" :auto-upload="true" :show-file-list="false"
-                    :before-upload="beforeAvatarUpload" accept="image/*">
-                    <div class="avatar-uploader-box">
-                        <el-image v-if="newRoute.image" :src="newRoute.image" fit="cover"
-                            style="width: 150px; height: 90px; border-radius: 5px" />
-                        <Plus v-else style="width: 1em; height: 1em;" />
-                    </div>
-                </el-upload>
+            <el-form-item label="Giá cơ bản" prop="base_price" label-position="top">
+                <el-input v-model="ruleForm.base_price" type="text" autocomplete="off" />
             </el-form-item>
-
-            <el-form-item label="Trạng thái">
-                <el-switch v-model="newRoute.status" active-text="Hiện" inactive-text="Ẩn" />
+            <el-form-item label="Trạng thái" prop="status" label-position="top">
+                <el-switch v-model="ruleForm.status" active-text="Kích hoạt" inactive-text="Ngưng kích hoạt" />
             </el-form-item>
         </el-form>
 
         <template #footer>
-            <el-button @click="isModalOpen = false">Hủy</el-button>
-            <el-button type="primary" @click="saveRoute">Lưu</el-button>
+            <div class="dialog-footer">
+                <el-button @click="handleCloseDialog()">Thoát</el-button>
+                <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="isLoading">Lưu</el-button>
+            </div>
         </template>
     </el-dialog>
+
 
 </template>
 
