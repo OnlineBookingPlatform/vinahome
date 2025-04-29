@@ -133,6 +133,10 @@ const handleDelete = async (row: DTO_RP_SuperAdmin) => {
         isLoading.value = false
     }
 }
+const handleCloseDialog = () => {
+    dialogVisible.value = false
+    resetForm()
+}
 
 onMounted(() => {
     fetchSuperAdminAccount()
@@ -182,7 +186,7 @@ onMounted(() => {
 
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogVisible = false">Thoát</el-button>
+                <el-button @click="handleCloseDialog()">Thoát</el-button>
                 <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="isLoading">Lưu</el-button>
             </div>
         </template>
