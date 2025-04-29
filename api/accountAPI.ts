@@ -1,6 +1,7 @@
-import type { AccountByCompanyBusType, UserType } from "~/types/AccountType";
+import type { AccountByCompanyBusType, DTO_RP_SuperAdmin, DTO_RQ_SuperAdmin, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
+import { da } from "element-plus/es/locales.mjs";
 // const API_BASE_URL = "http://localhost:3002";
 // const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
 // const config = useRuntimeConfig();
@@ -112,3 +113,74 @@ export const getListsAccountByCompanyAPI = async (
     throw error;
   }
 };
+
+export const createSuperAdminAccountAPI = async (
+  data: DTO_RQ_SuperAdmin
+): Promise<ApiResponse<DTO_RP_SuperAdmin>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<DTO_RP_SuperAdmin>>(
+      `${API_GATEWAY_URL}/v1/account/create-super-admin-account`,
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+  } catch (error) {
+    console.error("Create Super Admin Account failed: ", error);
+    throw error;
+  }
+}
+export const getListSuperAdminAccountAPI = async (): Promise<ApiResponse<DTO_RP_SuperAdmin[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<DTO_RP_SuperAdmin[]>>(
+      `${API_GATEWAY_URL}/v1/account/get-list-super-admin-account`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Get List Super Admin Account failed: ", error);
+    throw error;
+  }
+}
+
+export const deleteSuperAdminAccountAPI = async (
+  data: DTO_RP_SuperAdmin
+): Promise<ApiResponse<DTO_RP_SuperAdmin>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<DTO_RP_SuperAdmin>>(
+      `${API_GATEWAY_URL}/v1/account/delete-super-admin-account/${data.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+  } catch (error) {
+    console.error("Delete Super Admin Account failed: ", error);
+    throw error;
+  }
+}
+
+export const updateSuperAdminAccountAPI = async (
+  data: DTO_RQ_SuperAdmin
+): Promise<ApiResponse<DTO_RP_SuperAdmin>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<DTO_RP_SuperAdmin>>(
+      `${API_GATEWAY_URL}/v1/account/update-super-admin-account/${data.id}`,
+      {
+        method: "PUT",
+        body: data,
+      }
+    );
+  } catch (error) {
+    console.error("Update Super Admin Account failed: ", error);
+    throw error;
+  }
+}
