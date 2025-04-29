@@ -2,6 +2,7 @@
 import { ElMessage } from 'element-plus';
 import { getSaleTicketOnPlatformAPI } from '~/api/companyAPI';
 import type { DTO_RP_RegisterSaleTicketOnPlatform } from '~/types/CompanyType';
+import { MoreFilled } from "@element-plus/icons-vue";
 
 definePageMeta({
     layout: "superadmin",
@@ -26,7 +27,20 @@ const fetchRegisterSaleTicket = async () => {
         loading.value = false;
     }
 };
+const handleDelete = (row: DTO_RP_RegisterSaleTicketOnPlatform) => {
+  console.log('Xoá:', row)
+  // Gọi API xoá
+}
 
+const handleMarkUnprocessed = (row: DTO_RP_RegisterSaleTicketOnPlatform) => {
+  console.log('Chuyển về "Chưa xử lý":', row)
+  // Gọi API cập nhật status về 1
+}
+
+const handleMarkProcessed = (row: DTO_RP_RegisterSaleTicketOnPlatform) => {
+  console.log('Chuyển về "Đã xử lý":', row)
+  // Gọi API cập nhật status về 2 
+}
 onMounted(() => {
     fetchRegisterSaleTicket();
 });
@@ -52,6 +66,25 @@ onMounted(() => {
             <el-table-column prop="created_at" label="Ngày nhận tin">
                 <template #default="{ row }">
                     {{ new Date(row.created_at).toLocaleDateString('vi-VN') }}
+                </template>
+            </el-table-column>
+            <el-table-column fixed="right">
+                <template #default="{ row }">
+                    <el-dropdown :hide-on-click="false">
+                        <span class="el-dropdown-link">
+                            <el-icon>
+                                <MoreFilled />
+                            </el-icon>
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="() => handleDelete(row)">Xoá</el-dropdown-item>
+                                <el-dropdown-item @click="() => handleMarkUnprocessed(row)">Chưa xử
+                                    lý</el-dropdown-item>
+                                <el-dropdown-item @click="() => handleMarkProcessed(row)">Đã xử lý</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                 </template>
             </el-table-column>
 
