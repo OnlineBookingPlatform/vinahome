@@ -4,6 +4,33 @@ import { Search } from "@element-plus/icons-vue";
 import SelectTrip_v2 from "~/components/select/SelectTrip_v2.vue";
 
 const radio1 = ref('Vé xe khách')
+
+// Dữ liệu tuyến đường
+const routes = ref([
+  {
+    name: 'Sài Gòn - Đà Lạt',
+    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
+  },
+  {
+    name: 'Sài Gòn - Phan Thiết',
+    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
+  },
+  {
+    name: 'Hà Nội - Sapa',
+    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
+  },
+  {
+    name: 'Sài Gòn - Nha Trang',
+    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
+  },
+  {
+    name: 'Đà Nẵng - Huế',
+    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
+  }
+]);
+
+// Lưu chỉ số của item đã chọn
+const selectedIndex = ref<number | null>(null);
 </script>
 
 <template>
@@ -297,9 +324,29 @@ const radio1 = ref('Vé xe khách')
         </div>
 
         <div class="mt-10 mb-10">
-          <el-carousel :interval="4000" type="card" height="200px">
-            <el-carousel-item v-for="item in 6" :key="item">
-              <h3 text="2xl" justify="center">{{ item }}</h3>
+          <el-carousel :interval="4000" type="card" height="280px">
+            <el-carousel-item v-for="(route, index) in routes" :key="index" :style="{ background: 'none' }">
+              <div class="relative w-full h-full flex justify-center items-center">
+                <div
+                  class="relative w-[340px] h-[200px] flex-shrink-0 rounded-2xl overflow-visible transition-all duration-300 cursor-pointer hover:scale-105 "
+                  :class="selectedIndex === index ? 'ring-2 ring-blue-500 scale-105' : ''"
+                  @click="selectedIndex = index">
+                  <img :src="route.image" class="w-full h-full object-cover rounded-2xl" />
+                  <div
+                    class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow px-4 h-12 w-[280px] flex items-center z-20 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600"
+                    :class="selectedIndex === index ? 'justify-start pr-4 ring-2 ring-blue-500 scale-105' : 'justify-center'">
+                    <span class="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                      {{ route.name }}
+                    </span>
+                    <div v-if="selectedIndex === index"
+                      class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-0 h-[48px] w-[48px] bg-blue-500 ring-2 ring-blue-500 rounded-full flex items-center justify-center text-white shadow-md">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -549,13 +596,12 @@ const radio1 = ref('Vé xe khách')
   background-color: #d3dce6;
 }
 
-@media (max-width: 768px) {
 
-  .el-carousel__indicators,
-  .el-carousel__indicator,
-  .el-carousel__indicator--horizontal,
-  .el-carousel__indicator.is-active {
-    display: none !important;
-  }
+
+.el-carousel__indicators,
+.el-carousel__indicator,
+.el-carousel__indicator--horizontal,
+.el-carousel__indicator.is-active {
+  display: none !important;
 }
 </style>
