@@ -7,7 +7,7 @@ import {
   ElMessageBox,
 } from "element-plus";
 import type { FormInstance, FormRules } from 'element-plus'
-import { th } from "element-plus/es/locales.mjs";
+import { Edit, Operation } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import {
   createCompanyAPI,
@@ -192,9 +192,7 @@ onMounted(fetchCompanies);
   <section class="mx-auto p-4">
     <div class="flex justify-between items-center">
       <h3 class="text-lg font-semibold">Danh sách nhà xe</h3>
-      <el-button type="primary" @click="dialogVisible = true"
-        >Thêm nhà xe</el-button
-      >
+      <el-button type="primary" @click="dialogVisible = true">Thêm nhà xe</el-button>
     </div>
     <el-table :data="tableData" style="width: 100%" v-loading="loading">
       <el-table-column type="index" label="STT" width="50" />
@@ -203,11 +201,7 @@ onMounted(fetchCompanies);
       <el-table-column prop="address" label="Địa chỉ" />
       <el-table-column prop="status" label="Trạng thái" width="150">
         <template #default="{ row }">
-          <el-tag
-            :type="row.status ? 'success' : 'danger'"
-            class="text-center"
-            disable-transitions
-          >
+          <el-tag :type="row.status ? 'success' : 'danger'" class="text-center" disable-transitions>
             {{ row.status ? "Đang hoạt động" : "Ngừng hoạt động" }}
           </el-tag>
         </template>
@@ -218,20 +212,8 @@ onMounted(fetchCompanies);
       <el-table-column prop="note" label="Ghi chú" />
       <el-table-column fixed="right" label="Tùy chọn">
         <template #default="{ row }">
-          <el-button
-            link
-            type="primary"
-            size="small"
-            @click="openDetailCompanyBus(row)"
-            >Detail</el-button
-          >
-          <el-button
-            link
-            type="primary"
-            size="small"
-            @click="openEditDialog(row)"
-            >Edit</el-button
-          >
+          <el-button type="warning" :icon="Operation" circle @click="openDetailCompanyBus(row)" />
+          <el-button type="primary" :icon="Edit" circle @click="openEditDialog(row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -241,13 +223,10 @@ onMounted(fetchCompanies);
     <template #title>
       <span class="text-lg">{{
         isEditing ? "Chỉnh sửa nhà xe" : "Thêm nhà xe mới"
-      }}</span>
+        }}</span>
     </template>
 
-    <el-form
-      label-width="120px"
-      ref="ruleFormRef" :model="form" :rules="rules"
-    >
+    <el-form label-width="120px" ref="ruleFormRef" :model="form" :rules="rules">
       <el-form-item label="Tên nhà xe" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
@@ -258,10 +237,7 @@ onMounted(fetchCompanies);
         <el-input v-model="form.address" />
       </el-form-item>
       <el-form-item label="Trạng thái">
-        <el-select v-model="form.status" placeholder="Chọn trạng thái">
-          <el-option label="Hoạt động" :value="true" />
-          <el-option label="Ngưng hoạt động" :value="false" />
-        </el-select>
+        <el-switch v-model="form.status" size="large" active-text="Kích hoạt" inactive-text="Ngưng kích hoạt" />
       </el-form-item>
       <el-form-item label="Mã số thuế">
         <el-input v-model="form.tax_code" />
@@ -276,9 +252,7 @@ onMounted(fetchCompanies);
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button type="danger" :loading="isDeleting" @click="handleDelete" v-if="isEditing"
-          >Xóa</el-button
-        >
+        <el-button type="danger" :loading="isDeleting" @click="handleDelete" v-if="isEditing">Xóa</el-button>
         <el-button @click="closeDialog">Thoát</el-button>
         <el-button type="primary" @click="saveData" :loading="isSaving">
           {{ isEditing ? "Cập nhật" : "Thêm mới" }}
