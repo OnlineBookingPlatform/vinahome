@@ -1,7 +1,10 @@
 <script setup lang="ts">
 
 import { Search } from "@element-plus/icons-vue";
+import { ElMessage, type FormInstance } from "element-plus";
+import { registerReceiveNewsAPI } from "~/api/newsAPI";
 import SelectTrip_v2 from "~/components/select/SelectTrip_v2.vue";
+import type { DTO_RQ_NewsType } from "~/types/NewsType";
 
 const radio1 = ref('Vé xe khách')
 
@@ -36,6 +39,25 @@ const handleCarouselChange = (newIndex: number) => {
   currentIndex.value = newIndex;
 };
 
+
+// Đăng ký nhận bản tin
+const receiveNews = ref<DTO_RQ_NewsType>({
+  email: null
+})
+const submitFormReceiveNews = async () => {
+  console.log('submit form', receiveNews.value)
+  try {
+    const response = await registerReceiveNewsAPI(receiveNews.value)
+    console.log('response', response)
+    if (response.status === 200) {
+      ElMessage.success('Đăng ký nhận tin thành công')
+    } else {
+      ElMessage.error(response.message || 'Đăng ký nhận tin thất bại')
+    }
+  } catch (error) {
+    ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
+  }
+}
 </script>
 
 <template>
@@ -568,9 +590,9 @@ const handleCarouselChange = (newIndex: number) => {
             <p class="mt-4 text-md text-white">Cập nhật ngay những mẹo du lịch mới nhất và ưu đãi hấp dẫn nhất</p>
             <div class="mt-6 flex max-w-md gap-x-4">
               <div class="bg-white rounded-lg w-full flex p-1.5">
-                <input id="email-address" name="email" type="email" autocomplete="email"
+                <input v-model="receiveNews.email" id="email-address" name="email" type="email" autocomplete="email"
                   class="w-full outline-none mx-1" placeholder="Nhập địa chỉ email" />
-                <el-button type="primary" size="large">Đăng ký</el-button>
+                <el-button type="primary" size="large" @click="submitFormReceiveNews()">Đăng ký</el-button>
               </div>
             </div>
           </div>

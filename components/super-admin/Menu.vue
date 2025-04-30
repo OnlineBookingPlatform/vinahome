@@ -5,18 +5,28 @@
         <span>Tổng quan</span>
       </el-menu-item>
     </NuxtLink>
-    <NuxtLink to="/super-admin/register-sale-ticket">
+    <NuxtLink to="/super-admin/account">
       <el-menu-item index="2">
+        <span>Tài khoản quản trị</span>
+      </el-menu-item>
+    </NuxtLink>
+    <NuxtLink to="/super-admin/register-sale-ticket">
+      <el-menu-item index="3">
         <span>Đăng ký mở bán vé</span>
       </el-menu-item>
     </NuxtLink>
+    <NuxtLink to="/super-admin/receive-news">
+      <el-menu-item index="4">
+        <span>Đăng ký nhận tin</span>
+      </el-menu-item>
+    </NuxtLink>
     <NuxtLink to="/super-admin/route-popular">
-      <el-menu-item index="3">
+      <el-menu-item index="5">
         <span>Tuyến đường phổ biến</span>
       </el-menu-item>
     </NuxtLink>
 
-    <el-sub-menu index="4">
+    <el-sub-menu index="6">
       <template #title>
         <span>Danh sách đối tác</span>
       </template>

@@ -113,3 +113,4 @@ export const getSaleTicketOnPlatformAPI = async (): Promise<ApiResponse<DTO_RP_R
         throw error;
     }
 }
+

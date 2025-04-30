@@ -1,7 +1,6 @@
 import type { AccountByCompanyBusType, DTO_RP_SuperAdmin, DTO_RQ_SuperAdmin, UserType } from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
-import { da } from "element-plus/es/locales.mjs";
 // const API_BASE_URL = "http://localhost:3002";
 // const API_BASE_URL = "https://8ace-2001-ee0-4f00-57d0-f4b5-6d0d-6d5-45c3.ngrok-free.app";
 // const config = useRuntimeConfig();
@@ -184,3 +183,5 @@ export const updateSuperAdminAccountAPI = async (
     throw error;
   }
 }
+
+
