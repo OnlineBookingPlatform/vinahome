@@ -3,10 +3,12 @@ import { ref } from 'vue';
 import { ElMessage, type FormInstance } from 'element-plus';
 import type { DTO_RQ_SuperAdminLogin } from '~/types/AccountType';
 import { loginSuperAdminAPI } from '~/api/authAPI';
-import { fa } from 'element-plus/es/locales.mjs';
+
 definePageMeta({
   layout: false,
 });
+const superAdminStore = useSuperAdminStore()
+const router = useRouter();
 
 const isLoading = ref(false);
 const ruleFormRef = ref<FormInstance>();
@@ -36,6 +38,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       try {
         const response = await loginSuperAdminAPI(ruleForm)
         console.log('Login response:', response)
+        if (response.status === 200) {
+          ElMessage.success('Đăng nhập thành công');
+          superAdminStore.setData(response.result)
+          router.push('/super-admin/dashboard')
+        } else {
+          ElMessage.error( response.message || 'Đăng nhập thất bại');
+        }
       } catch (error) {
         ElMessage.error('Lỗi hệ thông, vui lòng thử lại sau.');
       } finally {

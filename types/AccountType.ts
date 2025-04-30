@@ -42,3 +42,11 @@ export interface DTO_RQ_SuperAdmin {
     name: string | null;
     account_type: string | null;
 }
+
+export interface SuperAdminType {
+    id: string;
+    name: string;
+    username: string;
+    token: string;
+    account_type: string;
+}

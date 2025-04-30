@@ -2,9 +2,12 @@
 import {
     House, SwitchButton, User
 } from "@element-plus/icons-vue";
-
+const superAdminStore = useSuperAdminStore()
+const router = useRouter();
 function logout(): void {
   console.log('Đăng xuất');
+  superAdminStore.clearData()
+  router.push('/super-admin/login')
 }
 </script>
 <template>

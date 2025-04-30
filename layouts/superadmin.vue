@@ -1,6 +1,8 @@
 <script lang="ts">
-import { SuperAdminHeaderSuperAdmin } from '#components';
-
+const superAdminStore = useSuperAdminStore()
+onMounted(() => {
+  superAdminStore.loadData();
+})
 
 
 </script>
