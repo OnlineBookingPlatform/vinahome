@@ -24,16 +24,16 @@ const tableData = ref<BusCompanyType[]>([]);
 const loading = ref(false);
 const isDeleting = ref(false);
 const form = ref<BusCompanyType>({
-  id: 0,
-  name: "",
-  phone: "",
-  address: "",
+  id: null,
+  name: null,
+  phone: null,
+  address: null,
   status: false,
-  tax_code: "",
-  code: "",
-  note: "",
-  url_logo: "",
-  created_at: "",
+  tax_code: null,
+  code: null,
+  note: null,
+  url_logo: null,
+  url_vehicle_online: null,
 });
 const ruleFormRef = ref<FormInstance>();
 const rules = reactive<FormRules<BusCompanyType>>({
@@ -45,6 +45,9 @@ const rules = reactive<FormRules<BusCompanyType>>({
   ],
   code: [
     { required: true, message: "Vui lòng nhập mã nhà xe", trigger: "blur" },
+  ],
+  url_vehicle_online: [
+    { required: true, message: "Vui lòng nhập URL hình ảnh", trigger: "blur" },
   ],
 });
 const openEditDialog = (row: BusCompanyType) => {
@@ -142,16 +145,16 @@ const handleDelete = async () => {
 const resetForm = () => {
   isEditing.value = false;
   form.value = {
-    id: 0,
-    name: "",
-    phone: "",
-    address: "",
+    id: null,
+    name: null,
+    phone: null,
+    address: null,
     status: false,
-    tax_code: "",
-    code: "",
-    note: "",
-    url_logo: "",
-    created_at: "",
+    tax_code: null,
+    code: null,
+    note: null,
+    url_logo: null,
+    url_vehicle_online: null,
   };
 };
 const handleClose = (done: () => void) => {
@@ -209,6 +212,13 @@ onMounted(fetchCompanies);
 
       <el-table-column prop="tax_code" label="Mã số thuế" />
       <el-table-column prop="code" label="Mã nhà xe" />
+      <el-table-column prop="url_vehicle_online" label="Hình ảnh">
+        <template #default="{ row }">
+          <div class="w-26">
+            <img :src="row.url_vehicle_online" alt="Hình ảnh nhà xe" class="w-full h-full object-cover" />
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="note" label="Ghi chú" />
       <el-table-column fixed="right" label="Tùy chọn">
         <template #default="{ row }">
@@ -247,6 +257,9 @@ onMounted(fetchCompanies);
       </el-form-item>
       <el-form-item label="Ghi chú">
         <el-input v-model="form.note" type="textarea" />
+      </el-form-item>
+      <el-form-item label="URL Hình ảnh" prop="url_vehicle_online">
+        <el-input v-model="form.url_vehicle_online" type="textarea" />
       </el-form-item>
     </el-form>
 

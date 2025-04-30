@@ -1,14 +1,14 @@
 export interface BusCompanyType {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  tax_code: string;
+  id: number | null;
+  name: string | null;
+  phone: string | null;
+  address: string | null;
+  tax_code: string | null;
   status: boolean;
-  url_logo: string;
-  code: string;
-  note: string;
-  created_at: string;
+  url_logo: string | null;
+  code: string | null;
+  note: string | null;
+  url_vehicle_online: string | null;
 }
 
 export interface DTO_RQ_RegisterSaleTicketOnPlatform {
