@@ -128,6 +128,13 @@ onMounted(() => {
         <el-table :data="tableData" stripe style="width: 100%">
             <el-table-column type="index" label="STT" width="50" />
             <el-table-column prop="name" label="Tên tuyến" />
+            <el-table-column prop="url_avatar" label="Hình ảnh">
+                <template #default="{ row }">
+                    <div class="w-24 h-24">
+                        <img :src="row.url_avatar" alt="" fit="cover">
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column prop="url_avatar" label="URL Hình ảnh" />
             <el-table-column prop="base_price" label="Giá cơ bản">
                 <template #default="{ row }">
