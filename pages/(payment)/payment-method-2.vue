@@ -248,19 +248,19 @@ const fetchBookingDataTicketAPI = async () => {
     const selectedTickets = pendingData.value?.selectedTicket ?? [];
 
     const ticketData: DTO_RQ_UpdateTicketOnPlatform[] = selectedTickets.map(ticket => ({
-      id: ticket.id ?? 0,
-      passenger_name: localUserData.value.name,
-      passenger_phone: localUserData.value.phone,
+      id: ticket.id ?? null,
+      passenger_name: localUserData.value.name || null,
+      passenger_phone: localUserData.value.phone || null,
       point_up: typeof pointStore.pointUp?.name === 'string'
         ? pointStore.pointUp.name
-        : "",
+        : null,
       point_down: typeof pointStore.pointDown?.name === 'string'
         ? pointStore.pointDown.name
-        : "",
-      ticket_note: localUserData.value.note,
-
-      email: localUserData.value.email,
-      gender: localUserData.value.gender,
+        : null,
+      ticket_note: localUserData.value.note || null,
+      email: localUserData.value.email || null,
+      gender: localUserData.value.gender ?? null,
+      creator_by_id: userStore.userData?.id || null,
     }));
     console.log("Ticket data to update:", ticketData);
     const response = await updateTicketOnPlatformAPI(ticketData);

@@ -16,14 +16,15 @@ export interface SelectedTicket {
 }
 
 export interface DTO_RQ_UpdateTicketOnPlatform {
-  id: number;
-  passenger_name: string;
-  passenger_phone: string;
-  point_up: string;
-  point_down: string;
-  ticket_note: string;
-  email: string;
-  gender: number;
+  id: number | null;
+  passenger_name: string | null;
+  passenger_phone: string | null;
+  point_up: string | null;
+  point_down: string | null;
+  ticket_note: string | null;
+  email: string | null;
+  gender: number | null;
+  creator_by_id: string | null;
 }
 
 export interface DTO_RQ_TicketSearch {
