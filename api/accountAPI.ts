@@ -1,4 +1,9 @@
-import type { AccountByCompanyBusType, DTO_RP_SuperAdmin, DTO_RQ_SuperAdmin, UserType } from "~/types/AccountType";
+import type {
+  AccountByCompanyBusType,
+  DTO_RP_SuperAdmin,
+  DTO_RQ_SuperAdmin,
+  UserType,
+} from "~/types/AccountType";
 import type { ApiResponse } from "~/api/APIResponse";
 import { ElMessage } from "element-plus";
 // const API_BASE_URL = "http://localhost:3002";
@@ -130,8 +135,10 @@ export const createSuperAdminAccountAPI = async (
     console.error("Create Super Admin Account failed: ", error);
     throw error;
   }
-}
-export const getListSuperAdminAccountAPI = async (): Promise<ApiResponse<DTO_RP_SuperAdmin[]>> => {
+};
+export const getListSuperAdminAccountAPI = async (): Promise<
+  ApiResponse<DTO_RP_SuperAdmin[]>
+> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
@@ -145,7 +152,7 @@ export const getListSuperAdminAccountAPI = async (): Promise<ApiResponse<DTO_RP_
     console.error("Get List Super Admin Account failed: ", error);
     throw error;
   }
-}
+};
 
 export const deleteSuperAdminAccountAPI = async (
   data: DTO_RP_SuperAdmin
@@ -163,7 +170,7 @@ export const deleteSuperAdminAccountAPI = async (
     console.error("Delete Super Admin Account failed: ", error);
     throw error;
   }
-}
+};
 
 export const updateSuperAdminAccountAPI = async (
   data: DTO_RQ_SuperAdmin
@@ -182,9 +189,11 @@ export const updateSuperAdminAccountAPI = async (
     console.error("Update Super Admin Account failed: ", error);
     throw error;
   }
-}
+};
 
-export const createAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<AccountByCompanyBusType>> => {
+export const createAccountBySuperAdminAPI = async (
+  data: AccountByCompanyBusType
+): Promise<ApiResponse<AccountByCompanyBusType>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
@@ -199,9 +208,11 @@ export const createAccountBySuperAdminAPI = async (data: AccountByCompanyBusType
     console.error("Create Account By Super Admin failed: ", error);
     throw error;
   }
-}
+};
 
-export const getListAccountByCompanyOnPlatformAPI = async (companyId: number): Promise<ApiResponse<AccountByCompanyBusType[]>> => {
+export const getListAccountByCompanyOnPlatformAPI = async (
+  companyId: number
+): Promise<ApiResponse<AccountByCompanyBusType[]>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
@@ -215,9 +226,11 @@ export const getListAccountByCompanyOnPlatformAPI = async (companyId: number): P
     console.error("Get List Account By Company On Platform failed: ", error);
     throw error;
   }
-}
+};
 
-export const deleteAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<void>> => {
+export const deleteAccountBySuperAdminAPI = async (
+  data: AccountByCompanyBusType
+): Promise<ApiResponse<void>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
@@ -231,9 +244,11 @@ export const deleteAccountBySuperAdminAPI = async (data: AccountByCompanyBusType
     console.error("Delete Account By Super Admin failed: ", error);
     throw error;
   }
-}
+};
 
-export const updateAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<AccountByCompanyBusType>> => {
+export const updateAccountBySuperAdminAPI = async (
+  data: AccountByCompanyBusType
+): Promise<ApiResponse<AccountByCompanyBusType>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
@@ -248,4 +263,4 @@ export const updateAccountBySuperAdminAPI = async (data: AccountByCompanyBusType
     console.error("Update Account By Super Admin failed: ", error);
     throw error;
   }
-}
+};

@@ -2,22 +2,18 @@
 import { ref, onMounted } from "vue";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
-import TableListAccount from "~/components/super-admin/company-bus/TableListAccount.vue";
-import { createAccountBySuperAdminAPI, deleteAccountBySuperAdminAPI, getListAccountByCompanyOnPlatformAPI, getListsAccountByCompanyAPI, updateAccountBySuperAdminAPI } from "~/api/accountAPI";
+import { createAccountBySuperAdminAPI, deleteAccountBySuperAdminAPI, getListAccountByCompanyOnPlatformAPI, updateAccountBySuperAdminAPI } from "~/api/accountAPI";
 import type { AccountByCompanyBusType } from "~/types/AccountType";
 import Quill from "~/components/Quill.vue";
+import { getCompanyAPI } from "~/api/companyAPI";
+import { createPolicy, updatePolicy } from "~/api/policy.api";
 definePageMeta({
   layout: "superadmin",
 });
-onMounted(() => {
-  const companyId = route.params.id;
-  // fetchAccounts(Number(companyId));
-});
 const route = useRoute();
-const companyId = route.params.id;
+const companyId = computed(() => route.params.id as string);
 const isLoading = ref(false);
 const dialogVisible = ref(false);
-const tableData = ref<AccountByCompanyBusType[]>([]);
 const ruleFormRef = ref<FormInstance>()
 const isEditMode = ref(false)
 const ruleForm = reactive<AccountByCompanyBusType>({
@@ -32,6 +28,10 @@ const ruleForm = reactive<AccountByCompanyBusType>({
   gender: 1,
   role: null,
 });
+
+const { data: tableData, refresh } = useAsyncData('get-accounts', () => getListAccountByCompanyOnPlatformAPI(Number(companyId.value)), { lazy: true, watch: [companyId] })
+const { data, error } = useAsyncData('get-company', () => getCompanyAPI(companyId.value), { lazy: true, watch: [companyId] })
+
 const rules = reactive({
   name: [
     { required: true, message: "Vui lòng nhập họ tên", trigger: "blur" },
@@ -49,6 +49,7 @@ const rules = reactive({
     { required: true, message: "Vui lòng chọn vai trò", trigger: "blur" },
   ],
 });
+
 const resetForm = () => {
   ruleForm.id = null
   ruleForm.name = null
@@ -60,6 +61,7 @@ const resetForm = () => {
   ruleForm.company_id = Number(companyId)
   ruleFormRef.value?.clearValidate()
 }
+
 const handleClose = (done: () => void) => {
   ElMessageBox.confirm('Bạn chắc chắn muốn đóng không?')
     .then(() => {
@@ -70,10 +72,12 @@ const handleClose = (done: () => void) => {
       // catch error
     })
 }
+
 const handleCloseDialog = () => {
   dialogVisible.value = false
   resetForm()
 }
+
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate(async (valid, fields) => {
@@ -84,15 +88,12 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           const res = await updateAccountBySuperAdminAPI(ruleForm)
           ElMessage.success('Cập nhật tài khoản thành công')
 
-          const index = tableData.value.findIndex(item => item.id === res.result.id)
-          if (index !== -1) {
-            tableData.value[ index ] = { ...res.result }
-          }
+          refresh();
         } else {
           const res = await createAccountBySuperAdminAPI(ruleForm)
           if (res.status === 200) {
             ElMessage.success('Thêm tài khoản thành công')
-            tableData.value.push(res.result)
+            refresh();
           } else {
             ElMessage.error(res.message || 'Thêm không thành công')
           }
@@ -108,14 +109,17 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+
 const handleEdit = (row: AccountByCompanyBusType) => {
   console.log("Edit row: ", row);
   isEditMode.value = true
-    Object.assign(ruleForm, row) // Điền thông tin vào form
+  Object.assign(ruleForm, row) // Điền thông tin vào form
 
-    // Hiển thị modal
-    dialogVisible.value = true
+  // Hiển thị modal
+  dialogVisible.value = true
+  console.log(tableData.value?.result)
 }
+
 const handleDelete = async (row: AccountByCompanyBusType) => {
   try {
     await ElMessageBox.confirm(
@@ -131,7 +135,7 @@ const handleDelete = async (row: AccountByCompanyBusType) => {
     isLoading.value = true
     const res = await deleteAccountBySuperAdminAPI(row)
     if (res.status === 200) {
-      tableData.value = tableData.value.filter(item => item.id !== row.id)
+      refresh();
 
       ElMessage.success('Xoá tài khoản thành công')
     } else {
@@ -146,24 +150,23 @@ const handleDelete = async (row: AccountByCompanyBusType) => {
   }
 }
 
-const fetchAccounts = async (companyId: number) => {
+const content = ref(data.value?.result.policies[0].content);
+
+const saveContentPolicy = async () => {
+  console.log(data.value?.result.policies)
   try {
-    const res = await getListAccountByCompanyOnPlatformAPI(companyId);
-    if (res.status === 200) {
-      tableData.value = res.result;
-    } else {
-      ElMessage.error(res.message || "Lỗi khi tải danh sách tài khoản");
+    if (data.value?.result.policies.length === 0) {
+      await createPolicy(Number(companyId), content.value);
+      ElMessage.success("Lưu chính sách thành công!");
+      return;
     }
+
+    await updatePolicy(Number(companyId), content.value);
+    ElMessage.success("Lưu chính sách thành công!");
   } catch (error) {
-    ElMessage.error("Lỗi hệ thống, vui lòng thử lại sau.");
+    ElMessage.error("Lưu thất bại.");
   }
 };
-onMounted(() => {
-  fetchAccounts(Number(companyId));
-});
-
-
-
 </script>
 
 <template>
@@ -173,7 +176,7 @@ onMounted(() => {
         <div>
           <el-button type="primary" @click="dialogVisible = true">Thêm tài khoản</el-button>
         </div>
-        <el-table :data="tableData" stripe style="width: 100%">
+        <el-table :data="tableData?.result" stripe style="width: 100%">
           <el-table-column type="index" label="STT" width="50" />
           <el-table-column prop="name" label="Tên" />
           <el-table-column prop="username" label="Tài khoản" />
@@ -272,8 +275,7 @@ onMounted(() => {
         </el-dialog>
       </el-tab-pane>
       <el-tab-pane label="Chính sách">
-
-        <Quill />
+        <Quill v-model="content" @onsave="saveContentPolicy" />
       </el-tab-pane>
       <el-tab-pane label="Trung chuyển">Trung chuyển</el-tab-pane>
     </el-tabs>

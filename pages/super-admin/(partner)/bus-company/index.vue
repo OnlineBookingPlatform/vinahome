@@ -12,7 +12,7 @@ import { ref } from "vue";
 import {
   createCompanyAPI,
   deleteCompanyAPI,
-  getCompanyAPI,
+  getAllCompanyAPI,
   updateCompanyAPI,
 } from "~/api/companyAPI";
 import type { BusCompanyType } from "~/types/CompanyType";
@@ -34,6 +34,7 @@ const form = ref<BusCompanyType>({
   note: null,
   url_logo: null,
   url_vehicle_online: null,
+  policies: []
 });
 const ruleFormRef = ref<FormInstance>();
 const rules = reactive<FormRules<BusCompanyType>>({
@@ -155,6 +156,7 @@ const resetForm = () => {
     note: null,
     url_logo: null,
     url_vehicle_online: null,
+    policies: []
   };
 };
 const handleClose = (done: () => void) => {
@@ -170,7 +172,7 @@ const handleClose = (done: () => void) => {
 const fetchCompanies = async () => {
   loading.value = true; // Bắt đầu hiển thị loading
   try {
-    const response = await getCompanyAPI();
+    const response = await getAllCompanyAPI();
     if (response.result) {
       tableData.value = response.result;
     } else {
@@ -233,7 +235,7 @@ onMounted(fetchCompanies);
     <template #title>
       <span class="text-lg">{{
         isEditing ? "Chỉnh sửa nhà xe" : "Thêm nhà xe mới"
-        }}</span>
+      }}</span>
     </template>
 
     <el-form label-width="120px" ref="ruleFormRef" :model="form" :rules="rules">
