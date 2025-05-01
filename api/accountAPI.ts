@@ -184,4 +184,68 @@ export const updateSuperAdminAccountAPI = async (
   }
 }
 
+export const createAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<AccountByCompanyBusType>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<AccountByCompanyBusType>>(
+      `${API_GATEWAY_URL}/v1/account/create-account-by-super-admin`,
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+  } catch (error) {
+    console.error("Create Account By Super Admin failed: ", error);
+    throw error;
+  }
+}
 
+export const getListAccountByCompanyOnPlatformAPI = async (companyId: number): Promise<ApiResponse<AccountByCompanyBusType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<AccountByCompanyBusType[]>>(
+      `${API_GATEWAY_URL}/v1/account/get-list-account-by-company-on-platform/${companyId}`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Get List Account By Company On Platform failed: ", error);
+    throw error;
+  }
+}
+
+export const deleteAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<void>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<void>>(
+      `${API_GATEWAY_URL}/v1/account/delete-account-by-super-admin/${data.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+  } catch (error) {
+    console.error("Delete Account By Super Admin failed: ", error);
+    throw error;
+  }
+}
+
+export const updateAccountBySuperAdminAPI = async (data: AccountByCompanyBusType): Promise<ApiResponse<AccountByCompanyBusType>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<AccountByCompanyBusType>>(
+      `${API_GATEWAY_URL}/v1/account/update-account-by-super-admin/${data.id}`,
+      {
+        method: "PUT",
+        body: data,
+      }
+    );
+  } catch (error) {
+    console.error("Update Account By Super Admin failed: ", error);
+    throw error;
+  }
+}

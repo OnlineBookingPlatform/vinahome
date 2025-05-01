@@ -13,15 +13,16 @@ export interface UserType {
 
 
 export interface AccountByCompanyBusType {
-    id: string;
-    name: string;
-    username: string;
-    password: string;
-    phone: string;
-    gender: number;
-    role: number;
-    email: string;
-    company_id: number;
+    id: string | null;
+    name: string | null;
+    username: string | null;
+    password: string | null;
+    phone: string | null;
+    gender: number | null;
+    role: number | null;
+    email: string | null;
+    status: false;
+    company_id: number | null;
 }
 
 export interface DTO_RQ_SuperAdminLogin {
@@ -49,4 +50,16 @@ export interface SuperAdminType {
     username: string;
     token: string;
     account_type: string;
+}
+
+export interface AccountByCompanyBusType {
+    id: string | null;
+    name: string | null;
+    username: string | null;
+    password: string | null;
+    phone: string | null;
+    gender: number | null;
+    role: number | null;
+    email: string | null;
+    company_id: number | null;
 }
