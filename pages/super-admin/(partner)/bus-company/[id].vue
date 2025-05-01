@@ -275,8 +275,7 @@ onMounted(() => {
 
         <Quill />
       </el-tab-pane>
-      <el-tab-pane label="Role">Role</el-tab-pane>
-      <el-tab-pane label="Task">Task</el-tab-pane>
+      <el-tab-pane label="Trung chuyển">Trung chuyển</el-tab-pane>
     </el-tabs>
   </section>
 </template>
