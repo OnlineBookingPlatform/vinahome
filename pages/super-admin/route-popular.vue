@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 import { ElMessageBox, ElMessage, type FormInstance, type UploadProps, type UploadUserFile } from "element-plus";
 import type { RoutePopularType } from "~/types/RouteType";
-import { createRoutePopularAPI, updateRoutePopularAPI, getListRoutePopularAPI } from "~/api/routeAPI";
+import { createRoutePopularAPI, updateRoutePopularAPI, getListRoutePopularAPI, deleteRoutePopularAPI } from "~/api/routeAPI";
 
 definePageMeta({
     layout: "superadmin",
@@ -110,9 +110,39 @@ const fetchRoutePopular = async () => {
 
 const handleEdit = (row: RoutePopularType) => {
     console.log("Edit row: ", row);
+    isEditMode.value = true
+    Object.assign(ruleForm, row)
+
+    dialogVisible.value = true
 }
-const handleDelete = (row: RoutePopularType) => {
-    console.log("Delete row: ", row);
+const handleDelete = async (row: RoutePopularType) => {
+    try {
+        await ElMessageBox.confirm(
+            `Bạn có chắc chắn muốn xoá tuyến "${row.name}"?`,
+            'Xác nhận xoá',
+            {
+                confirmButtonText: 'Xoá',
+                cancelButtonText: 'Huỷ',
+                type: 'warning',
+            }
+        )
+
+        isLoading.value = true
+        const res = await deleteRoutePopularAPI(row)
+        if (res.status === 200) {
+            tableData.value = tableData.value.filter(item => item.id !== row.id)
+
+            ElMessage.success('Xoá tuyến thành công')
+        } else {
+            ElMessage.error(res.message || 'Xoá không thành công')
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
+        }
+    } finally {
+        isLoading.value = false
+    }
 }
 onMounted(() => {
     fetchRoutePopular()
@@ -130,7 +160,7 @@ onMounted(() => {
             <el-table-column prop="name" label="Tên tuyến" />
             <el-table-column prop="url_avatar" label="Hình ảnh">
                 <template #default="{ row }">
-                    <div class="w-24 h-24">
+                    <div class="w-26">
                         <img :src="row.url_avatar" alt="" fit="cover">
                     </div>
                 </template>

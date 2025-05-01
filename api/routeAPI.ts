@@ -28,7 +28,7 @@ export const updateRoutePopularAPI = async (
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
     return await $fetch<ApiResponse<RoutePopularType>>(
-      `${API_GATEWAY_URL}/v2/route/update-route-popular`,
+      `${API_GATEWAY_URL}/v2/route/update-route-popular/${data.id}`,
       {
         method: "PUT",
         body: data,
@@ -70,6 +70,22 @@ export const getListRoutePopularAPI = async (): Promise<ApiResponse<RoutePopular
     );
   } catch (error) {
     console.error("Get List Route Popular failed: ", error);
+    throw error;
+  }
+}
+
+export const getListRoutePopularOnPlatformAPI = async (): Promise<ApiResponse<RoutePopularType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<RoutePopularType[]>>(
+      `${API_GATEWAY_URL}/v2/route/get-list-route-popular-on-platform`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Get List Route Popular On Platform failed: ", error);
     throw error;
   }
 }
