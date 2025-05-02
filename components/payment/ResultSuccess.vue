@@ -3,16 +3,17 @@
 const router = useRouter();
 const userStore = useUserStore();
 const pendingTicketStore = usePendingTicketStore();
-const user = userStore.userData;
 const remainingTime = ref(10);
 let timer: ReturnType<typeof setInterval> | undefined;
 
 const goToHome = () => {
   pendingTicketStore.clearPendingTicket();
   localStorage.removeItem('paymentStartTime');
+  localStorage.removeItem('paymentMethod');
   router.push('/');
 };
-onMounted(() => {
+onMounted(async () => {
+  await userStore.loadUserData();
   timer = setInterval(() => {
     if (remainingTime.value > 0) {
       remainingTime.value--;
@@ -35,9 +36,9 @@ onBeforeUnmount(() => {
     class="bg-white py-12 rounded-xl border w-full payment-method flex flex-col justify-center items-center space-y-6 px-6">
     <Icon name="vinahome:payment-complete" size="108" />
     <h5>Thanh toán thành công</h5>
-    <p class="text-muted max-w-md text-center">
+    <p class="text-muted max-w-md text-center" v-if="userStore?.userData?.email">
       Thông tin chuyến xe đã được gửi đến
-      <span class="font-bold">{{ user?.email || 'N/A' }}</span>
+      <span class="font-bold">{{ userStore?.userData?.email ?? 'N/A' }}</span>
       Hãy kiểm tra nhé.
     </p>
     <button class="button-gradient h-[50px] w-full text-white text-lg font-bold rounded-lg hover:brightness-75"

@@ -167,6 +167,8 @@ onMounted(() => {
   if (currentTimeleft.value <= 1) {
     currentTimeleft.value = 1;
   }
+  clearTimer();
+  
 });
 onUnmounted(clearTimer);
 
@@ -191,7 +193,6 @@ const handleBack = async () => {
 
 // Xử lý params khi thanh toán thành công
 const paymentSuccess = ref(false);
-const hasCalledAPI = ref(false);
 const paymentMethod = ref("vnpay");
 const submitForm = async () => {
   showPaymentMethods.value = true;
@@ -208,7 +209,6 @@ const submitForm = async () => {
   } as UserType);
 
   const dataPay: DTO_RQ_DataPay = {
-    account_id: userStore.userData?.id || null,
     service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id || null,
     service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name || null,
     ticket: pendingTicketStore.pendingTicket?.selectedTicket.map((ticket) => ({
@@ -216,14 +216,29 @@ const submitForm = async () => {
       seat_name: ticket.seat_name,
       price: ticket.price,
     })) || [],
+
+    passenger_name: localUserData.value.name || null,
+    passenger_phone: localUserData.value.phone || null,
+    point_up: typeof pointStore.pointUp?.name === 'string'
+      ? pointStore.pointUp.name
+      : null,
+    point_down: typeof pointStore.pointDown?.name === 'string'
+      ? pointStore.pointDown.name
+      : null,
+    ticket_note: localUserData.value.note || null,
+    email: localUserData.value.email || null,
+    gender: localUserData.value.gender ?? null,
+    creator_by_id: userStore.userData?.id || null,
   };
 
 
   if ((showPaymentMethods.value = true)) {
     if (paymentMethod.value == "vnpay") {
+      localStorage.setItem('paymentMethod', 'vnpay');
       console.log("VNPAY selected");
     }
     if (paymentMethod.value == "momo") {
+      localStorage.setItem('paymentMethod', 'momo');
       console.log("MoMo selected");
       try {
         console.log("MoMo Data send to Server:", dataPay);
@@ -231,7 +246,7 @@ const submitForm = async () => {
         if (response.result) {
           console.log("MoMo:", response.result);
 
-          window.location.href = response.result.order_url;
+          window.location.href = response.result.payUrl;
         } else {
           ElMessage.error(response.message || "Thanh toán thất bại");
         }
@@ -240,6 +255,7 @@ const submitForm = async () => {
       }
     }
     if (paymentMethod.value == "zalopay") {
+      localStorage.setItem('paymentMethod', 'zalopay');
       console.log("ZaloPay selected");
       try {
         console.log("ZaloPay Data send to Server:", dataPay);
@@ -256,73 +272,71 @@ const submitForm = async () => {
       }
     }
     if (paymentMethod.value == "national") {
+      localStorage.setItem('paymentMethod', 'national');
       console.log("National selected");
-
-
-
     }
   }
 };
 
-const fetchBookingDataTicketAPI = async () => {
-  try {
-    await userStore.loadUserData();
-    await pendingTicketStore.loadPendingTicket();
+// const fetchBookingDataTicketAPI = async () => {
+//   try {
+//     await userStore.loadUserData();
+//     await pendingTicketStore.loadPendingTicket();
 
-    const selectedTickets = pendingData.value?.selectedTicket ?? [];
+//     const selectedTickets = pendingData.value?.selectedTicket ?? [];
 
-    const ticketData: DTO_RQ_UpdateTicketOnPlatform[] = selectedTickets.map(ticket => ({
-      id: ticket.id ?? null,
-      passenger_name: localUserData.value.name || null,
-      passenger_phone: localUserData.value.phone || null,
-      point_up: typeof pointStore.pointUp?.name === 'string'
-        ? pointStore.pointUp.name
-        : null,
-      point_down: typeof pointStore.pointDown?.name === 'string'
-        ? pointStore.pointDown.name
-        : null,
-      ticket_note: localUserData.value.note || null,
-      email: localUserData.value.email || null,
-      gender: localUserData.value.gender ?? null,
-      creator_by_id: userStore.userData?.id || null,
-    }));
-    console.log("Ticket data to update:", ticketData);
-    const response = await updateTicketOnPlatformAPI(ticketData);
-    if (response.status === 200) {
-      console.log('Cập nhật vé thành công!');
-      ElMessage.success('Đặt vé thành công!');
-    } else {
-      console.error('Cập nhật vé thất bại');
-      ElMessage.error('Đặt vé thất bại!');
-    }
-  } catch (error) {
-    console.error("Error calling API:", error);
-  }
-};
+//     const ticketData: DTO_RQ_UpdateTicketOnPlatform[] = selectedTickets.map(ticket => ({
+//       id: ticket.id ?? null,
+//       passenger_name: localUserData.value.name || null,
+//       passenger_phone: localUserData.value.phone || null,
+//       point_up: typeof pointStore.pointUp?.name === 'string'
+//         ? pointStore.pointUp.name
+//         : null,
+//       point_down: typeof pointStore.pointDown?.name === 'string'
+//         ? pointStore.pointDown.name
+//         : null,
+//       ticket_note: localUserData.value.note || null,
+//       email: localUserData.value.email || null,
+//       gender: localUserData.value.gender ?? null,
+//       creator_by_id: userStore.userData?.id || null,
+//     }));
+//     console.log("Ticket data to update:", ticketData);
+//     const response = await updateTicketOnPlatformAPI(ticketData);
+//     if (response.status === 200) {
+//       console.log('Cập nhật vé thành công!');
+//       ElMessage.success('Đặt vé thành công!');
+//     } else {
+//       console.error('Cập nhật vé thất bại');
+//       ElMessage.error('Đặt vé thất bại!');
+//     }
+//   } catch (error) {
+//     console.error("Error calling API:", error);
+//   }
+// };
 
 
-const checkPaymentStatus = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const status = urlParams.get('status');
+// const checkPaymentStatus = () => {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   const status = urlParams.get('status');
 
-  if (status && status === '1' && !hasCalledAPI.value) {
-    hasCalledAPI.value = true;
-    paymentSuccess.value = true;
-    console.log("Payment success detected!");
-    fetchBookingDataTicketAPI()
-  } else if (status !== '1') {
-    paymentSuccess.value = false;
-  }
-};
-onMounted(() => {
-  checkPaymentStatus();
-  const interval = setInterval(() => {
-    checkPaymentStatus();
-  }, 10000); // Kiểm tra mỗi giây
-  onBeforeUnmount(() => {
-    clearInterval(interval);
-  });
-});
+//   if (status && status === '1' && !hasCalledAPI.value) {
+//     hasCalledAPI.value = true;
+//     paymentSuccess.value = true;
+//     console.log("Payment success detected!");
+//     fetchBookingDataTicketAPI()
+//   } else if (status !== '1') {
+//     paymentSuccess.value = false;
+//   }
+// };
+// onMounted(() => {
+//   checkPaymentStatus();
+//   const interval = setInterval(() => {
+//     checkPaymentStatus();
+//   }, 10000); // Kiểm tra mỗi giây
+//   onBeforeUnmount(() => {
+//     clearInterval(interval);
+//   });
+// });
 </script>
 
 <template>
@@ -347,7 +361,7 @@ onMounted(() => {
           <h5 v-if="!showPaymentMethods">Thông tin chuyến đi của bạn</h5>
           <h5 v-else>Phương thức thanh toán</h5>
         </div>
-        <ResultSuccess v-if="paymentSuccess" />
+        <!-- <ResultSuccess v-if="paymentSuccess" /> -->
 
         <PaymentTripInfo v-if="!paymentSuccess && !showPaymentMethods" :pending-data="pendingData"
           :point-up="pointStore.pointUp" :point-down="pointStore.pointDown" />
@@ -527,7 +541,7 @@ onMounted(() => {
             Số lượng vé:
             <span class="font-semibold">{{
               pendingData?.selectedTicket.length
-            }}</span>
+              }}</span>
           </div>
         </div>
       </div>
