@@ -103,7 +103,7 @@ const vietQRUrl = computed(() => {
       <el-radio value="momo" border class="[&>*:first-child]:mt-1 w-full">
         <template #default>
           <p class="flex items-center payment-label">
-            <Icon name="fa6-solid:credit-card" class="size-4 mr-1.5" />
+            <img src="/icon/momo.png" alt="ZaloPay" width="20" class="mr-1.5" />
             <span class="font-bold">Ví MoMo</span>
           </p>
           <p class="text-grey-600">Điện thoại của bạn phải được cài đặt ứng dụng MoMo</p>
