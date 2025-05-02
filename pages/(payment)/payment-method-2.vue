@@ -2,11 +2,12 @@
 import { ArrowLeft, Ticket } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import { checkZaloPayPayment, createZaloPayPayment } from "~/api/paymentAPI";
+import { checkZaloPayPayment, createMomoPayment, createZaloPayPayment } from "~/api/paymentAPI";
 import { changeTicketAvailableAPI, updateTicketOnPlatformAPI } from "~/api/ticketAPI";
 import ResultSuccess from "~/components/payment/ResultSuccess.vue";
 import { calculateTotalTime } from "~/lib/libTime"
 import type { UserType } from "~/types/AccountType";
+import type { DTO_RQ_DataPay } from "~/types/PaymentType";
 import type { BookingData } from "~/types/PendingType";
 import type { DTO_RQ_UpdateTicketOnPlatform } from "~/types/TicketType";
 import type { DTO_RP_StatusZaloPay, DTO_RQ_ZaloPay } from "~/types/ZaloPayType";
@@ -205,32 +206,44 @@ const submitForm = async () => {
     ...userStore.userData,
     ...fieldsToUpdate,
   } as UserType);
+
+  const dataPay: DTO_RQ_DataPay = {
+    account_id: userStore.userData?.id || null,
+    service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id || null,
+    service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name || null,
+    ticket: pendingTicketStore.pendingTicket?.selectedTicket.map((ticket) => ({
+      id: ticket.id,
+      seat_name: ticket.seat_name,
+      price: ticket.price,
+    })) || [],
+  };
+
+
   if ((showPaymentMethods.value = true)) {
     if (paymentMethod.value == "vnpay") {
       console.log("VNPAY selected");
     }
     if (paymentMethod.value == "momo") {
       console.log("MoMo selected");
+      try {
+        console.log("MoMo Data send to Server:", dataPay);
+        const response = await createMomoPayment(dataPay);
+        if (response.result) {
+          console.log("MoMo:", response.result);
+
+          window.location.href = response.result.order_url;
+        } else {
+          ElMessage.error(response.message || "Thanh toán thất bại");
+        }
+      } catch (error) {
+        ElMessage.error("Có lỗi xảy ra khi tạo thanh toán MoMo");
+      }
     }
     if (paymentMethod.value == "zalopay") {
       console.log("ZaloPay selected");
-      console.log(pendingTicketStore.pendingTicket);
-
-      /// Data gửi tới ZaloPay
-      const data = {
-        account_id: userStore.userData?.id || "",
-        service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id || 0,
-        service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name || "",
-        ticket: pendingTicketStore.pendingTicket?.selectedTicket.map((ticket: { id: any; seat_name: any; price: any; }) => ({
-          id: ticket.id,
-          seat_name: ticket.seat_name,
-          price: ticket.price,
-        })) || [],
-      };
-
       try {
-        console.log("ZaloPay Data send to Server:", data);
-        const response = await createZaloPayPayment(data);
+        console.log("ZaloPay Data send to Server:", dataPay);
+        const response = await createZaloPayPayment(dataPay);
         if (response.result) {
           console.log("ZaloPay:", response.result);
 
@@ -245,7 +258,7 @@ const submitForm = async () => {
     if (paymentMethod.value == "national") {
       console.log("National selected");
 
-      
+
 
     }
   }
@@ -323,11 +336,11 @@ onMounted(() => {
         <el-button type="primary" :icon="ArrowLeft" link @click="handleBack">Quay lại</el-button>
       </div>
       <div v-if="paymentMethod === 'national'" class="stripe-card-container">
-      <div id="card-element" class="stripe-card-element"></div>
-   
+        <div id="card-element" class="stripe-card-element"></div>
 
 
-    </div>
+
+      </div>
       <!-- Thông tin thanh toán + Thông tin chuyến đi -->
       <div class="bg-white py-6 rounded-xl border w-full payment-method">
         <div class="border-b px-6 py-4">
