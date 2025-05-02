@@ -213,7 +213,7 @@ const handleClickTab = async (tripId: number, tab: any) => {
     "activeTabs trước khi cập nhật:",
     activeTabs.value[String(tripId)]
   );
-  if (tab.props.name === "select-seats" || tab.props.name === "policy") {
+  if (tab.props.name === 1) {
     if (selectedTripId.value !== tripId) {
       selectedTicket.value = [];
       activeStep.value = 0;
@@ -245,8 +245,24 @@ const handleClickTab = async (tripId: number, tab: any) => {
     } else {
       optionsPointDown.value = [];
     }
+  } else if (tab.props.name === 3) {
+    if (selectedTripId.value !== tripId) {
+      selectedTicket.value = [];
+      activeStep.value = 0;
+    }
+    selectedStep.value = 1;
+    selectedTicket.value = [];
+
+    await openTrip(tripId);
   } else if (tab.props.name === 4) {
-    console.log("API response cho tab 4:");
+    if (selectedTripId.value !== tripId) {
+      selectedTicket.value = [];
+      activeStep.value = 0;
+    }
+    selectedStep.value = 1;
+    selectedTicket.value = [];
+
+    await openTrip(tripId);
   } else {
     activeTabs.value[tripId] =
       activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
@@ -722,7 +738,7 @@ const nextStep = async () => {
                   handleClickTab(trip.id, tab);
                 }
               ">
-                <el-tab-pane label="Chọn ghế" name="select-seats" class="">
+                <el-tab-pane label="Chọn ghế" :name="1" class="">
                   <div class="mt-5 items-center">
                     <el-steps :active="activeStep" align-center finish-status="success">
                       <el-step title="Chỗ mong muốn" />
@@ -862,7 +878,7 @@ const nextStep = async () => {
                     </div>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Lịch trình" name="schedule">
+                <el-tab-pane label="Lịch trình" :name="2">
                   <div class="p-4">
                     <el-row :gutter="20">
                       <el-col :span="12">
@@ -920,7 +936,7 @@ const nextStep = async () => {
                     </el-row>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Trung chuyển" name="moving">
+                <el-tab-pane label="Trung chuyển" :name="3">
                   <div class="p-4">
                     Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
                     Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
@@ -934,7 +950,7 @@ const nextStep = async () => {
                     chảy nước trên xe.nn
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Chính sách" name="policy">
+                <el-tab-pane label="Chính sách" :name="4">
                   <div class="prose p-4" v-html="tripDetail?.policy_content">
                   </div>
                 </el-tab-pane>
