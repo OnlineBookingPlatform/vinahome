@@ -3,34 +3,15 @@
 import { Search } from "@element-plus/icons-vue";
 import { ElMessage, type FormInstance } from "element-plus";
 import { registerReceiveNewsAPI } from "~/api/newsAPI";
+import { getRoutePopularAPI } from "~/api/routeAPI";
 import SelectTrip_v2 from "~/components/select/SelectTrip_v2.vue";
 import type { DTO_RQ_NewsType } from "~/types/NewsType";
+import type { RoutePopularType } from "~/types/RouteType";
 
 const radio1 = ref('Vé xe khách')
 
 // Dữ liệu tuyến đường
-const routes = ref([
-  {
-    name: 'Sài Gòn - Đà Lạt',
-    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
-  },
-  {
-    name: 'Sài Gòn - Phan Thiết',
-    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
-  },
-  {
-    name: 'Hà Nội - Sapa',
-    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
-  },
-  {
-    name: 'Sài Gòn - Nha Trang',
-    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
-  },
-  {
-    name: 'Đà Nẵng - Huế',
-    image: 'https://lh3.googleusercontent.com/proxy/uTgoaqDytL6PqMttFbnRi-nrJlcJ3fRVAz3rJwOHh1a8BXLQbUFMyLpQRqqGcw4OqBi9CcDGTvO6ZHPe5KnEYXABmcCksD9YXJBw3LQcYRnkmwKnReZgcDnrWOA4ZRNUV19IvrrmAWZD58k'
-  }
-]);
+
 
 // Dữ liệu chỉ số carousel hiện tại
 const currentIndex = ref(0);
@@ -58,6 +39,23 @@ const submitFormReceiveNews = async () => {
     ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
   }
 }
+const routes = ref<RoutePopularType[]>([])
+const fetchRoutePopular = async () => {
+  try {
+    const response = await getRoutePopularAPI()
+    if (response.status === 200) {
+      routes.value = response.result
+      console.log('routes', routes.value)
+    } else {
+      ElMessage.error(response.message || 'Lỗi hệ thống, vui lòng thử lại sau.')
+    }
+  } catch (error) {
+    ElMessage.error('Lỗi hệ thống, vui lòng thử lại sau.')
+  }
+}
+onMounted(() => {
+  fetchRoutePopular()
+})
 </script>
 
 <template>
@@ -362,7 +360,7 @@ const submitFormReceiveNews = async () => {
                     currentIndex === index ? 'scale-105 ring-2 ring-[#03acff]' : '',
                     'hover:scale-105'
                   ]">
-                  <img :src="route.image" class="w-full h-full object-cover rounded-2xl" />
+                  <img :src="route.url_avatar ?? ''" class="w-full h-full object-cover rounded-2xl" />
                   <div
                     class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow px-4 h-12 w-[280px] flex items-center z-20 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600"
                     :class="currentIndex === index ? 'justify-start pr-4 ring-2 ring-[#03acff] scale-105' : 'justify-center'">

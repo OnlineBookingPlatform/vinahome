@@ -89,3 +89,19 @@ export const getListRoutePopularOnPlatformAPI = async (): Promise<ApiResponse<Ro
     throw error;
   }
 }
+
+export const getRoutePopularAPI = async (): Promise<ApiResponse<RoutePopularType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<RoutePopularType[]>>(
+      `${API_GATEWAY_URL}/v2/route/get-list-route-popular`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Get Route Popular failed: ", error);
+    throw error;
+  }
+}
