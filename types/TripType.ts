@@ -69,7 +69,12 @@ export interface DTO_RP_SeatMapInfo {
 
 // DTO cho thông tin chuyến đi
 export interface DTO_RP_TripInfo {
-  departureTime(arg0: string, arg1: string, departureTime: any, id: number): unknown;
+  departureTime(
+    arg0: string,
+    arg1: string,
+    departureTime: any,
+    id: number
+  ): unknown;
   id: number;
   time_departure: string;
   dateDeparture: string;
@@ -89,6 +94,5 @@ export interface DetailTripType {
   total_row: number;
   total_column: number;
   tickets: TicketType[];
+  policy_content: string;
 }
-
-

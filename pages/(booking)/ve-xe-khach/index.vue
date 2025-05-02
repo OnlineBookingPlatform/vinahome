@@ -17,7 +17,7 @@ import { dayjs, ElMessage } from "element-plus";
 import {
   getPointDownByTrip,
   getPointUpByTrip,
-  getTripDeatil,
+  getTripDetail,
   getTripOnPlatform,
 } from "~/api/tripAPI";
 import { useRoute, useRouter } from "vue-router";
@@ -200,7 +200,7 @@ const openTrip = async (tripId: number) => {
   pointStore.clearPoints();
   activeStep.value = 0;
 
-  const response = await getTripDeatil(tripId);
+  const response = await getTripDetail(tripId);
   if (response.result) {
     tripDetail.value = response.result;
     console.log("API response:", tripDetail.value);
@@ -213,7 +213,7 @@ const handleClickTab = async (tripId: number, tab: any) => {
     "activeTabs trước khi cập nhật:",
     activeTabs.value[String(tripId)]
   );
-  if (tab.props.name === 1) {
+  if (tab.props.name === "select-seats" || tab.props.name === "policy") {
     if (selectedTripId.value !== tripId) {
       selectedTicket.value = [];
       activeStep.value = 0;
@@ -245,8 +245,6 @@ const handleClickTab = async (tripId: number, tab: any) => {
     } else {
       optionsPointDown.value = [];
     }
-  } else if (tab.props.name === 3) {
-    console.log("API response cho tab 3:");
   } else if (tab.props.name === 4) {
     console.log("API response cho tab 4:");
   } else {
@@ -461,11 +459,6 @@ watch(selectedPointDownId, (newId) => {
     pointStore.setPointDown(selectedPoint);
   }
 });
-
-
-
-
-
 
 const nextStep = async () => {
   // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
@@ -729,7 +722,7 @@ const nextStep = async () => {
                   handleClickTab(trip.id, tab);
                 }
               ">
-                <el-tab-pane label="Chọn ghế" :name="1" class="">
+                <el-tab-pane label="Chọn ghế" name="select-seats" class="">
                   <div class="mt-5 items-center">
                     <el-steps :active="activeStep" align-center finish-status="success">
                       <el-step title="Chỗ mong muốn" />
@@ -869,7 +862,7 @@ const nextStep = async () => {
                     </div>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Lịch trình" :name="2">
+                <el-tab-pane label="Lịch trình" name="schedule">
                   <div class="p-4">
                     <el-row :gutter="20">
                       <el-col :span="12">
@@ -927,7 +920,7 @@ const nextStep = async () => {
                     </el-row>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Trung chuyển" :name="3">
+                <el-tab-pane label="Trung chuyển" name="moving">
                   <div class="p-4">
                     Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
                     Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
@@ -941,18 +934,8 @@ const nextStep = async () => {
                     chảy nước trên xe.nn
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="Chính sách" :name="4">
-                  <div class="p-4">
-                    Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
-                    Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
-                    thông trong thành phố và sẽ kết hợp đón nhiều điểm khác nhau
-                    nên thời gian đón cụ thể tài xế sẽ liên hệ hẹn giờ. - Hẻm
-                    nhỏ xe không quay đầu được : Xe trung chuyển sẽ đón Khách
-                    đầu hẻm/ đầu đường. - Khu vực có biển cấm dừng đỗ xe không
-                    đón được : Xe trung chuyển sẽ đón tại vị trí gần nhất có
-                    thể. - Hành lý : Hành lý nhỏ gọn dưới 20 kg, không vận
-                    chuyển kèm động vật , thú cưng, không mang đồ có mùi, đồ
-                    chảy nước trên xe.nn
+                <el-tab-pane label="Chính sách" name="policy">
+                  <div class="prose p-4" v-html="tripDetail?.policy_content">
                   </div>
                 </el-tab-pane>
               </el-tabs>

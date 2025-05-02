@@ -10,7 +10,6 @@ import type { TripPointType } from "~/types/PointType";
 // const config = useRuntimeConfig();
 // const API_GATEWAY_URL = "http://localhost:3002";
 
-
 export const getTripOnPlatform = async (
   params: SearchTripParams
 ): Promise<ApiResponse<DTO_RP_TripInfo[]>> => {
@@ -30,7 +29,7 @@ export const getTripOnPlatform = async (
   }
 };
 
-export const getTripDeatil = async (
+export const getTripDetail = async (
   tripId: number
 ): Promise<ApiResponse<DetailTripType>> => {
   const config = useRuntimeConfig();
@@ -64,7 +63,7 @@ export const getPointUpByTrip = async (
     console.error("Lỗi khi lấy thông tin chuyến đi:", error);
     throw error;
   }
-}
+};
 
 export const getPointDownByTrip = async (
   tripId: number
@@ -82,4 +81,4 @@ export const getPointDownByTrip = async (
     console.error("Lỗi khi lấy thông tin chuyến đi:", error);
     throw error;
   }
-}
+};

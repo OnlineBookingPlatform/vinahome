@@ -153,7 +153,7 @@ const handleDelete = async (row: AccountByCompanyBusType) => {
 const content = ref(data.value?.result.policies[0].content);
 
 const saveContentPolicy = async () => {
-  console.log(data.value?.result.policies)
+  console.log(content.value);
   try {
     if (data.value?.result.policies.length === 0) {
       await createPolicy(Number(companyId), content.value);
@@ -161,8 +161,8 @@ const saveContentPolicy = async () => {
       return;
     }
 
-    await updatePolicy(Number(companyId), content.value);
-    ElMessage.success("Lưu chính sách thành công!");
+    await updatePolicy(data.value?.result.policies[0].id, content.value);
+    ElMessage.success("Cập nhật chính sách thành công!");
   } catch (error) {
     ElMessage.error("Lưu thất bại.");
   }
