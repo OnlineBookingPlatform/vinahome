@@ -167,7 +167,6 @@ onMounted(() => {
   if (currentTimeleft.value <= 1) {
     currentTimeleft.value = 1;
   }
-  clearTimer();
   
 });
 onUnmounted(clearTimer);
