@@ -81,5 +81,22 @@ export const searchTicketOnPlatformAPI = async (
     throw error;
   }
 } 
+export const getTicketByAccountIdAPI = async (
+  id: string
+): Promise<ApiResponse<DTO_RP_TicketSearch[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<DTO_RP_TicketSearch[]>>(
+      `${API_GATEWAY_URL}/v2/ticket/get-ticket-by-account-id/${id}`,
+      {
+        method: "GET",
+      }
+    );
+  } catch (error) {
+    console.error("Error getting ticket by account ID:", error);
+    throw error;
+  }
+}
 
 
