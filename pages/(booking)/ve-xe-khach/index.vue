@@ -514,6 +514,8 @@ const nextStep = async () => {
     activeStep.value = 2;
   }
 };
+import { Filter } from '@element-plus/icons-vue'
+const showFilterDrawer = ref(false)
 </script>
 
 <template>
@@ -522,9 +524,9 @@ const nextStep = async () => {
       <SelectTrip_v2 />
     </div>
     <div class="mt-16">
-      <el-row :gutter="20" class="mb-10">
+      <el-row :gutter="20" class="mb-10 [@media(max-width:450px)]:flex-col">
         <el-col :span="7">
-          <div class="p-4 bg-white rounded-2xl">
+          <div class="p-4 bg-white rounded-2xl [@media(max-width:450px)]:hidden">
             <div class="flex justify-between items-center mb-5">
               <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
               <el-button type="danger" text>
@@ -593,6 +595,74 @@ const nextStep = async () => {
               </el-collapse-item>
             </el-collapse>
           </div>
+
+          <!-- Nút lọc trên mobile -->
+          <div class="sm:hidden mb-4">
+            <el-button type="primary" @click="showFilterDrawer = true">
+              <el-icon>
+                <Filter />
+              </el-icon>
+              Bộ lọc
+            </el-button>
+          </div>
+          <!-- Drawer hiển thị bộ lọc trên mobile -->
+          <el-drawer v-model="showFilterDrawer" direction="btt" size="80%" :with-header="false">
+            <div class="p-4 bg-white rounded-2xl">
+              <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
+                <el-button type="danger" text>
+                  Bỏ lọc
+                  <el-icon class="el-icon--right">
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </div>
+              <el-collapse accordion>
+                <el-collapse-item name="1">
+                  <template #title><span class="font-semibold text-lg"> Giờ đi </span></template>
+                  <div>
+                    <el-checkbox-group v-model="filterTime" class="flex flex-col px-4">
+                      <el-checkbox label="00:00 - 06:00" :value="'0-6'" size="large" />
+                      <el-checkbox label="06:00 - 12:00" :value="'6-12'" size="large" />
+                      <el-checkbox label="12:00 - 18:00" :value="'12-18'" size="large" />
+                      <el-checkbox label="18:00 - 24:00" :value="'18-24'" size="large" />
+                    </el-checkbox-group>
+                  </div>
+                </el-collapse-item>
+                <el-collapse-item name="2">
+                  <template #title><span class="font-semibold text-lg"> Nhà xe </span></template>
+                  <div>
+                    <el-checkbox-group class="flex flex-col px-4" v-model="filterCompanies">
+                      <el-checkbox v-for="company in uniqueCompanies" :key="company.id" :label="company.company.name"
+                        :value="company.id" size="large" />
+                    </el-checkbox-group>
+                  </div>
+                </el-collapse-item>
+                <el-collapse-item name="3">
+                  <template #title><span class="font-semibold text-lg"> Giá vé </span></template>
+                  <div class="px-4"><el-slider /></div>
+                </el-collapse-item>
+                <el-collapse-item name="4">
+                  <template #title><span class="font-semibold text-lg"> Loại xe </span></template>
+                  <div>
+                    <el-checkbox-group class="flex flex-col px-4">
+                      <el-checkbox label="Ghế ngồi" :value="'0-6'" size="large" />
+                      <el-checkbox label="Ghế ngồi limousine" :value="'6-12'" size="large" />
+                      <el-checkbox label="Giường nằm" :value="'12-18'" size="large" />
+                      <el-checkbox label="Giường nằm limousine" :value="'18-24'" size="large" />
+                      <el-checkbox label="Phòng VIP (Cabin)" :value="'18-24'" size="large" />
+                    </el-checkbox-group>
+                  </div>
+                </el-collapse-item>
+                <el-collapse-item name="5">
+                  <template #title><span class="font-semibold text-lg"> Đánh giá </span></template>
+                  <div class="flex flex-col px-4">
+                    <el-rate size="large" />
+                  </div>
+                </el-collapse-item>
+              </el-collapse>
+            </div>
+          </el-drawer>
         </el-col>
         <el-col :span="17">
           <h2 class="text-lg font-semibold mb-4">Danh sách chuyến đi ({{ tripData.length }})</h2>
@@ -957,6 +1027,16 @@ const nextStep = async () => {
               </el-tabs>
             </div>
           </div>
+
+          <!-- <div v-else class="flex flex-col gap-4">
+            <div v-for="trip in tripData" :key="trip.id" :class="[
+              'trip-card rounded-2xl bg-white pt-4',
+              selectedTripId === trip.id ? 'border-[#03ACFF] border-[3px]' : '',
+            ]">
+              
+            </div>
+          </div> -->
+
         </el-col>
       </el-row>
     </div>
