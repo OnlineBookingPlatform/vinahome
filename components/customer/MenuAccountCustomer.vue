@@ -16,7 +16,7 @@
   <div>
     <el-menu :default-active="route.path" class="el-menu-vertical-demo rounded-lg hidden sm:block" v-if="!isMobile">
       <NuxtLink v-for="item in menuItems" :key="item.index" :to="item.to" class="no-underline">
-        <el-menu-item :index="item.index">
+        <el-menu-item :index="item.index" >
           <span v-html="item.icon" class="mr-2"></span>
           <span class="text-[1rem] font-bold">{{ item.label }}</span>
         </el-menu-item>

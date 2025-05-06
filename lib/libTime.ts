@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const timeToSeconds = (timeStr: string): number => {
   if (!timeStr) return 0;
   const parts = timeStr.split(":").map((part) => parseInt(part) || 0);
@@ -28,4 +30,9 @@ export const calculateDuration = (startTime: string, endTime: string): string =>
   const minutes = Math.floor((durationSec % 3600) / 60);
 
   return `${hours}h${minutes.toString().padStart(2, "0")}`;
+};
+
+
+export const formatDateTime = (_: any, __: any, value: string) => {
+  return dayjs(value).format('HH:mm DD/MM/YYYY');
 };
