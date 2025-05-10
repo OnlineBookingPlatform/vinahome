@@ -263,6 +263,15 @@ const handleClickTab = async (tripId: number, tab: any) => {
     selectedTicket.value = [];
 
     await openTrip(tripId);
+  } else if (tab.props.name === 5) {
+    if (selectedTripId.value !== tripId) {
+      selectedTicket.value = [];
+      activeStep.value = 0;
+    }
+    selectedStep.value = 1;
+    selectedTicket.value = [];
+
+    await openTrip(tripId);
   } else {
     activeTabs.value[tripId] =
       activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
@@ -1038,21 +1047,15 @@ const openDrawerTrip = async (tripId: number) => {
                   </div>
                 </el-tab-pane>
                 <el-tab-pane label="Trung chuyển" :name="3">
-                  <div class="p-4">
-                    Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
-                    Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
-                    thông trong thành phố và sẽ kết hợp đón nhiều điểm khác nhau
-                    nên thời gian đón cụ thể tài xế sẽ liên hệ hẹn giờ. - Hẻm
-                    nhỏ xe không quay đầu được : Xe trung chuyển sẽ đón Khách
-                    đầu hẻm/ đầu đường. - Khu vực có biển cấm dừng đỗ xe không
-                    đón được : Xe trung chuyển sẽ đón tại vị trí gần nhất có
-                    thể. - Hành lý : Hành lý nhỏ gọn dưới 20 kg, không vận
-                    chuyển kèm động vật , thú cưng, không mang đồ có mùi, đồ
-                    chảy nước trên xe.nn
+                  <div class="prose p-4" v-html="tripDetail?.transit_content">
                   </div>
                 </el-tab-pane>
                 <el-tab-pane label="Chính sách" :name="4">
                   <div class="prose p-4" v-html="tripDetail?.policy_content">
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="Đánh giá" :name="5">
+                  <div class="prose p-4" >
                   </div>
                 </el-tab-pane>
               </el-tabs>
