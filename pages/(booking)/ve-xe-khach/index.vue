@@ -213,6 +213,11 @@ const handleClickTab = async (tripId: number, tab: any) => {
     "activeTabs trước khi cập nhật:",
     activeTabs.value[String(tripId)]
   );
+  if (activeTabs.value[tripId] === tab.props.name) {
+    activeTabs.value[tripId] = null;
+    selectedTripId.value = null;
+    return;
+  }
   if (tab.props.name === 1) {
     if (selectedTripId.value !== tripId) {
       selectedTicket.value = [];
