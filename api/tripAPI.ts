@@ -1,6 +1,8 @@
 import type {
+  ConnectedTripType,
   DetailTripType,
   DTO_RP_TripInfo,
+  SearchResults,
   SearchTripParams,
   TripType,
 } from "~/types/TripType";
@@ -12,11 +14,11 @@ import type { TripPointType } from "~/types/PointType";
 
 export const getTripOnPlatform = async (
   params: SearchTripParams
-): Promise<ApiResponse<DTO_RP_TripInfo[]>> => {
+): Promise<ApiResponse<SearchResults>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
-    return await $fetch<ApiResponse<DTO_RP_TripInfo[]>>(
+    return await $fetch<ApiResponse<SearchResults>>(
       `${API_GATEWAY_URL}/v2/trip/search`,
       {
         method: "POST",
@@ -25,6 +27,29 @@ export const getTripOnPlatform = async (
     );
   } catch (error) {
     console.error("Lỗi khi tìm kiếm chuyến đi:", error);
+    throw error;
+  }
+};
+
+// Thêm API mới để tìm kiếm chuyến nối
+export const findConnectedTrips = async (
+  params: SearchTripParams
+): Promise<ApiResponse<ConnectedTripType[]>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    console.log('Gọi API tìm kiếm chuyến nối với tham số:', JSON.stringify(params));
+    const response = await $fetch<ApiResponse<ConnectedTripType[]>>(
+      `${API_GATEWAY_URL}/v2/trip/search-connected`,
+      {
+        method: "POST",
+        body: params,
+      }
+    );
+    console.log('Kết quả API tìm kiếm chuyến nối:', JSON.stringify(response));
+    return response;
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm chuyến nối:", error);
     throw error;
   }
 };
