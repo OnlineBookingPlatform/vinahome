@@ -3,12 +3,12 @@ definePageMeta({
   layout: 'default'
 });
 
-import ContentAccountComments from "~/components/customer/ContentAccountComments.vue"
+import ContentAccountVoucher from "~/components/customer/ContentAccountVoucher.vue"
 </script>
 
 <template>
   <NuxtLayout name="layout-v1">
-    <ContentAccountComments/>
+    <ContentAccountVoucher />
   </NuxtLayout>
 </template>
 

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
 import { createAccountBySuperAdminAPI, deleteAccountBySuperAdminAPI, getListAccountByCompanyOnPlatformAPI, updateAccountBySuperAdminAPI } from "~/api/accountAPI";
 import type { AccountByCompanyBusType } from "~/types/AccountType";
-import Quill from "~/components/Quill.vue";
 import { getCompanyAPI } from "~/api/companyAPI";
 import { createPolicy, updatePolicy } from "~/api/policy.api";
+import { createTransit, updateTransit } from "~/api/transit.api";
+
 definePageMeta({
   layout: "superadmin",
 });
+
 const route = useRoute();
 const companyId = computed(() => route.params.id as string);
 const isLoading = ref(false);
@@ -31,6 +32,11 @@ const ruleForm = reactive<AccountByCompanyBusType>({
 
 const { data: tableData, refresh } = useAsyncData('get-accounts', () => getListAccountByCompanyOnPlatformAPI(Number(companyId.value)), { lazy: true, watch: [companyId] })
 const { data, error } = useAsyncData('get-company', () => getCompanyAPI(companyId.value), { lazy: true, watch: [companyId] })
+
+watchEffect(() => {
+  if (!error) return
+  console.log(error)
+})
 
 const rules = reactive({
   name: [
@@ -150,19 +156,36 @@ const handleDelete = async (row: AccountByCompanyBusType) => {
   }
 }
 
-const content = ref(data.value?.result.policies[0].content);
+const policyContent = ref(data.value?.result.policies[0]?.content ?? "");
+const transitContent = ref(data.value?.result.transits[0]?.content ?? "");
 
 const saveContentPolicy = async () => {
-  console.log(content.value);
+  console.log(policyContent.value);
   try {
     if (data.value?.result.policies.length === 0) {
-      await createPolicy(Number(companyId), content.value);
+      await createPolicy(Number(companyId), policyContent.value);
       ElMessage.success("Lưu chính sách thành công!");
       return;
     }
 
-    await updatePolicy(data.value?.result.policies[0].id, content.value);
+    await updatePolicy(data.value?.result.policies[0].id, policyContent.value);
     ElMessage.success("Cập nhật chính sách thành công!");
+  } catch (error) {
+    ElMessage.error("Lưu thất bại.");
+  }
+};
+
+const saveContentTransit = async () => {
+  console.log(policyContent.value);
+  try {
+    if (data.value?.result.transits.length === 0) {
+      await createTransit(Number(companyId), transitContent.value);
+      ElMessage.success("Lưu trung chuyển thành công!");
+      return;
+    }
+
+    await updateTransit(data.value?.result.transits[0].id, transitContent.value);
+    ElMessage.success("Cập nhật trung chuyển thành công!");
   } catch (error) {
     ElMessage.error("Lưu thất bại.");
   }
@@ -275,9 +298,11 @@ const saveContentPolicy = async () => {
         </el-dialog>
       </el-tab-pane>
       <el-tab-pane label="Chính sách">
-        <Quill v-model="content" @onsave="saveContentPolicy" />
+        <Quill v-model="policyContent" @onsave="saveContentPolicy" />
       </el-tab-pane>
-      <el-tab-pane label="Trung chuyển">Trung chuyển</el-tab-pane>
+      <el-tab-pane label="Trung chuyển">
+        <Quill v-model="transitContent" @onsave="saveContentTransit" />
+      </el-tab-pane>
     </el-tabs>
   </section>
 </template>

@@ -8,6 +8,7 @@ definePageMeta({
 });
 
 const loading = ref(false);
+const router = useRouter();
 
 const ticketData = ref<DTO_RP_TicketSearch[]>([]);
 const userStore = useUserStore();
@@ -34,6 +35,17 @@ onMounted(() => {
   userStore.loadUserData();
   fetchTicketByAccountId();
 });
+
+const handleEvaluate = () => {
+  router.push({ path: '/account/review-trip' })
+};
+const handleDownloadTicket = () => {
+  ElMessage({
+    message: 'Chức năng đang được phát triển',
+    type: 'warning',
+    duration: 2000,
+  });
+};
 </script>
 
 <template>
@@ -93,7 +105,8 @@ onMounted(() => {
                 </div>
               </div>
               <div>
-                <el-button type="success">Tải vé</el-button>
+                <el-button type="danger" @click="handleEvaluate()">Đánh giá</el-button>
+                <el-button type="success" @click="handleDownloadTicket()">Tải vé</el-button>
               </div>
             </div>
             <div

@@ -10,6 +10,7 @@ export interface BusCompanyType {
   note: string | null;
   url_vehicle_online: string | null;
   policies: { id: number; content: string }[];
+  transits: { id: number; content: string }[];
 }
 
 export interface DTO_RQ_RegisterSaleTicketOnPlatform {
