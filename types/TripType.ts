@@ -95,4 +95,5 @@ export interface DetailTripType {
   total_column: number;
   tickets: TicketType[];
   policy_content: string;
+  transit_content: string;
 }
