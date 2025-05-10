@@ -37,7 +37,20 @@ onMounted(() => {
 });
 
 const handleEvaluate = () => {
-  router.push({ path: '/account/review-trip' })
+  const companyId = ticketData.value.find((ticket) => ticket.company_id)?.company_id;
+  const tripId = ticketData.value.find((ticket) => ticket.trip_id)?.trip_id;
+  const ticketId = ticketData.value.find((ticket) => ticket.id)?.id;
+  const ticketPhone = ticketData.value.find((ticket) => ticket.passenger_phone)?.passenger_phone;
+  console.log("Company ID:", companyId);
+
+  if (companyId) {
+    router.push({ 
+      path: '/account/review-trip', 
+      query: { company_id: companyId , trip_id: tripId, ticket_id: ticketId, ticket_phone: ticketPhone }
+    });
+  } else {
+    ElMessage.error("Không tìm thấy thông tin nhà xe");
+  }
 };
 const handleDownloadTicket = () => {
   ElMessage({
@@ -46,11 +59,12 @@ const handleDownloadTicket = () => {
     duration: 2000,
   });
 };
+
 </script>
 
 <template>
   <NuxtLayout name="layout-v1">
-    <h2 class="text-lg">Vé Của Tôi</h2>
+    <h1 class="text-xl font-bold mb-4 text-center text-blue-600">Vé của tôi</h1>
     <div class="bg-white rounded-lg w-full py-2" v-loading="loading">
       <div class="mx-5 my-5 flex items-center">
         <div class="flex flex-col w-full">

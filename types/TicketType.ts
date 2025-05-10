@@ -45,5 +45,7 @@ export interface DTO_RP_TicketSearch {
   license_plate: string;
   start_time: string;
   start_date: string;
+  company_id: number;
+  trip_id: number;
 }
 
