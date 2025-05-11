@@ -13,6 +13,8 @@ import {
   type DetailTripType,
   type DTO_RP_TripInfo,
   type SearchTripParams,
+  type ConnectedTripType,
+  type SearchResults
 } from "~/types/TripType";
 import { dayjs, ElMessage } from "element-plus";
 import {
@@ -20,13 +22,16 @@ import {
   getPointUpByTrip,
   getTripDetail,
   getTripOnPlatform,
+  findConnectedTrips
 } from "~/api/tripAPI";
 import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
-import type { BookingData } from "~/types/PendingType";
+import type { BookingData, ConnectedTripWithTickets } from "~/types/PendingType";
 import { changeTicketBookedAPI } from "~/api/ticketAPI";
 import { timeToSeconds, calculateTotalTime, calculateDuration } from "~/lib/libTime"
 import type { TripPointType } from "~/types/PointType";
+import ConnectedTripSeatSelection from "~/components/ConnectedTripSeatSelection.vue";
+
 const route = useRoute();
 const router = useRouter();
 const tripData = ref<DTO_RP_TripInfo[]>([]);
@@ -49,8 +54,10 @@ const checked2 = ref(false);
 const pendingTicketStore = usePendingTicketStore();
 const activeStep = ref(0);
 const pointStore = usePointStore();
-const connectedTrips = ref<DTO_RP_TripInfo[]>([]);
+const connectedTrips = ref<ConnectedTripType[]>([]);
 const allTrips = ref<DTO_RP_TripInfo[]>([]);
+const selectedConnectedTrip = ref<ConnectedTripType | null>(null);
+const showConnectedTripSeatSelection = ref(false);
 
 // Bộ lọc theo tên công ty
 const filterCompanies = ref<number[]>([])
@@ -77,7 +84,7 @@ const fetchTrips = async () => {
     numberOfTickets,
   });
 
-  const searchParams = {
+  const searchParams: SearchTripParams = {
     departureId: departureId ? Number(departureId) : null,
     destinationId: destinationId ? Number(destinationId) : null,
     departureDate: departureDate as string,
@@ -93,16 +100,17 @@ const fetchTrips = async () => {
 
     if (response?.result) {
       // Kiểm tra và xử lý định dạng kết quả trả về
-      if (response.result.directTrips) {
+      if ('directTrips' in response.result) {
         // Định dạng mới với chuyến nối
-        tripData.value = response.result.directTrips;
-        connectedTrips.value = response.result.connectedTrips || [];
-        allTrips.value = response.result.directTrips;
+        const results = response.result as SearchResults;
+        tripData.value = results.directTrips;
+        connectedTrips.value = results.connectedTrips || [];
+        allTrips.value = results.directTrips;
       } else {
         // Định dạng cũ, chỉ có chuyến trực tiếp
-        tripData.value = response.result;
+        tripData.value = response.result as DTO_RP_TripInfo[];
         connectedTrips.value = [];
-        allTrips.value = response.result;
+        allTrips.value = response.result as DTO_RP_TripInfo[];
       }
     } else {
       tripData.value = [];
@@ -133,6 +141,7 @@ const fetchTrips = async () => {
     ElMessage.error("Có lỗi xảy ra khi tìm kiếm chuyến đi");
     tripData.value = [];
     connectedTrips.value = [];
+    allTrips.value = [];
   } finally {
     loading.value = false;
   }
@@ -539,7 +548,7 @@ const openDrawerTrip = async (tripId: number) => {
 };
 
 // Thêm hàm xử lý cho việc đặt vé chuyến nối
-const handleConnectedTrip = (connectedTrip) => {
+const handleConnectedTrip = (connectedTrip: ConnectedTripType) => {
   ElMessage.info({
     message: 'Tính năng đặt vé cho chuyến nối đang được phát triển. Vui lòng đặt riêng từng chuyến.',
     type: 'info',
@@ -548,7 +557,7 @@ const handleConnectedTrip = (connectedTrip) => {
 };
 
 // Hàm định dạng tiền tệ
-const formatCurrency = (amount) => {
+const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
@@ -557,21 +566,55 @@ const formatCurrency = (amount) => {
 };
 
 // Hàm định dạng ngày
-const formatDate = (dateString) => {
+const formatDate = (dateString: string) => {
   if (!dateString) return '';
   return dayjs(dateString).format('DD/MM/YYYY');
 };
 
-const handleSelectConnectedTrip = (connection) => {
+const handleSelectConnectedTrip = (connection: ConnectedTripType) => {
   console.log("Selected connected trip:", connection);
-  // Xử lý khi người dùng chọn chuyến nối
-  // Có thể lưu vào store hoặc chuyển sang trang đặt vé
-  pendingTicketStore.addConnectedTrip(connection);
+  selectedConnectedTrip.value = connection;
+  showConnectedTripSeatSelection.value = true;
+};
+
+const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTripTickets: SelectedTicket[]) => {
+  console.log("Connected trip selected tickets:", {
+    firstTripTickets,
+    secondTripTickets
+  });
+  
+  if (!selectedConnectedTrip.value) {
+    ElMessage.error("Không tìm thấy thông tin chuyến nối");
+    return;
+  }
+  
+  // Combine both trip tickets into one selected ticket array with proper types
+  const combinedTickets = [
+    ...firstTripTickets.map(ticket => ({
+      ...ticket,
+      trip_id: selectedConnectedTrip.value!.firstTrip.id,
+      trip_name: `${selectedConnectedTrip.value!.firstTrip.departureInfo.pointName} → ${selectedConnectedTrip.value!.firstTrip.destinationInfo.pointName}`
+    })),
+    ...secondTripTickets.map(ticket => ({
+      ...ticket,
+      trip_id: selectedConnectedTrip.value!.secondTrip.id,
+      trip_name: `${selectedConnectedTrip.value!.secondTrip.departureInfo.pointName} → ${selectedConnectedTrip.value!.secondTrip.destinationInfo.pointName}`
+    }))
+  ];
+  
+  const connectedTripWithTickets: ConnectedTripWithTickets = {
+    ...selectedConnectedTrip.value,
+    firstTripTickets,
+    secondTripTickets
+  };
+  
+  pendingTicketStore.addConnectedTrip(connectedTripWithTickets);
+  
   router.push({
     path: '/payment',
     query: {
       type: 'connected-trip',
-      id: `${connection.firstTrip.id}-${connection.secondTrip.id}`
+      id: `${selectedConnectedTrip.value.firstTrip.id}-${selectedConnectedTrip.value.secondTrip.id}`
     }
   });
 };
@@ -707,7 +750,7 @@ const handleSelectConnectedTrip = (connection) => {
                   <div class="flex justify-between mx-4">
                     <!-- Ảnh -->
                     <div class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]">
-                      <img :src="trip.company.url_vehicle_online" class="w-full object-cover" loading="eager" />
+                      <img :src="trip.company.url_vehicle_online" class="w-full object-cover" loading="eager" alt="Vehicle image for company" />
                     </div>
                     <!-- Thông tin chuyến đi -->
                     <div class="w-full ml-4">
@@ -1140,6 +1183,21 @@ const handleSelectConnectedTrip = (connection) => {
       </div>
     </div>
   </div>
+
+  <!-- Connected Trip Seat Selection Modal -->
+  <el-dialog 
+    v-model="showConnectedTripSeatSelection" 
+    :title="'Chọn ghế cho chuyến đi'"
+    width="90%"
+    destroy-on-close
+    append-to-body
+  >
+    <ConnectedTripSeatSelection 
+      v-if="selectedConnectedTrip"
+      :connectedTrip="selectedConnectedTrip" 
+      @proceed="handleConnectedTripProceed"
+    />
+  </el-dialog>
 </template>
 
 <style>

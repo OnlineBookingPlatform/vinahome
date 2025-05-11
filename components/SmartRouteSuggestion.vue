@@ -55,10 +55,12 @@ const formatTime = (time: string) => {
 };
 
 const formatDate = (date: string) => {
+  if (!date) return '';
   return new Date(date).toLocaleDateString('vi-VN');
 };
 
 const formatCurrency = (amount: number) => {
+  if (!amount && amount !== 0) return '0 ₫';
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
@@ -66,11 +68,52 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Thêm hàm tính ngày đến dựa trên thời gian khởi hành và đến
-const calculateArrivalDate = (departureDate: string, departureTime: string, arrivalTime: string, duration?: number, fromProvince?: string, toProvince?: string): string => {
-  // Function no longer needed, keeping it for reference only
-  const depDate = new Date(departureDate);
-  return depDate.toISOString().split('T')[0];
+// Calculate trip duration
+const calculateDurationText = (trip: any): string => {
+  if (trip.duration) {
+    return `Thời gian: ${trip.duration}`;
+  }
+  
+  // Nếu không có duration nhưng có thể tính từ thời gian khởi hành và thời gian đến
+  const departureTime = trip.time_departure;
+  const arrivalTime = trip.destinationInfo?.time || trip.destinationInfo?.arrivalTime;
+  
+  if (departureTime && arrivalTime) {
+    try {
+      // Parse time in format HH:MM or HH:MM:SS
+      const parseTime = (timeStr: string): number => {
+        const parts = timeStr.split(':');
+        let hours = parseInt(parts[0]);
+        let minutes = parseInt(parts[1]);
+        return hours * 60 + minutes; // Convert to minutes
+      };
+      
+      let departureMinutes = parseTime(departureTime);
+      let arrivalMinutes = parseTime(arrivalTime);
+      
+      // Handle overnight trips
+      if (arrivalMinutes < departureMinutes) {
+        arrivalMinutes += 24 * 60; // Add 24 hours
+      }
+      
+      const durationMinutes = arrivalMinutes - departureMinutes;
+      const hours = Math.floor(durationMinutes / 60);
+      const minutes = durationMinutes % 60;
+      
+      if (hours > 0 && minutes > 0) {
+        return `Thời gian: ${hours}h ${minutes}p`;
+      } else if (hours > 0) {
+        return `Thời gian: ${hours}h`;
+      } else {
+        return `Thời gian: ${minutes}p`;
+      }
+    } catch (e) {
+      console.error('Lỗi khi tính thời gian di chuyển:', e);
+      return '';
+    }
+  }
+  
+  return '';
 };
 
 /**
@@ -137,7 +180,9 @@ const logConnectedTripDetails = (connection: ConnectedTripType) => {
       point: connection.firstTrip.destinationInfo?.pointName,
       province: connection.firstTrip.destinationInfo?.province
     },
-    duration: connection.firstTrip.duration
+    duration: connection.firstTrip.duration,
+    tickets_available: connection.firstTrip.tickets_available,
+    seat_map: connection.firstTrip.seat_map
   });
   
   console.log('Second Trip:', {
@@ -155,7 +200,9 @@ const logConnectedTripDetails = (connection: ConnectedTripType) => {
       point: connection.secondTrip.destinationInfo?.pointName,
       province: connection.secondTrip.destinationInfo?.province
     },
-    duration: connection.secondTrip.duration
+    duration: connection.secondTrip.duration,
+    tickets_available: connection.secondTrip.tickets_available,
+    seat_map: connection.secondTrip.seat_map
   });
   
   console.log('Connection Info:', {
@@ -176,23 +223,37 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="connectedTrips && connectedTrips.length > 0" class="mt-6 border border-yellow-100 bg-yellow-50 p-4 rounded-lg">
+  <div v-if="connectedTrips && connectedTrips.length > 0" class="mt-6 space-y-6">
     <div class="flex items-center mb-3">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-5 w-5 mr-2 text-yellow-600">
-        <path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
-      </svg>
-      <h3 class="text-lg font-semibold">Không có chuyến trực tiếp. Gợi ý cho bạn:</h3>
+      <h3 class="text-lg font-semibold">Chuyến nối có thể phù hợp với bạn</h3>
     </div>
     
-    <div v-for="(connection, index) in connectedTrips" :key="index" class="mt-4 border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center">
-        <div class="w-full">
-          <!-- First trip -->
+    <div v-for="(connection, index) in connectedTrips" 
+         :key="index" 
+         class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300">
+      <!-- Header with destination overview -->
+      <div class="bg-blue-600 text-white p-3">
+        <div class="flex justify-between items-center">
+          <div class="font-medium">
+            {{ connection.firstTrip.departureInfo.pointName }} → {{ connection.secondTrip.destinationInfo.pointName }}
+          </div>
+          <div class="text-sm">
+            Tổng thời gian: <span class="font-semibold">{{ connection.totalDuration || 'Đang tính...' }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-4">
+        <!-- First trip -->
+        <div class="rounded-lg border border-gray-200 p-3 bg-gray-50">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center">
-                <img :src="connection.firstTrip.company.urlLogo" class="h-8 w-8 object-contain mr-2" :alt="`Logo của ${connection.firstTrip.company.name}`" />
-                <div class="text-lg font-medium">{{ connection.firstTrip.company.name }}</div>
+                <img :src="connection.firstTrip.company.urlLogo || connection.firstTrip.company.url_vehicle_online" class="h-8 w-8 object-contain mr-2" :alt="`Logo của ${connection.firstTrip.company.name}`" />
+                <div class="flex items-center gap-2">
+                  <div class="text-lg font-medium">{{ connection.firstTrip.company.name }}</div>
+                  <div v-if="connection.firstTrip.seat_map" class="text-sm text-gray-500">({{ connection.firstTrip.seat_map.name }})</div>
+                </div>
               </div>
               <div class="flex items-center mt-3">
                 <div class="mr-4">
@@ -206,6 +267,9 @@ onMounted(() => {
                       {{ connection.firstTrip.departureInfo.pointName }} → {{ connection.firstTrip.destinationInfo.pointName }}
                     </div>
                     <div class="border-t-2 border-dashed border-gray-300 w-full"></div>
+                    <div class="text-center text-xs text-gray-500 mt-1">
+                      {{ calculateDurationText(connection.firstTrip) }}
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -214,26 +278,46 @@ onMounted(() => {
                   <div class="text-sm">{{ formatDate(getArrivalDate(connection.firstTrip)) }}</div>
                 </div>
               </div>
-            </div>
-            <div class="ml-4 text-right">
-              <div class="font-semibold text-lg text-red-600">{{ formatCurrency(connection.firstTrip.route.base_price) }}</div>
+              <div class="mt-2 flex justify-between items-center">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 mr-1 text-amber-500" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                  <span class="text-amber-600 text-sm font-medium">
+                    Còn {{ connection.firstTrip.tickets_available > 0 ? connection.firstTrip.tickets_available : '0' }} chỗ trống
+                  </span>
+                </div>
+                <div class="text-blue-600 font-semibold">
+                  {{ formatCurrency(connection.firstTrip.route.base_price) }}
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Transfer -->
-          <div class="my-4 border-l-4 border-yellow-500 pl-4 py-2 bg-yellow-50">
-            <div class="text-sm">
-              <span class="font-medium text-yellow-700">Chuyển tiếp tại {{ connection.connectionPoint.pointName }} ({{ connection.connectionPoint.province.name }})</span>
-              <span class="text-gray-600 ml-2">· Thời gian chờ: {{ connection.waitingTime }}</span>
-            </div>
+        <!-- Transfer -->
+        <div class="my-4 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
           </div>
+          <div class="ml-3">
+            <div class="text-sm font-medium">Chuyển tiếp tại {{ connection.connectionPoint.pointName }}</div>
+            <div class="text-xs text-gray-500">{{ connection.connectionPoint.province.name }} · Thời gian chờ: {{ connection.waitingTime }}</div>
+          </div>
+        </div>
 
-          <!-- Second trip -->
+        <!-- Second trip -->
+        <div class="rounded-lg border border-gray-200 p-3 bg-gray-50">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center">
-                <img :src="connection.secondTrip.company.urlLogo" class="h-8 w-8 object-contain mr-2" :alt="`Logo của ${connection.secondTrip.company.name}`" />
-                <div class="text-lg font-medium">{{ connection.secondTrip.company.name }}</div>
+                <img :src="connection.secondTrip.company.urlLogo || connection.secondTrip.company.url_vehicle_online" class="h-8 w-8 object-contain mr-2" :alt="`Logo của ${connection.secondTrip.company.name}`" />
+                <div class="flex items-center gap-2">
+                  <div class="text-lg font-medium">{{ connection.secondTrip.company.name }}</div>
+                  <div v-if="connection.secondTrip.seat_map" class="text-sm text-gray-500">({{ connection.secondTrip.seat_map.name }})</div>
+                </div>
               </div>
               <div class="flex items-center mt-3">
                 <div class="mr-4">
@@ -247,6 +331,9 @@ onMounted(() => {
                       {{ connection.secondTrip.departureInfo.pointName }} → {{ connection.secondTrip.destinationInfo.pointName }}
                     </div>
                     <div class="border-t-2 border-dashed border-gray-300 w-full"></div>
+                    <div class="text-center text-xs text-gray-500 mt-1">
+                      {{ calculateDurationText(connection.secondTrip) }}
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -255,34 +342,60 @@ onMounted(() => {
                   <div class="text-sm">{{ formatDate(getArrivalDate(connection.secondTrip)) }}</div>
                 </div>
               </div>
-            </div>
-            <div class="ml-4 text-right">
-              <div class="font-semibold text-lg text-red-600">{{ formatCurrency(connection.secondTrip.route.base_price) }}</div>
+              <div class="mt-2 flex justify-between items-center">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 mr-1 text-amber-500" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                  <span class="text-amber-600 text-sm font-medium">
+                    Còn {{ connection.secondTrip.tickets_available > 0 ? connection.secondTrip.tickets_available : '0' }} chỗ trống
+                  </span>
+                </div>
+                <div class="text-blue-600 font-semibold">
+                  {{ formatCurrency(connection.secondTrip.route.base_price) }}
+                </div>
+              </div>
             </div>
           </div>
+        </div>
           
-          <!-- Total -->
-          <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-            <div class="text-sm text-gray-600">
+        <!-- Total -->
+        <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               Tổng thời gian: {{ connection.totalDuration || 'Đang tính...' }}
             </div>
-            <div>
-              <div class="text-sm text-gray-500">Tổng chi phí</div>
-              <div class="font-bold text-xl text-red-600">{{ formatCurrency(connection.totalPrice) }}</div>
-            </div>
           </div>
-
-          <button 
-            class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition"
-            @click="handleSelectConnection(connection)"
-            tabindex="0"
-            aria-label="Chọn hành trình này"
-            @keydown="handleKeyDown($event, connection)"
-          >
-            Chọn hành trình này
-          </button>
+          <div>
+            <div class="text-sm text-gray-500">Tổng chi phí</div>
+            <div class="font-bold text-xl text-blue-600">{{ formatCurrency(connection.totalPrice) }}</div>
+          </div>
         </div>
+
+        <button 
+          class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          @click="handleSelectConnection(connection)"
+          tabindex="0"
+          aria-label="Chọn hành trình này"
+          @keydown="handleKeyDown($event, connection)"
+        >
+          Chọn hành trình này
+        </button>
       </div>
     </div>
   </div>
-</template> 
+</template>
+
+<style scoped>
+.seat-availability {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+</style> 

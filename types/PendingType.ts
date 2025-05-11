@@ -6,6 +6,14 @@ export interface Ticket {
   price: number;
 }
 
+export interface SelectedTicket {
+  id: number;
+  seat_name: string;
+  price: number;
+  trip_id?: number;
+  trip_name?: string;
+}
+
 export interface BookingData {
   selectedTicket: Ticket[];
   selectedTripId: number;
@@ -27,4 +35,10 @@ export interface ConnectedBookingData {
     totalPrice: number;
     totalDuration: string;
   };
+}
+
+// Add extended connected trip type with ticket information
+export interface ConnectedTripWithTickets extends ConnectedTripType {
+  firstTripTickets?: SelectedTicket[];
+  secondTripTickets?: SelectedTicket[];
 }

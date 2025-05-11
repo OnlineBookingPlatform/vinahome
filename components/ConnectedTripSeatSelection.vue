@@ -26,76 +26,216 @@ const selectedSecondTripTickets = ref<SelectedTicket[]>([]);
 const loadingFirstTrip = ref(true);
 const loadingSecondTrip = ref(true);
 
+// Error states
+const firstTripError = ref(false);
+const secondTripError = ref(false);
+
+// Retry counts
+const maxRetries = 3;
+const firstTripRetryCount = ref(0);
+const secondTripRetryCount = ref(0);
+
 // Active tab for each trip
 const firstTripActiveTab = ref(1);
 const secondTripActiveTab = ref(1);
 
-// Fetch trip details
+// Fetch trip details with retry mechanism
 const fetchTripDetails = async () => {
+  // Reset the states
+  firstTripError.value = false;
+  secondTripError.value = false;
+  selectedFirstTripTickets.value = [];
+  selectedSecondTripTickets.value = [];
+  
   try {
-    // Reset seat selections when fetching new trip details
-    selectedFirstTripTickets.value = [];
-    selectedSecondTripTickets.value = [];
-    
     // Fetch first trip details
-    loadingFirstTrip.value = true;
-    const firstResponse = await getTripDetail(props.connectedTrip.firstTrip.id);
-    if (firstResponse.result) {
-      firstTripDetail.value = firstResponse.result;
-      console.log("First trip details:", firstTripDetail.value);
-    } else {
-      console.error("No result in first trip response");
-      ElMessage.error("Không thể tải thông tin chuyến đi đầu tiên");
-    }
-    loadingFirstTrip.value = false;
-    
+    await fetchFirstTripDetails();
     // Fetch second trip details
-    loadingSecondTrip.value = true;
-    const secondResponse = await getTripDetail(props.connectedTrip.secondTrip.id);
-    if (secondResponse.result) {
-      secondTripDetail.value = secondResponse.result;
-      console.log("Second trip details:", secondTripDetail.value);
-    } else {
-      console.error("No result in second trip response");
-      ElMessage.error("Không thể tải thông tin chuyến đi thứ hai");
-    }
-    loadingSecondTrip.value = false;
+    await fetchSecondTripDetails();
   } catch (error) {
     console.error("Error fetching trip details:", error);
     ElMessage.error("Lỗi khi tải thông tin chuyến đi. Vui lòng thử lại sau.");
+  }
+};
+
+// Fetch first trip details with retry logic
+const fetchFirstTripDetails = async () => {
+  loadingFirstTrip.value = true;
+  firstTripError.value = false;
+  firstTripDetail.value = null;
+  
+  try {
+    console.log(`=== FETCHING FIRST TRIP DETAILS ===`);
+    console.log(`Trip ID: ${props.connectedTrip.firstTrip.id}`);
+    console.log(`Company: ${props.connectedTrip.firstTrip.company.name}`);
+    console.log(`Route: ${props.connectedTrip.firstTrip.departureInfo.pointName} → ${props.connectedTrip.firstTrip.destinationInfo.pointName}`);
+    console.log(`Date: ${props.connectedTrip.firstTrip.dateDeparture}`);
+    
+    // This is the key part - similar to how index.vue handles it
+    const response = await getTripDetail(props.connectedTrip.firstTrip.id);
+    
+    console.log(`API Response status:`, response.status);
+    console.log(`API Response message:`, response.message);
+    console.log(`API Response has result:`, !!response.result);
+    
+    // Simplify validation like in index.vue
+    if (response && response.result) {
+      firstTripDetail.value = response.result;
+      console.log("First trip details loaded successfully");
+      
+      // Log basic structure information
+      console.log("Response result structure:", Object.keys(response.result));
+      console.log("Has tickets property:", 'tickets' in response.result);
+      console.log("Has seat_map property:", 'seat_map' in response.result);
+      
+      if (response.result.tickets) {
+        console.log("Tickets is array:", Array.isArray(response.result.tickets));
+        console.log("Tickets count:", Array.isArray(response.result.tickets) ? response.result.tickets.length : 'N/A');
+      }
+      
+      // Debug the ticket data
+      debugTicketData(firstTripDetail.value, "First Trip");
+      
+      // Special handling for empty ticket arrays
+      if (!firstTripDetail.value.tickets || !Array.isArray(firstTripDetail.value.tickets) || firstTripDetail.value.tickets.length === 0) {
+        console.warn("First trip has no tickets array or empty array");
+        ElMessage.warning("Chuyến đi đầu tiên không có dữ liệu ghế ngồi hoặc đã hết vé");
+      }
+    } else {
+      console.warn("First trip response invalid:", response);
+      console.warn("Response stringified:", JSON.stringify(response));
+      firstTripError.value = true;
+      ElMessage.error("Không thể tải thông tin ghế cho chuyến đi đầu tiên");
+    }
+  } catch (error) {
+    console.error("Error fetching first trip details:", error);
+    console.error("Error type:", error instanceof Error ? error.constructor.name : typeof error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    firstTripError.value = true;
+    ElMessage.error("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
+  } finally {
     loadingFirstTrip.value = false;
+    console.log(`=== END FETCHING FIRST TRIP DETAILS ===`);
+  }
+};
+
+// Fetch second trip details with retry logic
+const fetchSecondTripDetails = async () => {
+  loadingSecondTrip.value = true;
+  secondTripError.value = false;
+  secondTripDetail.value = null;
+  
+  try {
+    console.log(`=== FETCHING SECOND TRIP DETAILS ===`);
+    console.log(`Trip ID: ${props.connectedTrip.secondTrip.id}`);
+    console.log(`Company: ${props.connectedTrip.secondTrip.company.name}`);
+    console.log(`Route: ${props.connectedTrip.secondTrip.departureInfo.pointName} → ${props.connectedTrip.secondTrip.destinationInfo.pointName}`);
+    console.log(`Date: ${props.connectedTrip.secondTrip.dateDeparture}`);
+    
+    // This is the key part - similar to how index.vue handles it
+    const response = await getTripDetail(props.connectedTrip.secondTrip.id);
+    
+    console.log(`API Response status:`, response.status);
+    console.log(`API Response message:`, response.message);
+    console.log(`API Response has result:`, !!response.result);
+    
+    // Simplify validation like in index.vue
+    if (response && response.result) {
+      secondTripDetail.value = response.result;
+      console.log("Second trip details loaded successfully");
+      
+      // Log basic structure information
+      console.log("Response result structure:", Object.keys(response.result));
+      console.log("Has tickets property:", 'tickets' in response.result);
+      console.log("Has seat_map property:", 'seat_map' in response.result);
+      
+      if (response.result.tickets) {
+        console.log("Tickets is array:", Array.isArray(response.result.tickets));
+        console.log("Tickets count:", Array.isArray(response.result.tickets) ? response.result.tickets.length : 'N/A');
+      }
+      
+      // Debug the ticket data
+      debugTicketData(secondTripDetail.value, "Second Trip");
+      
+      // Special handling for empty ticket arrays
+      if (!secondTripDetail.value.tickets || !Array.isArray(secondTripDetail.value.tickets) || secondTripDetail.value.tickets.length === 0) {
+        console.warn("Second trip has no tickets array or empty array");
+        ElMessage.warning("Chuyến đi thứ hai không có dữ liệu ghế ngồi hoặc đã hết vé");
+      }
+    } else {
+      console.warn("Second trip response invalid:", response);
+      console.warn("Response stringified:", JSON.stringify(response));
+      secondTripError.value = true;
+      ElMessage.error("Không thể tải thông tin ghế cho chuyến đi thứ hai");
+    }
+  } catch (error) {
+    console.error("Error fetching second trip details:", error);
+    console.error("Error type:", error instanceof Error ? error.constructor.name : typeof error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    secondTripError.value = true;
+    ElMessage.error("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
+  } finally {
     loadingSecondTrip.value = false;
+    console.log(`=== END FETCHING SECOND TRIP DETAILS ===`);
   }
 };
 
 // Formatted date
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return date.toLocaleDateString('vi-VN');
 };
 
-// Seat handling functions for first trip
+// Seat handling functions for first trip - using simplified approach from index.vue
 const getFirstTripFloors = computed(() => {
   if (!firstTripDetail.value?.tickets) return [];
-  return [...new Set(firstTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_floor))];
+  try {
+    const floors = new Set<number>(
+      firstTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_floor)
+    );
+    return Array.from(floors).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting first trip floors:", error);
+    return [];
+  }
 });
 
-const getFirstTripRows = (floor: number) => {
+const getFirstTripRows = (floor: number): number[] => {
   if (!firstTripDetail.value?.tickets) return [];
-  return [...new Set(
-    firstTripDetail.value.tickets
-      .filter((ticket: TicketType) => ticket.seat_floor === floor)
-      .map((ticket: TicketType) => ticket.seat_row)
-  )];
+  try {
+    const rows = new Set<number>(
+      firstTripDetail.value.tickets
+        .filter((ticket: TicketType) => ticket.seat_floor === floor)
+        .map((ticket: TicketType) => ticket.seat_row)
+    );
+    return Array.from(rows).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting first trip rows:", error);
+    return [];
+  }
 };
 
 const getFirstTripColumns = computed(() => {
   if (!firstTripDetail.value?.tickets) return [];
-  return [...new Set(firstTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_column))];
+  try {
+    const cols = new Set<number>(
+      firstTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_column)
+    );
+    return Array.from(cols).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting first trip columns:", error);
+    return [];
+  }
 });
 
-const getFirstTripSeatName = (floor: number, row: number, col: number) => {
+const getFirstTripSeatName = (floor: number, row: number, col: number): string => {
   if (!firstTripDetail.value?.tickets) return "";
   const seat = firstTripDetail.value.tickets.find(
     (ticket: TicketType) => 
@@ -106,7 +246,7 @@ const getFirstTripSeatName = (floor: number, row: number, col: number) => {
   return seat ? seat.seat_name : "";
 };
 
-const getFirstTripSeatPrice = (floor: number, row: number, col: number) => {
+const getFirstTripSeatPrice = (floor: number, row: number, col: number): string => {
   if (!firstTripDetail.value?.tickets) return "0 ₫";
   const seat = firstTripDetail.value.tickets.find(
     (ticket: TicketType) => 
@@ -117,7 +257,8 @@ const getFirstTripSeatPrice = (floor: number, row: number, col: number) => {
   if (!seat) return "0 ₫";
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
-    currency: 'VND'
+    currency: 'VND',
+    minimumFractionDigits: 0
   }).format(seat.base_price);
 };
 
@@ -185,27 +326,49 @@ const isFirstTripSeatSelected = (floor: number, row: number, col: number) => {
   return seat && selectedFirstTripTickets.value.some((s) => s.id === seat.id);
 };
 
-// Seat handling functions for second trip
+// Seat handling functions for second trip - using simplified approach from index.vue
 const getSecondTripFloors = computed(() => {
   if (!secondTripDetail.value?.tickets) return [];
-  return [...new Set(secondTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_floor))];
+  try {
+    const floors = new Set<number>(
+      secondTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_floor)
+    );
+    return Array.from(floors).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting second trip floors:", error);
+    return [];
+  }
 });
 
-const getSecondTripRows = (floor: number) => {
+const getSecondTripRows = (floor: number): number[] => {
   if (!secondTripDetail.value?.tickets) return [];
-  return [...new Set(
-    secondTripDetail.value.tickets
-      .filter((ticket: TicketType) => ticket.seat_floor === floor)
-      .map((ticket: TicketType) => ticket.seat_row)
-  )];
+  try {
+    const rows = new Set<number>(
+      secondTripDetail.value.tickets
+        .filter((ticket: TicketType) => ticket.seat_floor === floor)
+        .map((ticket: TicketType) => ticket.seat_row)
+    );
+    return Array.from(rows).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting second trip rows:", error);
+    return [];
+  }
 };
 
 const getSecondTripColumns = computed(() => {
   if (!secondTripDetail.value?.tickets) return [];
-  return [...new Set(secondTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_column))];
+  try {
+    const cols = new Set<number>(
+      secondTripDetail.value.tickets.map((ticket: TicketType) => ticket.seat_column)
+    );
+    return Array.from(cols).sort((a: number, b: number) => a - b);
+  } catch (error) {
+    console.error("Error getting second trip columns:", error);
+    return [];
+  }
 });
 
-const getSecondTripSeatName = (floor: number, row: number, col: number) => {
+const getSecondTripSeatName = (floor: number, row: number, col: number): string => {
   if (!secondTripDetail.value?.tickets) return "";
   const seat = secondTripDetail.value.tickets.find(
     (ticket: TicketType) => 
@@ -216,7 +379,7 @@ const getSecondTripSeatName = (floor: number, row: number, col: number) => {
   return seat ? seat.seat_name : "";
 };
 
-const getSecondTripSeatPrice = (floor: number, row: number, col: number) => {
+const getSecondTripSeatPrice = (floor: number, row: number, col: number): string => {
   if (!secondTripDetail.value?.tickets) return "0 ₫";
   const seat = secondTripDetail.value.tickets.find(
     (ticket: TicketType) => 
@@ -227,7 +390,8 @@ const getSecondTripSeatPrice = (floor: number, row: number, col: number) => {
   if (!seat) return "0 ₫";
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
-    currency: 'VND'
+    currency: 'VND',
+    minimumFractionDigits: 0
   }).format(seat.base_price);
 };
 
@@ -331,7 +495,104 @@ const handleProceed = () => {
   }
 };
 
+// Simple debug function to log seat information
+const debugTicketData = (tripDetail: any, tripName: string) => {
+  console.log(`===== DEBUG ${tripName} =====`);
+  
+  if (!tripDetail) {
+    console.error(`${tripName} detail is null or undefined`);
+    return;
+  }
+  
+  // Log the entire response for inspection
+  console.log(`${tripName} full response:`, JSON.stringify(tripDetail));
+  
+  // Check for tickets array
+  if (!tripDetail.tickets) {
+    console.error(`${tripName} has no 'tickets' property`);
+  } else if (!Array.isArray(tripDetail.tickets)) {
+    console.error(`${tripName} tickets is not an array, it's:`, typeof tripDetail.tickets);
+  } else if (tripDetail.tickets.length === 0) {
+    console.error(`${tripName} tickets array is empty`);
+  } else {
+    // Log ticket information
+    console.log(`${tripName} tickets count:`, tripDetail.tickets.length);
+    console.log(`${tripName} first ticket sample:`, JSON.stringify(tripDetail.tickets[0]));
+    
+    // Log available vs booked seats
+    const bookedSeats = tripDetail.tickets.filter((t: any) => t.status_booking_ticket).length;
+    const availableSeats = tripDetail.tickets.length - bookedSeats;
+    console.log(`${tripName} booked seats: ${bookedSeats}, available seats: ${availableSeats}`);
+    
+    // Log floor information
+    const floors = new Set(tripDetail.tickets.map((ticket: any) => ticket.seat_floor));
+    console.log(`${tripName} floors:`, Array.from(floors));
+    
+    // Log seat layout
+    Array.from(floors).forEach((floor: any) => {
+      const rows = new Set(tripDetail.tickets
+        .filter((t: any) => t.seat_floor === floor)
+        .map((t: any) => t.seat_row));
+      
+      const cols = new Set(tripDetail.tickets
+        .filter((t: any) => t.seat_floor === floor)
+        .map((t: any) => t.seat_column));
+      
+      console.log(`${tripName} floor ${floor} layout: ${Array.from(rows).length} rows × ${Array.from(cols).length} columns`);
+    });
+  }
+  
+  // Check for seat_map property (vehicle layout)
+  if (!tripDetail.seat_map) {
+    console.error(`${tripName} has no 'seat_map' property`);
+  } else {
+    console.log(`${tripName} seat_map:`, JSON.stringify(tripDetail.seat_map));
+  }
+  
+  console.log(`===== END DEBUG ${tripName} =====`);
+};
+
+// Add a diagnostic function to be called from the browser console
+const runDiagnostics = () => {
+  console.log("RUNNING FULL CONNECTED TRIP DIAGNOSTICS");
+  console.log("Connected Trip Props:", props.connectedTrip);
+  
+  // Check IDs 
+  console.log("First Trip ID:", props.connectedTrip.firstTrip.id);
+  console.log("Second Trip ID:", props.connectedTrip.secondTrip.id);
+  
+  // Log available seats from the original connected trip data
+  console.log("First Trip available seats from connector:", props.connectedTrip.firstTrip.tickets_available);
+  console.log("Second Trip available seats from connector:", props.connectedTrip.secondTrip.tickets_available);
+  
+  // Log detail data
+  if (firstTripDetail.value) {
+    debugTicketData(firstTripDetail.value, "First Trip Detail");
+  } else {
+    console.error("First Trip Detail is not loaded");
+  }
+  
+  if (secondTripDetail.value) {
+    debugTicketData(secondTripDetail.value, "Second Trip Detail");
+  } else {
+    console.error("Second Trip Detail is not loaded");
+  }
+  
+  console.log("DIAGNOSTICS COMPLETE");
+};
+
+// Expose diagnostics to window for console access
 onMounted(() => {
+  console.log("ConnectedTripSeatSelection mounted with connectedTrip:", props.connectedTrip);
+  console.log("First Trip ID:", props.connectedTrip.firstTrip.id);
+  console.log("Second Trip ID:", props.connectedTrip.secondTrip.id);
+  
+  // Make diagnostics available globally
+  if (typeof window !== 'undefined') {
+    (window as any).runConnectedTripDiagnostics = runDiagnostics;
+    console.log("Diagnostics function available. Run 'window.runConnectedTripDiagnostics()' in console to debug");
+  }
+  
   fetchTripDetails();
 });
 </script>
@@ -339,6 +600,25 @@ onMounted(() => {
 <template>
   <div class="connected-trip-seat-selection bg-gray-50 p-4 rounded-lg">
     <h2 class="text-xl font-bold mb-4 text-center text-blue-700">Chọn chỗ ngồi cho chuyến đi</h2>
+    
+    <!-- Retry button at the top -->
+    <div v-if="firstTripError || secondTripError" class="mb-4 bg-yellow-50 border border-yellow-300 rounded-lg p-4 flex justify-between items-center">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Không thể tải thông tin ghế. Vui lòng thử lại.</span>
+      </div>
+      <button 
+        @click="fetchTripDetails" 
+        class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Tải lại
+      </button>
+    </div>
     
     <!-- Connection information -->
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -388,8 +668,35 @@ onMounted(() => {
           <p class="mt-2 text-gray-600">Đang tải thông tin ghế...</p>
         </div>
 
-        <div v-else-if="!firstTripDetail" class="p-8 text-center text-red-600">
-          <p>Không thể tải thông tin ghế. Vui lòng thử lại sau.</p>
+        <div v-else-if="firstTripError" class="p-8 text-center">
+          <div class="text-red-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Không thể tải thông tin ghế. Vui lòng thử lại sau.</p>
+          </div>
+          <button 
+            @click="fetchFirstTripDetails" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+
+        <div v-else-if="!firstTripDetail?.tickets || firstTripDetail.tickets.length === 0" class="p-8 text-center">
+          <div class="text-amber-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Chuyến đi này không có dữ liệu ghế ngồi hoặc đã hết vé.</p>
+          </div>
+          <p class="text-sm text-gray-500 my-2">Thử lại hoặc liên hệ nhà xe để được hỗ trợ.</p>
+          <button 
+            @click="fetchFirstTripDetails" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Thử lại
+          </button>
         </div>
 
         <div v-else class="p-4">
@@ -483,8 +790,35 @@ onMounted(() => {
           <p class="mt-2 text-gray-600">Đang tải thông tin ghế...</p>
         </div>
 
-        <div v-else-if="!secondTripDetail" class="p-8 text-center text-red-600">
-          <p>Không thể tải thông tin ghế. Vui lòng thử lại sau.</p>
+        <div v-else-if="secondTripError" class="p-8 text-center">
+          <div class="text-red-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Không thể tải thông tin ghế. Vui lòng thử lại sau.</p>
+          </div>
+          <button 
+            @click="fetchSecondTripDetails" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+        
+        <div v-else-if="!secondTripDetail?.tickets || secondTripDetail.tickets.length === 0" class="p-8 text-center">
+          <div class="text-amber-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Chuyến đi này không có dữ liệu ghế ngồi hoặc đã hết vé.</p>
+          </div>
+          <p class="text-sm text-gray-500 my-2">Thử lại hoặc liên hệ nhà xe để được hỗ trợ.</p>
+          <button 
+            @click="fetchSecondTripDetails" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Thử lại
+          </button>
         </div>
 
         <div v-else class="p-4">
@@ -590,6 +924,51 @@ onMounted(() => {
         <div class="w-4 h-4 rounded-sm bg-gray-300 mr-2"></div>
         <span>Đã đặt</span>
       </div>
+    </div>
+    
+    <!-- Diagnostic information for debugging -->
+    <div class="mt-8 border-t border-gray-200 pt-4">
+      <details class="bg-gray-50 p-2 rounded-lg">
+        <summary class="cursor-pointer text-sm font-medium text-gray-700 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Thông tin chẩn đoán (dành cho nhà phát triển)
+        </summary>
+        
+        <div class="mt-2 text-xs font-mono bg-gray-100 p-3 rounded overflow-auto max-h-60">
+          <div class="mb-2">
+            <strong>Chuyến đi 1:</strong>
+            <div>ID: {{ props.connectedTrip.firstTrip.id }}</div>
+            <div>Công ty: {{ props.connectedTrip.firstTrip.company.name }}</div>
+            <div>Tuyến: {{ props.connectedTrip.firstTrip.departureInfo.pointName }} → {{ props.connectedTrip.firstTrip.destinationInfo.pointName }}</div>
+            <div>Ghế trống (ban đầu): {{ props.connectedTrip.firstTrip.tickets_available || 'Không có' }}</div>
+            <div>Trạng thái: {{ loadingFirstTrip ? 'Đang tải' : firstTripError ? 'Lỗi' : firstTripDetail ? 'Đã tải' : 'Chưa tải' }}</div>
+            <div v-if="firstTripDetail?.tickets">Số ghế trong response: {{ firstTripDetail.tickets.length }}</div>
+            <div v-if="firstTripDetail?.seat_map">Loại xe: {{ firstTripDetail.seat_map.name }}</div>
+          </div>
+          
+          <div class="mb-2">
+            <strong>Chuyến đi 2:</strong>
+            <div>ID: {{ props.connectedTrip.secondTrip.id }}</div>
+            <div>Công ty: {{ props.connectedTrip.secondTrip.company.name }}</div>
+            <div>Tuyến: {{ props.connectedTrip.secondTrip.departureInfo.pointName }} → {{ props.connectedTrip.secondTrip.destinationInfo.pointName }}</div>
+            <div>Ghế trống (ban đầu): {{ props.connectedTrip.secondTrip.tickets_available || 'Không có' }}</div>
+            <div>Trạng thái: {{ loadingSecondTrip ? 'Đang tải' : secondTripError ? 'Lỗi' : secondTripDetail ? 'Đã tải' : 'Chưa tải' }}</div>
+            <div v-if="secondTripDetail?.tickets">Số ghế trong response: {{ secondTripDetail.tickets.length }}</div>
+            <div v-if="secondTripDetail?.seat_map">Loại xe: {{ secondTripDetail.seat_map.name }}</div>
+          </div>
+          
+          <div class="mt-4">
+            <button 
+              @click="runDiagnostics" 
+              class="bg-gray-700 text-white px-2 py-1 rounded text-xs"
+            >
+              Chạy chẩn đoán đầy đủ (xem console)
+            </button>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
 </template>
