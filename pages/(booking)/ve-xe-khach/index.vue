@@ -117,14 +117,14 @@ const fetchTrips = async () => {
       connectedTrips.value = [];
       allTrips.value = [];
     }
-    
+
     // Luôn tìm kiếm chuyến nối nếu không tìm thấy chuyến trực tiếp hoặc có ít hơn 2 chuyến trực tiếp
     if (tripData.value.length < 2) {
       try {
         console.log("Tìm kiếm chuyến nối với tham số:", searchParams);
         const connectedResponse = await findConnectedTrips(searchParams);
         console.log("Kết quả tìm kiếm chuyến nối:", connectedResponse);
-        
+
         if (connectedResponse?.result && connectedResponse.result.length > 0) {
           connectedTrips.value = connectedResponse.result;
         }
@@ -132,7 +132,7 @@ const fetchTrips = async () => {
         console.error("Error fetching connected trips:", connectedErr);
       }
     }
-    
+
     if (tripData.value.length === 0 && connectedTrips.value.length === 0) {
       ElMessage.warning("Không tìm thấy chuyến đi phù hợp");
     }
@@ -582,12 +582,12 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
     firstTripTickets,
     secondTripTickets
   });
-  
+
   if (!selectedConnectedTrip.value) {
     ElMessage.error("Không tìm thấy thông tin chuyến nối");
     return;
   }
-  
+
   // Combine both trip tickets into one selected ticket array with proper types
   const combinedTickets = [
     ...firstTripTickets.map(ticket => ({
@@ -601,15 +601,15 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
       trip_name: `${selectedConnectedTrip.value!.secondTrip.departureInfo.pointName} → ${selectedConnectedTrip.value!.secondTrip.destinationInfo.pointName}`
     }))
   ];
-  
+
   const connectedTripWithTickets: ConnectedTripWithTickets = {
     ...selectedConnectedTrip.value,
     firstTripTickets,
     secondTripTickets
   };
-  
+
   pendingTicketStore.addConnectedTrip(connectedTripWithTickets);
-  
+
   router.push({
     path: '/payment',
     query: {
@@ -716,9 +716,12 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
           </div>
 
           <!-- No trips found and no connected trips -->
-          <div v-else-if="tripData.length === 0 && connectedTrips.length === 0" class="text-center p-8 bg-white rounded-lg shadow">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <div v-else-if="tripData.length === 0 && connectedTrips.length === 0"
+            class="text-center p-8 bg-white rounded-lg shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <h3 class="mt-4 text-lg font-medium text-gray-900">Không tìm thấy chuyến xe nào</h3>
             <p class="mt-2 text-sm text-gray-500">Vui lòng thử lại với điểm đi, điểm đến hoặc ngày khác.</p>
@@ -726,10 +729,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
 
           <!-- Connected trips when no direct trips are found -->
           <div v-else-if="tripData.length === 0 && connectedTrips.length > 0">
-            <SmartRouteSuggestion 
-              :connectedTrips="connectedTrips" 
-              @selectConnection="handleSelectConnectedTrip" 
-            />
+            <SmartRouteSuggestion :connectedTrips="connectedTrips" @selectConnection="handleSelectConnectedTrip" />
           </div>
 
           <!-- Direct trips list -->
@@ -749,8 +749,10 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                 ]" :loading="loading">
                   <div class="flex justify-between mx-4">
                     <!-- Ảnh -->
-                    <div class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]">
-                      <img :src="trip.company.url_vehicle_online" class="w-full object-cover" loading="eager" alt="Vehicle image for company" />
+                    <div
+                      class="flex items-center gap-2 rounded overflow-hidden border border-gray-300 h-[140px] w-[200px]">
+                      <img :src="trip.company.url_vehicle_online" class="w-full object-cover" loading="eager"
+                        alt="Vehicle image for company" />
                     </div>
                     <!-- Thông tin chuyến đi -->
                     <div class="w-full ml-4">
@@ -921,9 +923,9 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                                             : isSeatSelected(floor, row, col)
                                               ? 'danger'
                                               : ''
-                                          " @click="
-                                            toggleSeatSelection(floor, row, col)
-                                            ">{{
+                                            " @click="
+                                              toggleSeatSelection(floor, row, col)
+                                              ">{{
                                               getSeatName(floor, row, col)
                                             }}</el-button>
                                       </el-tooltip>
@@ -947,8 +949,8 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                               <span>Thông tin điểm đón</span>
                               <el-select v-model="selectedPointUpId" filterable allow-create default-first-option
                                 class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                                <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name" :value="item.id"
-                                  class="mb-[2px]">
+                                <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name"
+                                  :value="item.id" class="mb-[2px]">
                                   <div class="flex flex-col">
                                     <span class="font-semibold text-sm">
                                       •
@@ -1014,7 +1016,8 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                           </div>
                           <div>
                             <span class="text-white text-sm mr-5">Tổng cộng: {{ totalPrice }}</span>
-                            <el-button color="#fff" @click="nextStep" v-if="selectedTicket.length >= 1">Tiếp tục</el-button>
+                            <el-button color="#fff" @click="nextStep" v-if="selectedTicket.length >= 1">Tiếp
+                              tục</el-button>
                           </div>
                         </div>
                       </div>
@@ -1078,17 +1081,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                       </div>
                     </el-tab-pane>
                     <el-tab-pane label="Trung chuyển" :name="3">
-                      <div class="p-4">
-                        Đón/ trả tận nơi: - Thời gian nhận khách : Trước 4 tiếng. -
-                        Thời gian xe đón : Chuẩn bị trước 2 -3 tiếng, do mật độ giao
-                        thông trong thành phố và sẽ kết hợp đón nhiều điểm khác nhau
-                        nên thời gian đón cụ thể tài xế sẽ liên hệ hẹn giờ. - Hẻm
-                        nhỏ xe không quay đầu được : Xe trung chuyển sẽ đón Khách
-                        đầu hẻm/ đầu đường. - Khu vực có biển cấm dừng đỗ xe không
-                        đón được : Xe trung chuyển sẽ đón tại vị trí gần nhất có
-                        thể. - Hành lý : Hành lý nhỏ gọn dưới 20 kg, không vận
-                        chuyển kèm động vật , thú cưng, không mang đồ có mùi, đồ
-                        chảy nước trên xe.nn
+                      <div class="prose p-4" v-html="tripDetail?.transit_content">
                       </div>
                     </el-tab-pane>
                     <el-tab-pane label="Chính sách" :name="4">
@@ -1101,13 +1094,10 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
 
               <!-- Các chuyến xe -->
               <div v-if="connectedTrips.length > 0" class="mt-8">
-                <h2 class="text-lg font-semibold mb-2 text-blue-600">Đề xuất chuyến nối ({{ connectedTrips.length }})</h2>
-                <el-card
-                  v-for="(connectedTrip, index) in connectedTrips"
-                  :key="`connected-${index}`"
-                  class="mb-4 border-l-4 border-blue-500"
-                  shadow="hover"
-                >
+                <h2 class="text-lg font-semibold mb-2 text-blue-600">Đề xuất chuyến nối ({{ connectedTrips.length }})
+                </h2>
+                <el-card v-for="(connectedTrip, index) in connectedTrips" :key="`connected-${index}`"
+                  class="mb-4 border-l-4 border-blue-500" shadow="hover">
                   <div class="flex flex-col space-y-4">
                     <!-- Chuyến thứ nhất -->
                     <div class="flex items-start space-x-4 p-2 bg-blue-50 rounded-md">
@@ -1135,8 +1125,11 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                     </div>
 
                     <!-- Hiển thị điểm nối -->
-                    <div class="flex items-center justify-center text-sm text-orange-500 py-2 border-dashed border-y border-gray-300">
-                      <i class="el-icon-time mr-1"></i> Thời gian chờ tại {{ connectedTrip.connectionPoint.province.name }}: {{ connectedTrip.waitingTime }}
+                    <div
+                      class="flex items-center justify-center text-sm text-orange-500 py-2 border-dashed border-y border-gray-300">
+                      <i class="el-icon-time mr-1"></i> Thời gian chờ tại {{ connectedTrip.connectionPoint.province.name
+                      }}: {{
+                        connectedTrip.waitingTime }}
                     </div>
 
                     <!-- Chuyến thứ hai -->
@@ -1152,7 +1145,8 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                           <span class="text-xs">({{ connectedTrip.connectionPoint.province.name }})</span>
                         </div>
                         <div class="text-sm">
-                          <span class="font-semibold">Đến:</span> {{ connectedTrip.secondTrip.destinationInfo.pointName }}
+                          <span class="font-semibold">Đến:</span> {{ connectedTrip.secondTrip.destinationInfo.pointName
+                          }}
                           <span class="text-xs">({{ connectedTrip.secondTrip.destinationInfo.province }})</span>
                         </div>
                       </div>
@@ -1167,8 +1161,9 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                     <!-- Hiển thị tổng cộng -->
                     <div class="flex justify-between items-center pt-3 border-t border-gray-200">
                       <div class="text-gray-600">
-                        <span class="font-semibold">Tổng tiền:</span> 
-                        <span class="text-red-600 font-bold text-lg">{{ formatCurrency(connectedTrip.totalPrice) }}</span>
+                        <span class="font-semibold">Tổng tiền:</span>
+                        <span class="text-red-600 font-bold text-lg">{{ formatCurrency(connectedTrip.totalPrice)
+                        }}</span>
                       </div>
                       <el-button type="primary" @click="handleSelectConnectedTrip(connectedTrip)">
                         Đặt vé
@@ -1185,18 +1180,10 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
   </div>
 
   <!-- Connected Trip Seat Selection Modal -->
-  <el-dialog 
-    v-model="showConnectedTripSeatSelection" 
-    :title="'Chọn ghế cho chuyến đi'"
-    width="90%"
-    destroy-on-close
-    append-to-body
-  >
-    <ConnectedTripSeatSelection 
-      v-if="selectedConnectedTrip"
-      :connectedTrip="selectedConnectedTrip" 
-      @proceed="handleConnectedTripProceed"
-    />
+  <el-dialog v-model="showConnectedTripSeatSelection" :title="'Chọn ghế cho chuyến đi'" width="90%" destroy-on-close
+    append-to-body>
+    <ConnectedTripSeatSelection v-if="selectedConnectedTrip" :connectedTrip="selectedConnectedTrip"
+      @proceed="handleConnectedTripProceed" />
   </el-dialog>
 </template>
 
