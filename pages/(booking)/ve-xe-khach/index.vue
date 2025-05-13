@@ -632,9 +632,9 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
       <!-- Phần lọc và kết quả tìm kiếm -->
       <div class="mt-5 mx-2 md:mx-0 flex flex-col md:flex-row gap-4">
         <!-- Phần bộ lọc -->
-        <div class="w-full md:w-[280px] bg-white rounded-2xl p-4 shadow-md h-min">
+        <div class="w-full md:w-[300px] bg-white rounded-2xl p-4 shadow-md h-min">
           <div class="flex justify-between items-center mb-5">
-            <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
+            <h2 class="text-base">BỘ LỌC TÌM KIẾM</h2>
             <el-button type="danger" text>
               Bỏ lọc <el-icon class="el-icon--right">
                 <Delete />
@@ -734,8 +734,8 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
 
           <!-- Direct trips list -->
           <div v-else>
-            <div class="mt-8">
-              <h2 class="text-lg font-semibold mb-2 text-blue-600">Danh sách chuyến đi ({{ tripData.length }})</h2>
+            <div class="mt-8 mb-8">
+              <!-- <h2 class="text-lg font-semibold mb-2 text-blue-600">Danh sách chuyến đi ({{ tripData.length }})</h2> -->
               <div v-if="loading" class="loading-container">
                 <el-skeleton :rows="5" animated />
               </div>
