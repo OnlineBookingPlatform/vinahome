@@ -24,6 +24,7 @@ import {
   getTripOnPlatform,
   findConnectedTrips
 } from "~/api/tripAPI";
+import { getEvaluatesAverageAPI, getEvaluatesByTripIdAPI, createEvaluateAPI } from "~/api/evaluateAPI";
 import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
 import type { BookingData, ConnectedTripWithTickets } from "~/types/PendingType";
@@ -58,6 +59,13 @@ const connectedTrips = ref<ConnectedTripType[]>([]);
 const allTrips = ref<DTO_RP_TripInfo[]>([]);
 const selectedConnectedTrip = ref<ConnectedTripType | null>(null);
 const showConnectedTripSeatSelection = ref(false);
+
+// Review data
+const tripReviews = ref<any[]>([]);
+const tripAverageRating = ref<any>(null);
+const reviewLoading = ref(false);
+const userReview = ref<string>('');
+const userRating = ref<number>(5);
 
 // Bộ lọc theo tên công ty
 const filterCompanies = ref<number[]>([])
@@ -173,6 +181,62 @@ watchEffect(() => {
   }
 });
 
+// Fetch review data
+const fetchReviewData = async (tripId: number) => {
+  reviewLoading.value = true;
+  try {
+    const [averageResponse, reviewsResponse] = await Promise.all([
+      getEvaluatesAverageAPI(tripId),
+      getEvaluatesByTripIdAPI(tripId)
+    ]);
+    
+    if (averageResponse?.result) {
+      tripAverageRating.value = averageResponse.result;
+    }
+    
+    if (reviewsResponse?.result) {
+      tripReviews.value = reviewsResponse.result;
+    }
+  } catch (error) {
+    console.error("Error fetching review data:", error);
+    ElMessage.error("Có lỗi khi tải dữ liệu đánh giá");
+  } finally {
+    reviewLoading.value = false;
+  }
+};
+
+// Submit review
+const submitReview = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning("Bạn cần đăng nhập để gửi đánh giá!");
+    return;
+  }
+  
+  if (!selectedTripId.value) {
+    ElMessage.warning("Không tìm thấy thông tin chuyến xe");
+    return;
+  }
+  
+  try {
+    const reviewData = {
+      trip_id: selectedTripId.value,
+      company_id: tripDetail.value?.company?.id,
+      desc: userReview.value,
+      rating: userRating.value
+    };
+    
+    await createEvaluateAPI(reviewData);
+    ElMessage.success("Đánh giá của bạn đã được gửi thành công!");
+    userReview.value = '';
+    
+    // Refresh review data
+    await fetchReviewData(selectedTripId.value);
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    ElMessage.error("Có lỗi khi gửi đánh giá");
+  }
+};
+
 const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
     selectedTicket.value = [];
@@ -267,6 +331,17 @@ const handleClickTab = async (tripId: number, tab: any) => {
     selectedTicket.value = [];
 
     await openTrip(tripId);
+  } else if (tab.props.name === 6) {
+    if (selectedTripId.value !== tripId) {
+      selectedTicket.value = [];
+      activeStep.value = 0;
+    }
+    
+    (activeTabs.value as Record<number, number | null>)[tripId] = 6;
+    selectedTripId.value = tripId;
+    
+    // Fetch review data when review tab is clicked
+    await fetchReviewData(tripId);
   } else {
     activeTabs.value[tripId] =
       activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
@@ -1086,6 +1161,59 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                     </el-tab-pane>
                     <el-tab-pane label="Chính sách" :name="4">
                       <div class="prose p-4" v-html="tripDetail?.policy_content">
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Đánh giá" :name="6">
+                      <div class="prose p-4">
+                        <div v-if="reviewLoading" class="text-center">
+                          <el-skeleton :rows="3" animated />
+                        </div>
+                        <div v-else>
+                          <!-- Summary of reviews -->
+                          <div class="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <div class="flex items-center justify-between">
+                              <div>
+                                <h3 class="text-lg font-semibold">Đánh giá tổng quan</h3>
+                                <p class="text-gray-600">Tổng số: {{ tripAverageRating?.totalReviews || 0 }} đánh giá</p>
+                              </div>
+                              <div class="text-right">
+                                <div class="flex items-center">
+                                  <span class="text-2xl font-bold mr-2">{{ tripAverageRating?.averageRating?.toFixed(1) || 0 }}</span>
+                                  <el-rate :model-value="tripAverageRating?.averageRating || 0" disabled show-score />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- List of reviews -->
+                          <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-4">Tất cả đánh giá</h3>
+                            
+                            <div v-if="tripReviews.length === 0" class="text-center p-8 text-gray-500">
+                              Chưa có đánh giá nào cho chuyến xe này
+                            </div>
+                            
+                            <div v-else class="space-y-2">
+                              <div v-for="review in tripReviews" :key="review.id" class="border-b pb-4 flex flex-col">
+                                <div class="flex items-center">
+                                  <img 
+                                    :src="review.account_avatar || 'https://via.placeholder.com/40'" 
+                                    class="w-8 h-8 rounded-full mr-2 object-cover"
+                                    alt="Avatar"
+                                  />
+                                  <p class="text-base font-semibold">{{ review.account_name }}</p>
+                                  <span class="text-xs text-gray-500 ml-2">
+                                    {{ dayjs(review.created_at).format('DD/MM/YYYY') }}
+                                  </span>
+                                </div>
+                                <div class="w-content pl-12">
+                                  <el-rate :model-value="review.rating" disabled />
+                                  <p class="text-gray-700">{{ review.desc }}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </el-tab-pane>
                   </el-tabs>
