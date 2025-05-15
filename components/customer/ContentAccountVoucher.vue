@@ -60,6 +60,37 @@ const vouchers = ref([
     },
 ]);
 
+import { ElMessage } from 'element-plus';
+import { getDiscountsByUserPurchase } from '~/api/discountAPI';
+import type { DiscountType } from '~/types/DiscountType';
+
+const loading = ref(false);
+
+const discountData = ref<DiscountType[]>([]);
+const userStore = useUserStore();
+
+const fetchDiscountsByAccountId = async () => {
+  loading.value = true;
+  try {
+    if (userStore.userData?.id) {
+      console.log("Lấy mã giảm giá cho userId:", userStore.userData.id);
+      const response = await getDiscountsByUserPurchase('67e0ff57e4ac1f541884f17d');
+      discountData.value = response.result;
+      console.log("Mã giảm giá lấy được:", response);
+    } else {
+      ElMessage.error("Không tìm thấy userId");
+    }
+  } catch (error) {
+    console.error("Error fetching:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+onMounted(() => {
+  userStore.loadUserData();
+  fetchDiscountsByAccountId();
+});
+
 const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     alert(`Đã sao chép mã: ${code}`);
