@@ -36,17 +36,18 @@ onMounted(() => {
   fetchTicketByAccountId();
 });
 
-const handleEvaluate = () => {
-  const companyId = ticketData.value.find((ticket) => ticket.company_id)?.company_id;
-  const tripId = ticketData.value.find((ticket) => ticket.trip_id)?.trip_id;
-  const ticketId = ticketData.value.find((ticket) => ticket.id)?.id;
-  const ticketPhone = ticketData.value.find((ticket) => ticket.passenger_phone)?.passenger_phone;
-  console.log("Company ID:", companyId);
+const handleEvaluate = (ticket: DTO_RP_TicketSearch) => {
+  console.log("Company ID:", ticket.company_id);
 
-  if (companyId) {
+  if (ticket.company_id) {
     router.push({ 
       path: '/account/review-trip', 
-      query: { company_id: companyId , trip_id: tripId, ticket_id: ticketId, ticket_phone: ticketPhone }
+      query: { 
+        company_id: ticket.company_id, 
+        trip_id: ticket.trip_id, 
+        ticket_id: ticket.id, 
+        ticket_phone: ticket.passenger_phone 
+      }
     });
   } else {
     ElMessage.error("Không tìm thấy thông tin nhà xe");
@@ -159,7 +160,7 @@ const handleAbortTicket = async (ticketId: number) => {
                 </div>
               </div>
               <div>
-                <el-button type="warning" @click="handleEvaluate()">Đánh giá</el-button>
+                <el-button type="warning" @click="handleEvaluate(ticket)">Đánh giá</el-button>
                 <el-button type="success" @click="handleDownloadTicket()">Tải vé</el-button>
                 <el-button type="danger" @click="handleAbortTicket(ticket.id)">Hủy vé</el-button>
               </div>

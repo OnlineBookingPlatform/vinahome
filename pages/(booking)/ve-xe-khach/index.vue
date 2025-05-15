@@ -49,7 +49,7 @@ const optionsPointDown = ref<TripPointType[]>([]);
 const optionsPointUp = ref<TripPointType[]>([]);
 const selectedPointUpId = ref<number | null>(null);
 const selectedPointDownId = ref<number | null>(null);
-const valuePoint = ref(1);
+const valuePoint = ref(0);
 const checked1 = ref(true);
 const checked2 = ref(false);
 const pendingTicketStore = usePendingTicketStore();
@@ -81,6 +81,9 @@ const uniqueCompanies = computed(() => {
 
 // Bộ lọc theo thời gian khởi hành
 const filterTime = ref<string[]>([])
+
+// Add a map to store trip ratings
+const tripRatings = ref(new Map<number, any>());
 
 const fetchTrips = async () => {
   const { departureId, destinationId, departureDate, numberOfTickets } = route.query;
@@ -144,6 +147,11 @@ const fetchTrips = async () => {
     if (tripData.value.length === 0 && connectedTrips.value.length === 0) {
       ElMessage.warning("Không tìm thấy chuyến đi phù hợp");
     }
+    
+    // Fetch ratings for all trips right after they're loaded
+    if (tripData.value.length > 0) {
+      await fetchAverageRatingsForTrips(tripData.value);
+    }
   } catch (err) {
     console.error("Search error:", err);
     ElMessage.error("Có lỗi xảy ra khi tìm kiếm chuyến đi");
@@ -154,89 +162,30 @@ const fetchTrips = async () => {
     loading.value = false;
   }
 };
-onMounted(fetchTrips);
-watch(
-  () => route.query,
-  (newQuery, oldQuery) => {
-    // Chỉ fetch lại nếu query thực sự thay đổi (tránh gọi API liên tục)
-    if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
-      fetchTrips();
-    }
-  },
-  { deep: true }
-);
 
-// Lọc data theo thời gian khởi hành
-watchEffect(() => {
-  if (filterTime.value.length === 0) {
-    tripData.value = allTrips.value;
-  } else {
-    tripData.value = allTrips.value.filter(trip => {
-      const hour = dayjs(trip.time_departure, 'HH:mm:ss').hour();
-      return filterTime.value.some(range => {
-        const [start, end] = range.split('-').map(Number);
-        return hour >= start && hour < end;
-      });
+// Function to fetch average ratings for all trips
+const fetchAverageRatingsForTrips = async (trips: DTO_RP_TripInfo[]) => {
+  try {
+    const ratingPromises = trips.map(trip => getEvaluatesAverageAPI(trip.id));
+    const ratingResponses = await Promise.all(ratingPromises);
+    
+    ratingResponses.forEach((response, index) => {
+      if (response?.result) {
+        tripRatings.value.set(trips[index].id, response.result);
+      }
     });
-  }
-});
-
-// Fetch review data
-const fetchReviewData = async (tripId: number) => {
-  reviewLoading.value = true;
-  try {
-    const [averageResponse, reviewsResponse] = await Promise.all([
-      getEvaluatesAverageAPI(tripId),
-      getEvaluatesByTripIdAPI(tripId)
-    ]);
-
-    if (averageResponse?.result) {
-      tripAverageRating.value = averageResponse.result;
-    }
-
-    if (reviewsResponse?.result) {
-      tripReviews.value = reviewsResponse.result;
-    }
   } catch (error) {
-    console.error("Error fetching review data:", error);
-    ElMessage.error("Có lỗi khi tải dữ liệu đánh giá");
-  } finally {
-    reviewLoading.value = false;
+    console.error("Error fetching ratings:", error);
   }
 };
 
-// Submit review
-const submitReview = async () => {
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning("Bạn cần đăng nhập để gửi đánh giá!");
-    return;
-  }
-
-  if (!selectedTripId.value) {
-    ElMessage.warning("Không tìm thấy thông tin chuyến xe");
-    return;
-  }
-
-  try {
-    const reviewData = {
-      trip_id: selectedTripId.value,
-      company_id: tripDetail.value?.company?.id,
-      desc: userReview.value,
-      rating: userRating.value
-    };
-
-    await createEvaluateAPI(reviewData);
-    ElMessage.success("Đánh giá của bạn đã được gửi thành công!");
-    userReview.value = '';
-
-    // Refresh review data
-    await fetchReviewData(selectedTripId.value);
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    ElMessage.error("Có lỗi khi gửi đánh giá");
-  }
+// Add a computed function to get the rating for a specific trip
+const getTripRating = (tripId: number): number => {
+  const rating = tripRatings.value.get(tripId);
+  return rating?.averageRating || valuePoint.value;
 };
 
+// Modified openTrip function to also fetch rating
 const openTrip = async (tripId: number) => {
   if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
     selectedTicket.value = [];
@@ -259,6 +208,17 @@ const openTrip = async (tripId: number) => {
   if (response.result) {
     tripDetail.value = response.result;
     console.log("API response:", tripDetail.value);
+    
+    // Fetch rating when opening a trip
+    try {
+      const ratingResponse = await getEvaluatesAverageAPI(tripId);
+      if (ratingResponse?.result) {
+        tripAverageRating.value = ratingResponse.result;
+        tripRatings.value.set(tripId, ratingResponse.result);
+      }
+    } catch (error) {
+      console.error("Error fetching trip rating:", error);
+    }
   }
 };
 
@@ -694,6 +654,95 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
   });
 };
 
+onMounted(fetchTrips);
+watch(
+  () => route.query,
+  (newQuery, oldQuery) => {
+    // Chỉ fetch lại nếu query thực sự thay đổi (tránh gọi API liên tục)
+    if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+      fetchTrips();
+    }
+  },
+  { deep: true }
+);
+
+// Lọc data theo thời gian khởi hành
+watchEffect(() => {
+  if (filterTime.value.length === 0) {
+    tripData.value = allTrips.value;
+  } else {
+    tripData.value = allTrips.value.filter(trip => {
+      const hour = dayjs(trip.time_departure, 'HH:mm:ss').hour();
+      return filterTime.value.some(range => {
+        const [start, end] = range.split('-').map(Number);
+        return hour >= start && hour < end;
+      });
+    });
+  }
+});
+
+// Fetch review data
+const fetchReviewData = async (tripId: number) => {
+  reviewLoading.value = true;
+  try {
+    const [averageResponse, reviewsResponse] = await Promise.all([
+      getEvaluatesAverageAPI(tripId),
+      getEvaluatesByTripIdAPI(tripId)
+    ]);
+
+    if (averageResponse?.result) {
+      tripAverageRating.value = averageResponse.result;
+      tripRatings.value.set(tripId, averageResponse.result);
+    }
+
+    if (reviewsResponse?.result) {
+      tripReviews.value = reviewsResponse.result;
+    }
+  } catch (error) {
+    console.error("Error fetching review data:", error);
+    ElMessage.error("Có lỗi khi tải dữ liệu đánh giá");
+  } finally {
+    reviewLoading.value = false;
+  }
+};
+
+// Submit review
+const submitReview = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning("Bạn cần đăng nhập để gửi đánh giá!");
+    return;
+  }
+
+  if (!selectedTripId.value) {
+    ElMessage.warning("Không tìm thấy thông tin chuyến xe");
+    return;
+  }
+
+  try {
+    // Fix type errors in reviewData
+    const reviewData: any = {
+      trip_id: selectedTripId.value,
+      desc: userReview.value,
+      rating: userRating.value
+    };
+    
+    // Add company_id only if it exists to avoid type errors
+    if (tripDetail.value && 'company' in tripDetail.value) {
+      reviewData.company_id = (tripDetail.value as any).company?.id;
+    }
+
+    await createEvaluateAPI(reviewData);
+    ElMessage.success("Đánh giá của bạn đã được gửi thành công!");
+    userReview.value = '';
+
+    // Refresh review data
+    await fetchReviewData(selectedTripId.value);
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    ElMessage.error("Có lỗi khi gửi đánh giá");
+  }
+};
+
 </script>
 
 <template>
@@ -906,7 +955,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                               trip.company.name
                             }}</span>
                             <div class="px-2">
-                              <el-rate v-model="valuePoint" disabled show-score text-color="#ff9900"
+                              <el-rate :model-value="getTripRating(trip.id)" disabled show-score text-color="#ff9900"
                                 score-template="{value}" />
                             </div>
                           </div>
