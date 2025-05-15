@@ -16,3 +16,19 @@ export const getDiscountsByUserPurchase = async (userId: string): Promise<ApiRes
         throw error;
     }
 }
+
+export const getDiscountsByCompanyAPI = async (companyId: number): Promise<ApiResponse<DiscountType[]>> => {
+    const config = useRuntimeConfig();
+    const API_GATEWAY_URL = config.public.apiGatewayUrl;
+    try {
+        return await $fetch<ApiResponse<DiscountType[]>>(
+            `${API_GATEWAY_URL}/v2/discount/get-discounts-by-company/${companyId}`,
+            {
+                method: "GET",
+            }
+        );
+    } catch (error) {
+        console.error("Error:", error);
+        throw error;
+    }
+}

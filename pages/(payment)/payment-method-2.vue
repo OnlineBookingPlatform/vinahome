@@ -167,7 +167,7 @@ onMounted(() => {
   if (currentTimeleft.value <= 1) {
     currentTimeleft.value = 1;
   }
-  
+
 });
 onUnmounted(clearTimer);
 
@@ -207,14 +207,23 @@ const submitForm = async () => {
     ...fieldsToUpdate,
   } as UserType);
 
+  // ✅ Tính toán giá vé sau khi trừ discount
+  const selectedTickets = pendingTicketStore.pendingTicket?.selectedTicket || [];
+  const totalDiscount = selectedDiscount.value?.discount_value || 0;
+  const discountPerTicket = selectedTickets.length > 0
+    ? totalDiscount / selectedTickets.length
+    : 0;
+
+  const ticketsWithDiscount = selectedTickets.map(ticket => ({
+    id: ticket.id,
+    seat_name: ticket.seat_name,
+    price: Math.max(0, ticket.price - discountPerTicket), // ✅ Giá sau giảm
+  }));
+
   const dataPay: DTO_RQ_DataPay = {
     service_provider_id: pendingTicketStore.pendingTicket?.tripData.company.id || null,
     service_provider_name: pendingTicketStore.pendingTicket?.tripData.company.name || null,
-    ticket: pendingTicketStore.pendingTicket?.selectedTicket.map((ticket) => ({
-      id: ticket.id,
-      seat_name: ticket.seat_name,
-      price: ticket.price,
-    })) || [],
+    ticket: ticketsWithDiscount,
 
     passenger_name: localUserData.value.name || null,
     passenger_phone: localUserData.value.phone || null,
@@ -228,8 +237,12 @@ const submitForm = async () => {
     email: localUserData.value.email || null,
     gender: localUserData.value.gender ?? null,
     creator_by_id: userStore.userData?.id || null,
-    
+
   };
+
+  console.log("✅ Vé sau khi trừ giảm giá:", ticketsWithDiscount);
+  console.log("🧾 Dữ liệu gửi lên server (dataPay):", dataPay);
+
 
 
   if ((showPaymentMethods.value = true)) {
@@ -277,6 +290,50 @@ const submitForm = async () => {
     }
   }
 };
+
+import { getDiscountsByCompanyAPI } from '~/api/discountAPI';
+import type { DiscountType } from '~/types/DiscountType';
+
+const discountData = ref<DiscountType[]>([]);
+const companyId = computed(() => pendingTicketStore.pendingTicket?.tripData.company.id ?? null);
+const selectedDiscount = ref<DiscountType | null>(null);
+
+const fetchDiscountsByCompanyId = async () => {
+  try {
+    if (companyId.value) {
+      const response = await getDiscountsByCompanyAPI(companyId.value);
+      discountData.value = response.result;
+      console.log("Mã giảm giá lấy được:", response);
+    }
+  } catch (error) {
+    console.error("Lỗi lấy mã giảm giá:", error);
+  }
+};
+
+onMounted(() => {
+  fetchDiscountsByCompanyId();
+});
+
+function selectDiscount(discount: DiscountType) {
+  if (selectedDiscount.value?.id === discount.id) {
+    selectedDiscount.value = null; // Bỏ chọn khi nhấn lại
+  } else {
+    selectedDiscount.value = discount;
+  }
+}
+
+function formatDate(dateStr: string | null | undefined) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+
+
 
 // const fetchBookingDataTicketAPI = async () => {
 //   try {
@@ -437,7 +494,7 @@ const submitForm = async () => {
             <span class="text-gray-600">Giá vé</span>
             <span class="font-bold text-black">
               {{
-                Number(pendingData?.selectedTicket[ 0 ].price).toLocaleString(
+                Number(pendingData?.selectedTicket[0].price).toLocaleString(
                   "vi-VN"
                 )
               }}
@@ -455,17 +512,20 @@ const submitForm = async () => {
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600">Khuyến mãi</span>
-            <span class="text-green-500">0đ</span>
+            <span class="text-green-500">
+              {{ selectedDiscount?.discount_value ? selectedDiscount.discount_value.toLocaleString("vi-VN") + "đ"
+                : "0đ" }}
+            </span>
           </div>
         </div>
         <div class="p-4 border-t font-bold text-white bg-primary flex justify-between rounded-b-xl">
-          <span>Tổng tạm tính</span>
-          <span>{{
+          {{
             (
-              Number(pendingData?.selectedTicket?.[ 0 ]?.price || 0) *
-              (pendingData?.selectedTicket?.length || 0)
+              (Number(pendingData?.selectedTicket?.[0]?.price || 0) *
+                (pendingData?.selectedTicket?.length || 0)) -
+              (selectedDiscount?.discount_value || 0)
             ).toLocaleString("vi-VN")
-          }}đ</span>
+          }}đ
         </div>
       </div>
 
@@ -541,9 +601,36 @@ const submitForm = async () => {
             Số lượng vé:
             <span class="font-semibold">{{
               pendingData?.selectedTicket.length
-              }}</span>
+            }}</span>
           </div>
         </div>
+      </div>
+
+      <div>
+        <h3 class="mb-4 font-bold text-lg">Chọn mã giảm giá</h3>
+        <ul>
+          <li v-for="discount in discountData" :key="discount.id" @click="selectDiscount(discount)" :class="[
+            'p-4 mb-3 border rounded cursor-pointer',
+            selectedDiscount?.id === discount.id ? 'bg-blue-100 border-blue-600' : 'border-gray-300',
+          ]">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="font-semibold text-lg">{{ discount.discount_code }}</div>
+                <div class="text-sm text-gray-700">{{ discount.description }}</div>
+                <div class="text-sm text-green-600 font-bold mt-1">
+                  Giảm {{ discount.discount_value.toLocaleString('vi-VN') }}đ
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  Áp dụng từ {{ formatDate(discount.date_start) }} đến {{ formatDate(discount.date_end) }}
+                </div>
+              </div>
+              <div v-if="selectedDiscount?.id === discount.id" class="text-blue-700 font-bold">
+                Đã chọn
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div v-if="discountData.length === 0" class="text-gray-500">Không có mã giảm giá nào.</div>
       </div>
     </aside>
   </section>
