@@ -786,6 +786,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
             Bộ lọc
           </el-button>
         </div>
+
         <!-- Drawer hiển thị bộ lọc trên mobile -->
         <el-drawer v-model="showFilterDrawer" direction="btt" size="50%" :with-header="false">
           <div class="p-4 bg-white rounded-2xl">
@@ -1249,7 +1250,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                                 <div class="flex items-center">
                                   <span class="text-2xl font-bold mr-2">{{ tripAverageRating?.averageRating?.toFixed(1)
                                     || 0
-                                    }}</span>
+                                  }}</span>
                                   <el-rate :model-value="tripAverageRating?.averageRating || 0" disabled show-score />
                                 </div>
                               </div>
@@ -1287,6 +1288,331 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                   </el-tabs>
                 </div>
               </div>
+
+              <!-- Hiển thị chuyến xe trên mobile -->
+              <div v-if="!loading" class="block sm:hidden">
+                <div v-for="trip in tripData" :key="trip.id" class="w-full h-full">
+                  <div :class="[
+                    'trip-card w-[150%] rounded-2xl bg-white pt-4 shadow-md',
+                    selectedTripId === trip.id ? 'border-[#03ACFF] border-[3px]' : ''
+                  ]">
+                    <div class="flex flex-col px-4 pb-4 gap-2">
+                      <!-- Tên nhà xe và giá -->
+                      <div class="flex justify-between items-center">
+                        <span class="text-base font-semibold truncate">{{ trip.company.name }}</span>
+                        <span class="text-base font-bold text-red-500">
+                          {{ Number(trip.route.base_price).toLocaleString("vi-VN") }}đ
+                        </span>
+                      </div>
+
+                      <!-- Điểm đi - điểm đến -->
+                      <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                          <el-icon :style="{ color: 'red', fontSize: '1.25rem' }">
+                            <Place />
+                          </el-icon>
+                          <span class="text-sm text-black">{{ trip.departureInfo.pointName }}</span>
+                          <span class="text-xs text-gray-500 ml-auto">
+                            {{ calculateTotalTime(trip.time_departure, trip.departureInfo.time) }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <el-icon :style="{ color: '#3B82F6', fontSize: '1.25rem' }">
+                            <LocationFilled />
+                          </el-icon>
+                          <span class="text-sm text-black">{{ trip.destinationInfo.pointName }}</span>
+                          <span class="text-xs text-gray-500 ml-auto">
+                            {{ calculateTotalTime(trip.time_departure, trip.destinationInfo.time) }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Số chỗ trống -->
+                      <div class="flex justify-between items-center mt-2">
+                        <span class="text-sm text-gray-500">{{ trip.seat_map.name }}</span>
+                        <span class="text-amber-600 text-sm font-medium">Còn {{ trip.tickets_available }} chỗ</span>
+                      </div>
+
+                      <!-- Nút chọn chuyến -->
+                      <div class="relative">
+                        <el-button type="primary" round class="absolute bottom-[-35px] right-4 z-10 mt-[3px]"
+                          @click="openDrawerTrip(trip.id)">
+                          <span class="mx-2">Chọn chuyến</span>
+                        </el-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Drawer hiển thị bộ lọc trên mobile -->
+              <el-drawer v-model="drawerVisible" direction="btt" size="80%" title="Thông tin chuyến">
+                <template v-if="selectedTripId">
+                  <el-tabs v-model="activeTabs[selectedTripId]" class="demo-tabs relative z-0"
+                    @tab-click="(tab: any) => handleClickTab(selectedTripId!, tab)">
+                    <el-tab-pane label="Chọn ghế" :name="1" class="">
+                      <div class="mt-5 items-center">
+                        <el-steps :active="activeStep" align-center finish-status="success">
+                          <el-step title="Chỗ mong muốn" />
+                          <el-step title="Điểm đón/trả" />
+                        </el-steps>
+                      </div>
+                      <div v-if="selectedStep === 1">
+                        <el-row>
+                          <el-col :span="8">
+                            <div class="flex flex-col mt-5 mx-4 bg-[#f5f5f5] rounded-xl p-2">
+                              <span class="text-base font-semibold">Chú thích</span>
+                              <div class="mt-3">
+                                <el-button circle class="mx-2"></el-button>
+                                Còn trống
+                              </div>
+                              <div class="mt-3">
+                                <el-button circle class="mx-2" type="info"></el-button>
+                                Đã đặt
+                              </div>
+                            </div>
+                          </el-col>
+                          <el-col :span="16" class="flex justify-center">
+                            <div v-if="tripDetail" class="flex flex-wrap justify-center gap-8 mb-5 mt-5">
+                              <div v-for="floor in getFloors" :key="floor" class="flex flex-col items-center">
+                                <h3 class="text-base">Tầng {{ floor }}</h3>
+                                <div class="flex flex-col bg-[#f5f5f5] rounded-xl p-2">
+                                  <div v-for="row in getRows(floor)" :key="row" style="display: flex">
+                                    <div v-for="col in getColumns" :key="col" style="margin: 5px" class="">
+                                      <el-tooltip :content="'Số ghế: ' +
+                                        getSeatName(floor, row, col) +
+                                        ' -  Giá:' +
+                                        ' ' +
+                                        getBasePrice(floor, row, col)
+                                        " placement="top">
+                                        <el-button circle size="large" class="mx-2"
+                                          :disabled="getSeatStatus(floor, row, col)"
+                                          :class="getButtonClass(floor, row, col)" :type="getSeatStatus(floor, row, col)
+                                            ? 'info'
+                                            : isSeatSelected(floor, row, col)
+                                              ? 'danger'
+                                              : ''
+                                            " @click="
+                                              toggleSeatSelection(floor, row, col)
+                                              ">{{
+                                                getSeatName(floor, row, col)
+                                              }}</el-button>
+                                      </el-tooltip>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div v-else>
+                              <el-skeleton :rows="5" animated />
+                            </div>
+                            <!-- <div v-else>Loading seat map...</div> -->
+                          </el-col>
+                        </el-row>
+                      </div>
+                      <div v-if="selectedStep === 2">
+                        <el-row class="mx-10">
+                          <el-col :span="12">
+                            <div class="rounded-xl bg-gray-100 p-4 m-2 mt-5">
+                              <span>Thông tin điểm đón</span>
+                              <el-select v-model="selectedPointUpId" filterable allow-create default-first-option
+                                class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                                <el-option v-for="item in optionsPointUp" :key="item.id" :label="item.name"
+                                  :value="item.id" class="mb-[2px]">
+                                  <div class="flex flex-col">
+                                    <span class="font-semibold text-sm">
+                                      •
+                                      {{
+                                        calculateTotalTime(
+                                          item.start_time,
+                                          item.time_point
+                                        )
+                                      }}
+                                      - {{ item.name }}</span>
+                                    <span class="text-xs text-gray-600">{{
+                                      item.address
+                                    }}</span>
+                                  </div>
+                                </el-option>
+                              </el-select>
+                            </div>
+                          </el-col>
+                          <el-col :span="12">
+                            <div class="bg-gray-100 rounded-xl p-4 m-2 mt-5">
+                              <span>Thông tin điểm trả</span>
+                              <el-select v-model="selectedPointDownId" filterable allow-create default-first-option
+                                class="w-60 border bg-gray-100 border-gray-300 rounded-lg p-[1px] shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                                <el-option v-for="item in optionsPointDown" :key="item.id" :label="item.name"
+                                  :value="item.id" class="mb-[2px]">
+                                  <div class="flex flex-col">
+                                    <span class="font-semibold text-sm">
+                                      •
+                                      {{
+                                        calculateTotalTime(
+                                          item.start_time,
+                                          item.time_point
+                                        )
+                                      }}
+                                      - {{ item.name }}</span>
+                                    <span class="text-xs text-gray-600">{{
+                                      item.address
+                                    }}</span>
+                                  </div>
+                                </el-option>
+                              </el-select>
+                            </div>
+                          </el-col>
+                        </el-row>
+                        <div class="flex justify-center items-center mt-5 mb-5">
+                          <span class="text-sm italic text-gray-500">
+                            * Vui lòng chọn hoặc nhập điểm đón và điểm trả
+                          </span>
+                        </div>
+                      </div>
+                      <div class="w-full bg-[#4D5054] rounded-b-[14px] px-5">
+                        <div class="flex justify-between items-center py-2">
+                          <div class="text-white flex justify-center items-center">
+                            <el-button color="#fff" @click="preStep" v-if="selectedStep === 2" class="mr-5">
+                              Quay lại
+                            </el-button>
+                            <span>
+                              Ghế:
+                              {{
+                                selectedTicket.map((s) => s.seat_name).join(", ")
+                              }}
+                            </span>
+                          </div>
+                          <div>
+                            <span class="text-white text-sm mr-5">Tổng cộng: {{ totalPrice }}</span>
+                            <el-button color="#fff" @click="nextStep" v-if="selectedTicket.length >= 1">Tiếp
+                              tục</el-button>
+                          </div>
+                        </div>
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Lịch trình" :name="2">
+                      <div class="p-4">
+                        <el-row :gutter="20">
+                          <el-col :span="12">
+                            <h3 class="text-lg font-semibold mb-2">Điểm đón</h3>
+                            <ul class="list-disc pl-5">
+                              <el-scrollbar height="400px">
+                                <li v-for="point in optionsPointUp" :key="point.id" class="mb-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-semibold text-base">{{
+                                      point.name
+                                    }}</span>
+                                    <span class="text-sm text-gray-500">{{
+                                      point.address
+                                    }}</span>
+                                    <span class="text-sm text-gray-400">
+                                      Thời gian:
+                                      {{
+                                        calculateTotalTime(
+                                          point.start_time,
+                                          point.time_point
+                                        )
+                                      }}
+                                    </span>
+                                  </div>
+                                </li>
+                              </el-scrollbar>
+                            </ul>
+                          </el-col>
+                          <el-col :span="12">
+                            <h3 class="text-lg font-semibold mb-2">Điểm trả</h3>
+                            <ul class="list-disc pl-5">
+                              <el-scrollbar height="400px">
+                                <li v-for="point in optionsPointDown" :key="point.id" class="mb-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-semibold text-base">{{
+                                      point.name
+                                    }}</span>
+                                    <span class="text-sm text-gray-500">{{
+                                      point.address
+                                    }}</span>
+                                    <span class="text-sm text-gray-400">
+                                      Thời gian:
+                                      {{
+                                        calculateTotalTime(
+                                          point.start_time,
+                                          point.time_point
+                                        )
+                                      }}
+                                    </span>
+                                  </div>
+                                </li>
+                              </el-scrollbar>
+                            </ul>
+                          </el-col>
+                        </el-row>
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Trung chuyển" :name="3">
+                      <div class="prose p-4" v-html="tripDetail?.transit_content">
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Chính sách" :name="4">
+                      <div class="prose p-4" v-html="tripDetail?.policy_content">
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Đánh giá" :name="6">
+                      <div class="prose p-4">
+                        <div v-if="reviewLoading" class="text-center">
+                          <el-skeleton :rows="3" animated />
+                        </div>
+                        <div v-else>
+                          <!-- Summary of reviews -->
+                          <div class="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <div class="flex items-center justify-between">
+                              <div>
+                                <h3 class="text-lg font-semibold">Đánh giá tổng quan</h3>
+                                <p class="text-gray-600">Tổng số: {{ tripAverageRating?.totalReviews || 0 }} đánh giá
+                                </p>
+                              </div>
+                              <div class="text-right">
+                                <div class="flex items-center">
+                                  <span class="text-2xl font-bold mr-2">{{ tripAverageRating?.averageRating?.toFixed(1)
+                                    || 0
+                                  }}</span>
+                                  <el-rate :model-value="tripAverageRating?.averageRating || 0" disabled show-score />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- List of reviews -->
+                          <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-4">Tất cả đánh giá</h3>
+
+                            <div v-if="tripReviews.length === 0" class="text-center p-8 text-gray-500">
+                              Chưa có đánh giá nào cho chuyến xe này
+                            </div>
+
+                            <div v-else class="space-y-2">
+                              <div v-for="review in tripReviews" :key="review.id" class="border-b pb-4 flex flex-col">
+                                <div class="flex items-center">
+                                  <img :src="review.account_avatar || 'https://via.placeholder.com/40'"
+                                    class="w-8 h-8 rounded-full mr-2 object-cover" alt="Avatar" />
+                                  <p class="text-base font-semibold">{{ review.account_name }}</p>
+                                  <span class="text-xs text-gray-500 ml-2">
+                                    {{ dayjs(review.created_at).format('DD/MM/YYYY') }}
+                                  </span>
+                                </div>
+                                <div class="w-content pl-12">
+                                  <el-rate :model-value="review.rating" disabled />
+                                  <p class="text-gray-700">{{ review.desc }}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </el-tab-pane>
+                  </el-tabs>
+                </template>
+              </el-drawer>
 
               <!-- Các chuyến xe -->
               <div v-if="connectedTrips.length > 0" class="mt-8">
