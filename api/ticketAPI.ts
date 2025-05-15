@@ -99,4 +99,21 @@ export const getTicketByAccountIdAPI = async (
   }
 }
 
+export const abortTicketOnPlatformAPI = async (
+  id: number
+): Promise<ApiResponse<void>> => {
+  const config = useRuntimeConfig();
+  const API_GATEWAY_URL = config.public.apiGatewayUrl;
+  try {
+    return await $fetch<ApiResponse<void>>(
+      `${API_GATEWAY_URL}/v2/ticket/abort-ticket-on-platform/${id}`,
+      {
+        method: "PUT",
+      }
+    );
+  } catch (error) {
+    console.error("Error aborting ticket:", error);
+    throw error;
+  }
+}
 
