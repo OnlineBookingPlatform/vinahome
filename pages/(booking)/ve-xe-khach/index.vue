@@ -1345,7 +1345,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                 </div>
               </div>
 
-              <!-- Drawer hiển thị bộ lọc trên mobile -->
+              <!-- Drawer hiển thị chi tiết chuyến xe trên mobile -->
               <el-drawer v-model="drawerVisible" direction="btt" size="80%" title="Thông tin chuyến">
                 <template v-if="selectedTripId">
                   <el-tabs v-model="activeTabs[selectedTripId]" class="demo-tabs relative z-0"
