@@ -74,7 +74,7 @@ const fetchDiscountsByAccountId = async () => {
   try {
     if (userStore.userData?.id) {
       console.log("Lấy mã giảm giá cho userId:", userStore.userData.id);
-      const response = await getDiscountsByUserPurchase('67e0ff57e4ac1f541884f17d');
+      const response = await getDiscountsByUserPurchase(userStore.userData.id);
       discountData.value = response.result;
       console.log("Mã giảm giá lấy được:", response);
     } else {
