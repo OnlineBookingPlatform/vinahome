@@ -8,6 +8,7 @@ import {
   Minus,
   Search,
   CaretRight,
+  Filter
 } from "@element-plus/icons-vue";
 import {
   type DetailTripType,
@@ -59,6 +60,8 @@ const connectedTrips = ref<ConnectedTripType[]>([]);
 const allTrips = ref<DTO_RP_TripInfo[]>([]);
 const selectedConnectedTrip = ref<ConnectedTripType | null>(null);
 const showConnectedTripSeatSelection = ref(false);
+const showFilterDrawer = ref(false);
+const drawerVisible = ref(false);
 
 // Review data
 const tripReviews = ref<any[]>([]);
@@ -205,12 +208,30 @@ const getTripRating = (tripId: number): number => {
   return rating?.averageRating || valuePoint.value;
 };
 
-// Modified openTrip function to also fetch rating
-const openTrip = async (tripId: number) => {
-  if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
-    selectedTicket.value = [];
+// Modify the closeTrip function to clear all data related to a trip
+const closeTrip = (tripId: number) => {
+  activeTabs.value[tripId] = null;
+  
+  // Only reset selectedTripId if we're closing the currently selected trip
+  if (selectedTripId.value === tripId) {
+    selectedTripId.value = null;
+    tripDetail.value = null;
     activeStep.value = 0;
-    activeTabs.value[String(selectedTripId.value)] = null;
+    pointStore.clearPoints();
+    selectedTicket.value = [];
+    
+    // Clear reviews data when closing a trip
+    tripReviews.value = [];
+    tripAverageRating.value = null;
+  }
+};
+
+// Modify the openTrip function to ensure proper cleanup of previous trip
+const openTrip = async (tripId: number) => {
+  // Close the previous selected trip if it's different from the current one
+  if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
+    // First close the previous trip completely
+    closeTrip(selectedTripId.value);
   }
 
   (activeTabs.value as Record<number, number | null>)[tripId] = 1;
@@ -242,35 +263,38 @@ const openTrip = async (tripId: number) => {
   }
 };
 
+// Clear trip reviews data whenever a different tab is clicked
 const handleClickTab = async (tripId: number, tab: any) => {
   console.log("Tab được chọn:", tab.props.name);
   console.log(
     "activeTabs trước khi cập nhật:",
     activeTabs.value[String(tripId)]
   );
+  
+  // If clicking the same tab, close it
   if (activeTabs.value[tripId] === tab.props.name) {
     activeTabs.value[tripId] = null;
-    selectedTripId.value = null;
     return;
   }
-  if (tab.props.name === 1) {
-    if (selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
+  
+  // Set the active tab
+  (activeTabs.value as Record<number, number | null>)[tripId] = tab.props.name;
+  
+  // Make sure this trip is selected
+  if (selectedTripId.value !== tripId) {
+    // If we're switching trips, close the previous one first
+    if (selectedTripId.value !== null) {
+      closeTrip(selectedTripId.value);
     }
+    selectedTripId.value = tripId;
+  }
+
+  // Handle different tabs
+  if (tab.props.name === 1) {
     selectedStep.value = 1;
     selectedTicket.value = [];
-
     await openTrip(tripId);
   } else if (tab.props.name === 2) {
-    if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
-    }
-
-    (activeTabs.value as Record<number, number | null>)[tripId] = 2;
-    selectedTripId.value = tripId;
-
     console.log("API response cho tab 2:");
     const responsePointUp = await getPointUpByTrip(tripId);
     if (responsePointUp.result) {
@@ -284,325 +308,17 @@ const handleClickTab = async (tripId: number, tab: any) => {
     } else {
       optionsPointDown.value = [];
     }
-  } else if (tab.props.name === 3) {
-    if (selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
-    }
+  } else if (tab.props.name === 3 || tab.props.name === 4 || tab.props.name === 5) {
     selectedStep.value = 1;
     selectedTicket.value = [];
-
-    await openTrip(tripId);
-  } else if (tab.props.name === 4) {
-    if (selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
-    }
-    selectedStep.value = 1;
-    selectedTicket.value = [];
-
-    await openTrip(tripId);
-  } else if (tab.props.name === 5) {
-    if (selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
-    }
-    selectedStep.value = 1;
-    selectedTicket.value = [];
-
-    await openTrip(tripId);
   } else if (tab.props.name === 6) {
-    if (selectedTripId.value !== tripId) {
-      selectedTicket.value = [];
-      activeStep.value = 0;
-    }
-
-    (activeTabs.value as Record<number, number | null>)[tripId] = 6;
-    selectedTripId.value = tripId;
-
-    // Fetch review data when review tab is clicked
+    // Clear reviews data before fetching new ones
+    tripReviews.value = [];
+    tripAverageRating.value = null;
     await fetchReviewData(tripId);
-  } else {
-    activeTabs.value[tripId] =
-      activeTabs.value[tripId] === tab.props.name ? null : tab.props.name;
-    selectedTripId.value = tripId;
-  }
-};
-const closeTrip = (tripId: number) => {
-  activeTabs.value[tripId] = null;
-  selectedTripId.value = null;
-  tripDetail.value = null;
-  activeStep.value = 0;
-  pointStore.clearPoints();
-  selectedTicket.value = [];
-};
-
-const getFloors = computed(() => {
-  if (!tripDetail.value) return [];
-  const floors = new Set(
-    tripDetail.value.tickets.map((ticket) => ticket.seat_floor)
-  );
-  return Array.from(floors).sort((a, b) => a - b);
-});
-
-const getRows = (floor: number) => {
-  if (!tripDetail.value) return [];
-  const rows = new Set(
-    tripDetail.value.tickets
-      .filter((ticket) => ticket.seat_floor === floor)
-      .map((ticket) => ticket.seat_row)
-  );
-  return Array.from(rows).sort((a, b) => a - b);
-};
-
-const getColumns = computed(() => {
-  if (!tripDetail.value) return [];
-  const cols = new Set(
-    tripDetail.value.tickets.map((ticket) => ticket.seat_column)
-  );
-  return Array.from(cols).sort((a, b) => a - b);
-});
-
-const getSeatName = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return "";
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-  return seat ? seat.seat_name : "";
-};
-
-const getBasePrice = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return "0 ₫";
-
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-
-  if (!seat) return "0 ₫";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    minimumFractionDigits: 0,
-  }).format(seat.base_price);
-};
-const getSeatStatus = (floor: number, row: number, col: number): boolean => {
-  if (!tripDetail.value || !tripDetail.value.tickets) return false;
-
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-
-  return seat?.status_booking_ticket ?? false;
-};
-
-const toggleSeatSelection = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return;
-
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-
-  if (!seat) return;
-
-  const index = selectedTicket.value.findIndex((s) => s.id === seat.id);
-  if (index !== -1) {
-    selectedTicket.value.splice(index, 1);
-  } else {
-    selectedTicket.value.push({
-      id: seat.id,
-      seat_name: seat.seat_name,
-      price: seat.base_price,
-    });
-  }
-  console.log("Danh sách vé đã chọn:", selectedTicket.value);
-};
-
-const totalPrice = computed(() => {
-  const total = selectedTicket.value.reduce((sum, seat) => sum + seat.price, 0);
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    minimumFractionDigits: 0,
-  }).format(total);
-});
-
-const getButtonClass = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return "";
-
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-
-  return seat && selectedTicket.value.some((s) => s.id === seat.id)
-    ? "bg-green-500 text-white"
-    : "";
-};
-const isSeatSelected = (floor: number, row: number, col: number) => {
-  if (!tripDetail.value) return false;
-  const seat = tripDetail.value.tickets.find(
-    (ticket) =>
-      ticket.seat_floor === floor &&
-      ticket.seat_row === row &&
-      ticket.seat_column === col
-  );
-  return seat && selectedTicket.value.some((s) => s.id === seat.id);
-};
-
-watch(
-  () => selectedTicket.value.length,
-  (newLength) => {
-    activeStep.value = newLength > 0 ? 1 : 0;
-  }
-);
-
-const preStep = () => {
-  selectedStep.value = 1;
-  activeStep.value = 1;
-};
-
-const fetchPointUpOptions = async () => {
-  try {
-    if (selectedTripId.value !== null) {
-      const response = await getPointUpByTrip(selectedTripId.value);
-      optionsPointUp.value = response.result || [];
-    } else {
-      console.error("selectedTripId is null");
-    }
-  } catch (error) {
-    console.error("Lỗi khi lấy thông tin điểm đón:", error);
-    ElMessage.error(
-      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
-    );
   }
 };
 
-const fetchPointDownOptions = async () => {
-  try {
-    if (selectedTripId.value !== null) {
-      const response = await getPointDownByTrip(selectedTripId.value);
-      optionsPointDown.value = response.result || [];
-    } else {
-      console.error("selectedTripId is null");
-    }
-  } catch (error) {
-    console.error("Lỗi khi lấy thông tin điểm đón:", error);
-    ElMessage.error(
-      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
-    );
-  }
-};
-watch(
-  selectedTripId,
-  async (newVal) => {
-    if (newVal !== null) {
-      await fetchPointUpOptions();
-      await fetchPointDownOptions();
-      activeStep.value = 0;
-      selectedStep.value = 1;
-    }
-  },
-  { immediate: true }
-);
-
-watch(selectedPointUpId, (newId) => {
-  if (newId !== null) {
-    const selectedPoint = optionsPointUp.value.find(p => p.id === newId) || null;
-    pointStore.setPointUp(selectedPoint);
-  }
-});
-
-watch(selectedPointDownId, (newId) => {
-  if (newId !== null) {
-    const selectedPoint = optionsPointDown.value.find(p => p.id === newId) || null;
-    pointStore.setPointDown(selectedPoint);
-  }
-});
-
-const nextStep = async () => {
-  // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
-  // selectedStep = 2 là bước chọn điểm đón/trả
-  if (selectedStep.value === 2) {
-    const selectedTrip = tripData.value.find(
-      (trip) => trip.id === selectedTripId.value
-    );
-    const bookingData: BookingData = {
-      selectedTicket: selectedTicket.value,
-      selectedTripId: selectedTripId.value ?? 0,
-      tripData: selectedTrip ?? ({} as DTO_RP_TripInfo),
-    };
-
-    if (!userStore.isLoggedIn) {
-      ElMessage.warning("Bạn cần đăng nhập để tiếp tục!");
-      return;
-    }
-    pendingTicketStore.setPendingTicket(bookingData);
-    try {
-      await changeTicketBookedAPI(selectedTicket.value);
-      router.push("/payment-method-2");
-    } catch (error) {
-      ElMessage.error("Vé đã được đặt vui lòng chọn vé khác!");
-    }
-
-    console.log("Dữ liệu bookingData:", selectedTicket.value);
-
-    console.log(
-      "Dữ liệu pendingTicketStore:",
-      pendingTicketStore.pendingTicket
-    );
-  } else {
-    // Nếu chưa phải bước 2, chuyển sang bước 2
-    // selectedStep = 1 là bước chọn ghế
-    selectedStep.value = 2;
-    activeStep.value = 2;
-  }
-};
-
-import { Filter } from '@element-plus/icons-vue'
-const showFilterDrawer = ref(false)
-const drawerVisible = ref(false);
-const openDrawerTrip = async (tripId: number) => {
-  if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
-    selectedTicket.value = [];
-    activeStep.value = 0;
-    activeTabs.value[String(selectedTripId.value)] = null;
-  }
-
-  (activeTabs.value as Record<number, number | null>)[tripId] = 1;
-  selectedTripId.value = tripId;
-
-  // Reset point chọn
-  valuePointUp.value = null;
-  valuePointDown.value = null;
-  selectedPointUpId.value = null;
-  selectedPointDownId.value = null;
-  pointStore.clearPoints();
-  activeStep.value = 0;
-
-  const response = await getTripDetail(tripId);
-  if (response.result) {
-    tripDetail.value = response.result;
-    console.log("API response:", tripDetail.value);
-  }
-
-  drawerVisible.value = true; // mở drawer
-};
-
-// Thêm hàm xử lý cho việc đặt vé chuyến nối
 const handleConnectedTrip = (connectedTrip: ConnectedTripType) => {
   ElMessage.info({
     message: 'Tính năng đặt vé cho chuyến nối đang được phát triển. Vui lòng đặt riêng từng chuyến.',
@@ -719,8 +435,12 @@ watchEffect(() => {
   tripData.value = filteredTrips;
 });
 
-// Fetch review data
+// Update the fetchReviewData to ensure it's only fetching for the current trip
 const fetchReviewData = async (tripId: number) => {
+  if (selectedTripId.value !== tripId) {
+    return; // Don't fetch if this isn't the selected trip
+  }
+  
   reviewLoading.value = true;
   try {
     const [averageResponse, reviewsResponse] = await Promise.all([
@@ -728,13 +448,16 @@ const fetchReviewData = async (tripId: number) => {
       getEvaluatesByTripIdAPI(tripId)
     ]);
 
-    if (averageResponse?.result) {
-      tripAverageRating.value = averageResponse.result;
-      tripRatings.value.set(tripId, averageResponse.result);
-    }
+    // Only update if this is still the selected trip
+    if (selectedTripId.value === tripId) {
+      if (averageResponse?.result) {
+        tripAverageRating.value = averageResponse.result;
+        tripRatings.value.set(tripId, averageResponse.result);
+      }
 
-    if (reviewsResponse?.result) {
-      tripReviews.value = reviewsResponse.result;
+      if (reviewsResponse?.result) {
+        tripReviews.value = reviewsResponse.result;
+      }
     }
   } catch (error) {
     console.error("Error fetching review data:", error);
@@ -781,6 +504,271 @@ const submitReview = async () => {
   }
 };
 
+const getFloors = computed(() => {
+  if (!tripDetail.value) return [];
+  const floors = new Set(
+    tripDetail.value.tickets.map((ticket) => ticket.seat_floor)
+  );
+  return Array.from(floors).sort((a, b) => a - b);
+});
+
+const getRows = (floor: number) => {
+  if (!tripDetail.value) return [];
+  const rows = new Set(
+    tripDetail.value.tickets
+      .filter((ticket) => ticket.seat_floor === floor)
+      .map((ticket) => ticket.seat_row)
+  );
+  return Array.from(rows).sort((a, b) => a - b);
+};
+
+const getColumns = computed(() => {
+  if (!tripDetail.value) return [];
+  const cols = new Set(
+    tripDetail.value.tickets.map((ticket) => ticket.seat_column)
+  );
+  return Array.from(cols).sort((a, b) => a - b);
+});
+
+const getSeatName = (floor: number, row: number, col: number) => {
+  if (!tripDetail.value) return "";
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+  return seat ? seat.seat_name : "";
+};
+
+const getBasePrice = (floor: number, row: number, col: number) => {
+  if (!tripDetail.value) return "0 ₫";
+
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+
+  if (!seat) return "0 ₫";
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  }).format(seat.base_price);
+};
+
+const getSeatStatus = (floor: number, row: number, col: number): boolean => {
+  if (!tripDetail.value || !tripDetail.value.tickets) return false;
+
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+
+  return seat?.status_booking_ticket ?? false;
+};
+
+const toggleSeatSelection = (floor: number, row: number, col: number) => {
+  if (!tripDetail.value) return;
+
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+
+  if (!seat) return;
+
+  const index = selectedTicket.value.findIndex((s) => s.id === seat.id);
+  if (index !== -1) {
+    selectedTicket.value.splice(index, 1);
+  } else {
+    selectedTicket.value.push({
+      id: seat.id,
+      seat_name: seat.seat_name,
+      price: seat.base_price,
+    });
+  }
+  console.log("Danh sách vé đã chọn:", selectedTicket.value);
+};
+
+const totalPrice = computed(() => {
+  const total = selectedTicket.value.reduce((sum, seat) => sum + seat.price, 0);
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  }).format(total);
+});
+
+const getButtonClass = (floor: number, row: number, col: number) => {
+  if (!tripDetail.value) return "";
+
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+
+  return seat && selectedTicket.value.some((s) => s.id === seat.id)
+    ? "bg-green-500 text-white"
+    : "";
+};
+
+const isSeatSelected = (floor: number, row: number, col: number) => {
+  if (!tripDetail.value) return false;
+  const seat = tripDetail.value.tickets.find(
+    (ticket) =>
+      ticket.seat_floor === floor &&
+      ticket.seat_row === row &&
+      ticket.seat_column === col
+  );
+  return seat && selectedTicket.value.some((s) => s.id === seat.id);
+};
+
+watch(
+  () => selectedTicket.value.length,
+  (newLength) => {
+    activeStep.value = newLength > 0 ? 1 : 0;
+  }
+);
+
+const preStep = () => {
+  selectedStep.value = 1;
+  activeStep.value = 1;
+};
+
+const fetchPointUpOptions = async () => {
+  try {
+    if (selectedTripId.value !== null) {
+      const response = await getPointUpByTrip(selectedTripId.value);
+      optionsPointUp.value = response.result || [];
+    } else {
+      console.error("selectedTripId is null");
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin điểm đón:", error);
+    ElMessage.error(
+      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
+    );
+  }
+};
+
+const fetchPointDownOptions = async () => {
+  try {
+    if (selectedTripId.value !== null) {
+      const response = await getPointDownByTrip(selectedTripId.value);
+      optionsPointDown.value = response.result || [];
+    } else {
+      console.error("selectedTripId is null");
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin điểm đón:", error);
+    ElMessage.error(
+      "Có lỗi xảy ra khi lấy thông tin điểm đón. Vui lòng thử lại sau."
+    );
+  }
+};
+
+watch(
+  selectedTripId,
+  async (newVal) => {
+    if (newVal !== null) {
+      await fetchPointUpOptions();
+      await fetchPointDownOptions();
+      activeStep.value = 0;
+      selectedStep.value = 1;
+    }
+  },
+  { immediate: true }
+);
+
+watch(selectedPointUpId, (newId) => {
+  if (newId !== null) {
+    const selectedPoint = optionsPointUp.value.find(p => p.id === newId) || null;
+    pointStore.setPointUp(selectedPoint);
+  }
+});
+
+watch(selectedPointDownId, (newId) => {
+  if (newId !== null) {
+    const selectedPoint = optionsPointDown.value.find(p => p.id === newId) || null;
+    pointStore.setPointDown(selectedPoint);
+  }
+});
+
+const nextStep = async () => {
+  // Kiểm tra nếu bước hiện tại (selectedStep) đã là bước 2
+  // selectedStep = 2 là bước chọn điểm đón/trả
+  if (selectedStep.value === 2) {
+    const selectedTrip = tripData.value.find(
+      (trip) => trip.id === selectedTripId.value
+    );
+    const bookingData: BookingData = {
+      selectedTicket: selectedTicket.value,
+      selectedTripId: selectedTripId.value ?? 0,
+      tripData: selectedTrip ?? ({} as DTO_RP_TripInfo),
+    };
+
+    if (!userStore.isLoggedIn) {
+      ElMessage.warning("Bạn cần đăng nhập để tiếp tục!");
+      return;
+    }
+    pendingTicketStore.setPendingTicket(bookingData);
+    try {
+      await changeTicketBookedAPI(selectedTicket.value);
+      router.push("/payment-method-2");
+    } catch (error) {
+      ElMessage.error("Vé đã được đặt vui lòng chọn vé khác!");
+    }
+
+    console.log("Dữ liệu bookingData:", selectedTicket.value);
+
+    console.log(
+      "Dữ liệu pendingTicketStore:",
+      pendingTicketStore.pendingTicket
+    );
+  } else {
+    // Nếu chưa phải bước 2, chuyển sang bước 2
+    // selectedStep = 1 là bước chọn ghế
+    selectedStep.value = 2;
+    activeStep.value = 2;
+  }
+};
+
+// Add openDrawerTrip function
+const openDrawerTrip = async (tripId: number) => {
+  // Close the previous selected trip if it's different from the current one
+  if (selectedTripId.value !== null && selectedTripId.value !== tripId) {
+    // First close the previous trip completely
+    closeTrip(selectedTripId.value);
+  }
+
+  (activeTabs.value as Record<number, number | null>)[tripId] = 1;
+  selectedTripId.value = tripId;
+
+  // Reset point chọn
+  valuePointUp.value = null;
+  valuePointDown.value = null;
+  selectedPointUpId.value = null;
+  selectedPointDownId.value = null;
+  pointStore.clearPoints();
+  activeStep.value = 0;
+
+  const response = await getTripDetail(tripId);
+  if (response.result) {
+    tripDetail.value = response.result;
+    console.log("API response:", tripDetail.value);
+  }
+
+  drawerVisible.value = true; // mở drawer
+};
 </script>
 
 <template>
