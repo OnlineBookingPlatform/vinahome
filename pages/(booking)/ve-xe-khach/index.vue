@@ -85,6 +85,26 @@ const filterTime = ref<string[]>([])
 // Add a map to store trip ratings
 const tripRatings = ref(new Map<number, any>());
 
+// After existing refs in the script
+const filterRating = ref(0);
+
+// Add a computed property to check if any filters are active
+const hasActiveFilters = computed(() => {
+  return filterTime.value.length > 0 || filterCompanies.value.length > 0 || filterRating.value > 0;
+});
+
+// Add a method to clear all filters
+const clearAllFilters = () => {
+  filterTime.value = [];
+  filterCompanies.value = [];
+  filterRating.value = 0;
+};
+
+// Add a method to clear just the rating filter
+const clearRatingFilter = () => {
+  filterRating.value = 0;
+};
+
 const fetchTrips = async () => {
   const { departureId, destinationId, departureDate, numberOfTickets } = route.query;
 
@@ -668,10 +688,11 @@ watch(
 
 // Lọc data theo thời gian khởi hành
 watchEffect(() => {
-  if (filterTime.value.length === 0) {
-    tripData.value = allTrips.value;
-  } else {
-    tripData.value = allTrips.value.filter(trip => {
+  let filteredTrips = allTrips.value;
+  
+  // Apply time filter if selected
+  if (filterTime.value.length > 0) {
+    filteredTrips = filteredTrips.filter(trip => {
       const hour = dayjs(trip.time_departure, 'HH:mm:ss').hour();
       return filterTime.value.some(range => {
         const [start, end] = range.split('-').map(Number);
@@ -679,6 +700,23 @@ watchEffect(() => {
       });
     });
   }
+  
+  // Apply company filter if selected
+  if (filterCompanies.value.length > 0) {
+    filteredTrips = filteredTrips.filter(trip => 
+      filterCompanies.value.includes(trip.company.id)
+    );
+  }
+  
+  // Apply rating filter if set
+  if (filterRating.value > 0) {
+    filteredTrips = filteredTrips.filter(trip => {
+      const rating = tripRatings.value.get(trip.id);
+      return rating && rating.averageRating >= filterRating.value;
+    });
+  }
+  
+  tripData.value = filteredTrips;
 });
 
 // Fetch review data
@@ -759,7 +797,7 @@ const submitReview = async () => {
         <div class="w-full md:w-[300px] bg-white rounded-2xl p-4 shadow-md h-min [@media(max-width:450px)]:hidden">
           <div class="flex justify-between items-center mb-5">
             <h2 class="text-base">BỘ LỌC TÌM KIẾM</h2>
-            <el-button type="danger" text>
+            <el-button type="danger" text @click="clearAllFilters" v-if="hasActiveFilters">
               Bỏ lọc <el-icon class="el-icon--right">
                 <Delete />
               </el-icon>
@@ -818,9 +856,17 @@ const submitReview = async () => {
             <el-collapse-item name="5">
               <template #title>
                 <span class="font-semibold text-lg"> Đánh giá </span>
+                <span v-if="filterRating > 0" class="ml-2 text-blue-500 text-sm">
+                  ({{ filterRating }} sao trở lên)
+                </span>
               </template>
               <div class="flex flex-col px-4">
-                <el-rate size="large" />
+                <div class="flex items-center justify-between">
+                  <el-rate size="large" v-model="filterRating" />
+                  <el-button v-if="filterRating > 0" type="text" class="text-red-500" @click="clearRatingFilter">
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
+                </div>
               </div>
             </el-collapse-item>
           </el-collapse>
@@ -841,7 +887,7 @@ const submitReview = async () => {
           <div class="p-4 bg-white rounded-2xl">
             <div class="flex justify-between items-center mb-5">
               <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
-              <el-button type="danger" text>
+              <el-button type="danger" text @click="clearAllFilters" v-if="hasActiveFilters">
                 Bỏ lọc
                 <el-icon class="el-icon--right">
                   <Delete />
@@ -886,9 +932,19 @@ const submitReview = async () => {
                 </div>
               </el-collapse-item>
               <el-collapse-item name="5">
-                <template #title><span class="font-semibold text-lg"> Đánh giá </span></template>
+                <template #title>
+                  <span class="font-semibold text-lg"> Đánh giá </span>
+                  <span v-if="filterRating > 0" class="ml-2 text-blue-500 text-sm">
+                    ({{ filterRating }} sao trở lên)
+                  </span>
+                </template>
                 <div class="flex flex-col px-4">
-                  <el-rate size="large" />
+                  <div class="flex items-center justify-between">
+                    <el-rate size="large" v-model="filterRating" />
+                    <el-button v-if="filterRating > 0" type="text" class="text-red-500" @click="clearRatingFilter">
+                      <el-icon><Delete /></el-icon>
+                    </el-button>
+                  </div>
                 </div>
               </el-collapse-item>
             </el-collapse>
