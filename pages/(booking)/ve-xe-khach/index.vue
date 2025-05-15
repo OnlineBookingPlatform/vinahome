@@ -189,11 +189,11 @@ const fetchReviewData = async (tripId: number) => {
       getEvaluatesAverageAPI(tripId),
       getEvaluatesByTripIdAPI(tripId)
     ]);
-    
+
     if (averageResponse?.result) {
       tripAverageRating.value = averageResponse.result;
     }
-    
+
     if (reviewsResponse?.result) {
       tripReviews.value = reviewsResponse.result;
     }
@@ -211,12 +211,12 @@ const submitReview = async () => {
     ElMessage.warning("Bạn cần đăng nhập để gửi đánh giá!");
     return;
   }
-  
+
   if (!selectedTripId.value) {
     ElMessage.warning("Không tìm thấy thông tin chuyến xe");
     return;
   }
-  
+
   try {
     const reviewData = {
       trip_id: selectedTripId.value,
@@ -224,11 +224,11 @@ const submitReview = async () => {
       desc: userReview.value,
       rating: userRating.value
     };
-    
+
     await createEvaluateAPI(reviewData);
     ElMessage.success("Đánh giá của bạn đã được gửi thành công!");
     userReview.value = '';
-    
+
     // Refresh review data
     await fetchReviewData(selectedTripId.value);
   } catch (error) {
@@ -336,10 +336,10 @@ const handleClickTab = async (tripId: number, tab: any) => {
       selectedTicket.value = [];
       activeStep.value = 0;
     }
-    
+
     (activeTabs.value as Record<number, number | null>)[tripId] = 6;
     selectedTripId.value = tripId;
-    
+
     // Fetch review data when review tab is clicked
     await fetchReviewData(tripId);
   } else {
@@ -707,7 +707,7 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
       <!-- Phần lọc và kết quả tìm kiếm -->
       <div class="mt-5 mx-2 md:mx-0 flex flex-col md:flex-row gap-4">
         <!-- Phần bộ lọc -->
-        <div class="w-full md:w-[300px] bg-white rounded-2xl p-4 shadow-md h-min">
+        <div class="w-full md:w-[300px] bg-white rounded-2xl p-4 shadow-md h-min [@media(max-width:450px)]:hidden">
           <div class="flex justify-between items-center mb-5">
             <h2 class="text-base">BỘ LỌC TÌM KIẾM</h2>
             <el-button type="danger" text>
@@ -776,6 +776,74 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
             </el-collapse-item>
           </el-collapse>
         </div>
+
+        <!-- Nút lọc trên mobile -->
+        <div class="sm:hidden mb-4">
+          <el-button type="primary" @click="showFilterDrawer = true">
+            <el-icon>
+              <Filter />
+            </el-icon>
+            Bộ lọc
+          </el-button>
+        </div>
+        <!-- Drawer hiển thị bộ lọc trên mobile -->
+        <el-drawer v-model="showFilterDrawer" direction="btt" size="50%" :with-header="false">
+          <div class="p-4 bg-white rounded-2xl">
+            <div class="flex justify-between items-center mb-5">
+              <h2 class="text-lg">BỘ LỌC TÌM KIẾM</h2>
+              <el-button type="danger" text>
+                Bỏ lọc
+                <el-icon class="el-icon--right">
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </div>
+            <el-collapse accordion>
+              <el-collapse-item name="1">
+                <template #title><span class="font-semibold text-lg"> Giờ đi </span></template>
+                <div>
+                  <el-checkbox-group v-model="filterTime" class="flex flex-col px-4">
+                    <el-checkbox label="00:00 - 06:00" :value="'0-6'" size="large" />
+                    <el-checkbox label="06:00 - 12:00" :value="'6-12'" size="large" />
+                    <el-checkbox label="12:00 - 18:00" :value="'12-18'" size="large" />
+                    <el-checkbox label="18:00 - 24:00" :value="'18-24'" size="large" />
+                  </el-checkbox-group>
+                </div>
+              </el-collapse-item>
+              <el-collapse-item name="2">
+                <template #title><span class="font-semibold text-lg"> Nhà xe </span></template>
+                <div>
+                  <el-checkbox-group class="flex flex-col px-4" v-model="filterCompanies">
+                    <el-checkbox v-for="company in uniqueCompanies" :key="company.id" :label="company.company.name"
+                      :value="company.id" size="large" />
+                  </el-checkbox-group>
+                </div>
+              </el-collapse-item>
+              <el-collapse-item name="3">
+                <template #title><span class="font-semibold text-lg"> Giá vé </span></template>
+                <div class="px-4"><el-slider /></div>
+              </el-collapse-item>
+              <el-collapse-item name="4">
+                <template #title><span class="font-semibold text-lg"> Loại xe </span></template>
+                <div>
+                  <el-checkbox-group class="flex flex-col px-4">
+                    <el-checkbox label="Ghế ngồi" :value="'0-6'" size="large" />
+                    <el-checkbox label="Ghế ngồi limousine" :value="'6-12'" size="large" />
+                    <el-checkbox label="Giường nằm" :value="'12-18'" size="large" />
+                    <el-checkbox label="Giường nằm limousine" :value="'18-24'" size="large" />
+                    <el-checkbox label="Phòng VIP (Cabin)" :value="'18-24'" size="large" />
+                  </el-checkbox-group>
+                </div>
+              </el-collapse-item>
+              <el-collapse-item name="5">
+                <template #title><span class="font-semibold text-lg"> Đánh giá </span></template>
+                <div class="flex flex-col px-4">
+                  <el-rate size="large" />
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </el-drawer>
 
         <!-- Kết quả tìm kiếm -->
         <div class="w-full">
@@ -1001,8 +1069,8 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                                             " @click="
                                               toggleSeatSelection(floor, row, col)
                                               ">{{
-                                              getSeatName(floor, row, col)
-                                            }}</el-button>
+                                                getSeatName(floor, row, col)
+                                              }}</el-button>
                                       </el-tooltip>
                                     </div>
                                   </div>
@@ -1174,11 +1242,14 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                             <div class="flex items-center justify-between">
                               <div>
                                 <h3 class="text-lg font-semibold">Đánh giá tổng quan</h3>
-                                <p class="text-gray-600">Tổng số: {{ tripAverageRating?.totalReviews || 0 }} đánh giá</p>
+                                <p class="text-gray-600">Tổng số: {{ tripAverageRating?.totalReviews || 0 }} đánh giá
+                                </p>
                               </div>
                               <div class="text-right">
                                 <div class="flex items-center">
-                                  <span class="text-2xl font-bold mr-2">{{ tripAverageRating?.averageRating?.toFixed(1) || 0 }}</span>
+                                  <span class="text-2xl font-bold mr-2">{{ tripAverageRating?.averageRating?.toFixed(1)
+                                    || 0
+                                    }}</span>
                                   <el-rate :model-value="tripAverageRating?.averageRating || 0" disabled show-score />
                                 </div>
                               </div>
@@ -1188,19 +1259,16 @@ const handleConnectedTripProceed = (firstTripTickets: SelectedTicket[], secondTr
                           <!-- List of reviews -->
                           <div class="border-t pt-4">
                             <h3 class="text-lg font-semibold mb-4">Tất cả đánh giá</h3>
-                            
+
                             <div v-if="tripReviews.length === 0" class="text-center p-8 text-gray-500">
                               Chưa có đánh giá nào cho chuyến xe này
                             </div>
-                            
+
                             <div v-else class="space-y-2">
                               <div v-for="review in tripReviews" :key="review.id" class="border-b pb-4 flex flex-col">
                                 <div class="flex items-center">
-                                  <img 
-                                    :src="review.account_avatar || 'https://via.placeholder.com/40'" 
-                                    class="w-8 h-8 rounded-full mr-2 object-cover"
-                                    alt="Avatar"
-                                  />
+                                  <img :src="review.account_avatar || 'https://via.placeholder.com/40'"
+                                    class="w-8 h-8 rounded-full mr-2 object-cover" alt="Avatar" />
                                   <p class="text-base font-semibold">{{ review.account_name }}</p>
                                   <span class="text-xs text-gray-500 ml-2">
                                     {{ dayjs(review.created_at).format('DD/MM/YYYY') }}
