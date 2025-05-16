@@ -25,7 +25,7 @@ import {
   getTripOnPlatform,
   findConnectedTrips
 } from "~/api/tripAPI";
-import { getEvaluatesAverageAPI, getEvaluatesByTripIdAPI, createEvaluateAPI } from "~/api/evaluateAPI";
+import { getEvaluatesAverageByCompanyIdAPI, getEvaluatesByCompanyIdAPI, createEvaluateAPI } from "~/api/evaluateAPI";
 import { useRoute, useRouter } from "vue-router";
 import type { SelectedTicket } from "~/types/TicketType";
 import type { BookingData, ConnectedTripWithTickets } from "~/types/PendingType";
@@ -189,7 +189,7 @@ const fetchTrips = async () => {
 // Function to fetch average ratings for all trips
 const fetchAverageRatingsForTrips = async (trips: DTO_RP_TripInfo[]) => {
   try {
-    const ratingPromises = trips.map(trip => getEvaluatesAverageAPI(trip.id));
+    const ratingPromises = trips.map(trip => getEvaluatesAverageByCompanyIdAPI(trip.company.id));
     const ratingResponses = await Promise.all(ratingPromises);
     
     ratingResponses.forEach((response, index) => {
@@ -252,10 +252,15 @@ const openTrip = async (tripId: number) => {
     
     // Fetch rating when opening a trip
     try {
-      const ratingResponse = await getEvaluatesAverageAPI(tripId);
-      if (ratingResponse?.result) {
-        tripAverageRating.value = ratingResponse.result;
-        tripRatings.value.set(tripId, ratingResponse.result);
+      // Get the company ID from tripData, not from tripDetail
+      const selectedTrip = tripData.value.find(trip => trip.id === tripId);
+      const companyId = selectedTrip?.company?.id;
+      if (companyId) {
+        const ratingResponse = await getEvaluatesAverageByCompanyIdAPI(companyId);
+        if (ratingResponse?.result) {
+          tripAverageRating.value = ratingResponse.result;
+          tripRatings.value.set(tripId, ratingResponse.result);
+        }
       }
     } catch (error) {
       console.error("Error fetching trip rating:", error);
@@ -443,9 +448,17 @@ const fetchReviewData = async (tripId: number) => {
   
   reviewLoading.value = true;
   try {
+    // Get company ID from tripData, not from tripDetail
+    const selectedTrip = tripData.value.find(trip => trip.id === tripId);
+    const companyId = selectedTrip?.company?.id;
+    if (!companyId) {
+      console.error("Company ID not found for trip:", tripId);
+      return;
+    }
+
     const [averageResponse, reviewsResponse] = await Promise.all([
-      getEvaluatesAverageAPI(tripId),
-      getEvaluatesByTripIdAPI(tripId)
+      getEvaluatesAverageByCompanyIdAPI(companyId),
+      getEvaluatesByCompanyIdAPI(companyId)
     ]);
 
     // Only update if this is still the selected trip
@@ -480,17 +493,21 @@ const submitReview = async () => {
   }
 
   try {
+    // Get company ID from tripData, not from tripDetail
+    const selectedTrip = tripData.value.find(trip => trip.id === selectedTripId.value);
+    const companyId = selectedTrip?.company?.id;
+    if (!companyId) {
+      ElMessage.warning("Không tìm thấy thông tin công ty");
+      return;
+    }
+
     // Fix type errors in reviewData
     const reviewData: any = {
       trip_id: selectedTripId.value,
       desc: userReview.value,
-      rating: userRating.value
+      rating: userRating.value,
+      company_id: companyId
     };
-    
-    // Add company_id only if it exists to avoid type errors
-    if (tripDetail.value && 'company' in tripDetail.value) {
-      reviewData.company_id = (tripDetail.value as any).company?.id;
-    }
 
     await createEvaluateAPI(reviewData);
     ElMessage.success("Đánh giá của bạn đã được gửi thành công!");

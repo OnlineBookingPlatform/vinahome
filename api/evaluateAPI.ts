@@ -15,28 +15,28 @@ export const createEvaluateAPI = async (data: EvaluateType): Promise<ApiResponse
   }
 }
 
-export const getEvaluatesAverageAPI = async (tripId: number): Promise<ApiResponse<any>> => {
+export const getEvaluatesAverageByCompanyIdAPI = async (companyId: number): Promise<ApiResponse<any>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
-    return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/evaluate/get-evaluates-average/${tripId}`, {
+    return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/evaluate/get-evaluates-average-by-company-id/${companyId}`, {
       method: "GET",
     });
   } catch (error) {
-    console.error("Get evaluates average: ", error);
+    console.error("Get evaluates average by company id: ", error);
     throw error;
   }
 }
 
-export const getEvaluatesByTripIdAPI = async (tripId: number): Promise<ApiResponse<any>> => {
+export const getEvaluatesByCompanyIdAPI = async (companyId: number): Promise<ApiResponse<any>> => {
   const config = useRuntimeConfig();
   const API_GATEWAY_URL = config.public.apiGatewayUrl;
   try {
-    return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/evaluate/get-evaluates-by-trip-id/${tripId}`, {
+    return await $fetch<ApiResponse<any>>(`${API_GATEWAY_URL}/v2/evaluate/get-evaluates-by-company-id/${companyId}`, {
       method: "GET",
     });
   } catch (error) {
-    console.error("Get evaluates by trip id: ", error);
+    console.error("Get evaluates by company id: ", error);
     throw error;
   }
 }
